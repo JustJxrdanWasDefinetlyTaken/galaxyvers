@@ -15,7 +15,7 @@ const games = [
 
 const apps = [
     { title: "YouTube", thumbnail: "https://placehold.co/512x512", url: "https://www.youtube.com" },
-    { title: "Spotify", thumbnail: "https://placehold.co/512x512", url: "https://scramjet.mercurywork.shop/scramjet/https%3A%2F%2Fopen.spotify.com%2F" },
+    { title: "Spotify", thumbnail: "https://iili.io/KViCzgV.md.png", url: "https://scramjet.mercurywork.shop/scramjet/https%3A%2F%2Fopen.spotify.com%2F" },
     { title: "Soundboard", thumbnail: "https://placehold.co/512x512", url: "https://raw.githack.com/Teerths/TimelessDevelopments/refs/heads/main/game/soundboard/index.html" }
 ];
 
