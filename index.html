@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GalaxyVerse</title>
+
+<!-- Link to external CSS -->
+<link rel="stylesheet" href="styles.css" />
+
+<!-- Google Fonts loaded in CSS via @import; alternatively can be included here -->
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100..900&display=swap" rel="stylesheet" />
+
+</head>
+<body>
+
+<!-- Navigation bar -->
+<nav class="navbar">
+    <a href="#" class="logo">GalaxyVerse</a>
+    <ul>
+        <li><a class="active" href="#" id="homeLink">Home</a></li>
+        <li><a href="#" id="gameLink">Games</a></li>
+        <li><a href="#" id="aboutLink">About</a></li>
+        <li><a href="#" id="appsLink">Apps</a></li>
+        <li><a href="#" id="contactLink">Contact</a></li>
+    </ul>
+</nav>
+
+<div class="container">
+    <div id="content-home" class="content">
+        <h1>Welcome to GalaxyVerse</h1>
+        <p>This is the homepage btw go to the games section on the top</p>
+    </div>
+
+    <div id="content-games" class="content" style="display:none;">
+        <h1>Games</h1>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search for games...">
+            <button id="searchBtn">Search</button>
+        </div>
+        <div id="game-list" class="game-grid">
+            <!-- Game cards rendered here -->
+        </div>
+    </div>
+
+    <div id="content-about" class="content" style="display:none;">
+        <h2>About</h2>
+        <p>This websites was made by </p>
+    </div>
+
+    <div id="content-apps" class="content" style="display:none;">
+        <h1>Apps</h1>
+        <div id="app-list" class="app-grid">
+            <!-- App cards rendered here -->
+        </div>
+        <button id="backToHomeApps">Back to Home</button>
+    </div>
+
+    <div id="content-contact" class="content" style="display:none;">
+        <h2>Contact Us</h2>
+        <p>Have been moved to a google form</p>
+    </div>
+
+    <div id="game-display" class="content" style="display:none;">
+        <div class="game-play-area" id="game-play-area">
+            <button class="fullscreen-btn" id="fullscreenBtn">Fullscreen</button>
+            <iframe id="game-iframe" class="game-iframe" title="Game Display"></iframe>
+        </div>
+        <br>
+        <button id="backToHomeGame">Back to Home</button>
+    </div>
+</div>
+
+<!-- External JavaScript file -->
+<script src="scripts.js"></script>
+
+</body>
+</html>
