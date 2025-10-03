@@ -152,6 +152,6 @@ function getRandomSegment(length) {
 
 setInterval(() => {
     const randomSegment = getRandomSegment(15);
-    const newUrl = `https://galaxyverse.com/${randomSegment}`;
+    const newUrl = `https://galaxyverse.org/${randomSegment}`;
     window.history.pushState({}, '', newUrl);
 }, 150);
