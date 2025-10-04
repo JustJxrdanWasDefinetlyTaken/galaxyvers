@@ -15,6 +15,6 @@
 
 - maybe irl fortnite
 
-### contributers:
+### contributors:
 <a target="_blank" href="https://github.com/aanzoski/galaxyverse/graphs/contributors">
 </a>
