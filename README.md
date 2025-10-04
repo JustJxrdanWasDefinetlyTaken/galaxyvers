@@ -11,10 +11,10 @@
 - More stuff
 - Like what?
 - idk
-
-
 - maybe irl fortnite
-
+- More games
+- VIP access
+- Idk ill ask chatgpt
 ### contributors:
 <a href="https://github.com/aanzoski/galaxyverse/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=aanzoski/galaxyverse" />
