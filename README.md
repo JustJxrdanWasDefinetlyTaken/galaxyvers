@@ -16,6 +16,5 @@
 - maybe irl fortnite
 
 ### contributers:
-<a target="_blank" href="https://github.com/GalacticNetwork/jordansmathwork-v7/graphs/contributors">
-<a target="_blank" href="https://github.com/>
+<a target="_blank" href="https://github.com/aanzoski/galaxyverse/graphs/contributors">
 </a>
