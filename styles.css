@@ -1,274 +1,252 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
 :root {
-    --bg-color: #0d1117;
-    --nav-color: #000000;
-    --accent-color: #ffffff;
-    --text-color: #ffffff;
-    --border-color: #ffffff;
+  --bg-color: #121826;
+  --nav-color: #1e2433;
+  --accent-color: #4f90ff;
+  --text-color: #e0e6f1;
+  --border-color: #38415d;
+  --hover-bg: #2a2f48;
+  --btn-bg: #3b466f;
+  --btn-hover-bg: #4f90ff;
 }
 
 body {
-    margin: 0;
-    font-family: 'Roboto', sans-serif;
-    background-color: #000;
-    color: var(--text-color);
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+  background: var(--bg-color);
+  color: var(--text-color);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .navbar {
-    background-color: var(--nav-color);
-    border-bottom: 1px solid #ffffff;
-    padding: 10px 20px;
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  background-color: var(--nav-color);
+  border-bottom: 1px solid var(--border-color);
+  padding: 12px 28px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
 .logo {
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--accent-color);
-    text-decoration: none;
-    text-transform: lowercase;
-    letter-spacing: 2px;
-    margin-right: auto;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--accent-color);
+  text-transform: lowercase;
+  letter-spacing: 3px;
+  margin-right: auto;
+  user-select: none;
+  cursor: default;
 }
 
 .navbar ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-}
-
-.navbar li {
-    margin-right: 10px;
+  list-style: none;
+  display: flex;
+  gap: 18px;
+  margin: 0;
+  padding: 0;
 }
 
 .navbar li a {
-    display: block;
-    color: var(--text-color);
-    text-align: center;
-    padding: 8px 12px;
-    text-decoration: none;
-    border-radius: 20px;
-    transition: color 0.3s ease, background-color 0.3s ease;
+  color: var(--text-color);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 24px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.navbar li a:hover {
-    background-color: #B5B5B5;
-    color: var(--accent-color);
-}
-
+.navbar li a:hover,
 .navbar li a.active {
-    background-color: #B5B5B5;
-    color: var(--nav-color);
+  background-color: var(--btn-hover-bg);
+  color: #fff;
+  box-shadow: 0 0 8px var(--btn-hover-bg);
 }
 
 .search-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    width: 100%;
+  margin: 24px auto;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  max-width: 480px;
+  width: 90%;
 }
 
 .search-container input[type="text"] {
-    padding: 8px;
-    border: 1px solid var(--border-color);
-    border-radius: 5px;
-    background-color: var(--nav-color);
-    color: var(--text-color);
-    outline: none;
+  flex-grow: 1;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background-color: var(--nav-color);
+  color: var(--text-color);
+  font-size: 16px;
+  outline-offset: 2px;
+  transition: border-color 0.3s ease;
+}
+
+.search-container input[type="text"]:focus {
+  border-color: var(--btn-hover-bg);
+  box-shadow: 0 0 6px var(--btn-hover-bg);
 }
 
 .search-container button {
-    padding: 5px 10px;
-    font-size: 14px;
-    background-color: var(--accent-color);
-    color: var(--nav-color);
-    border: none;
-    border-radius: 5px;
-    margin-left: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: none;
+  background-color: var(--btn-bg);
+  color: var(--text-color);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .search-container button:hover {
-    background-color: #777777;
+  background-color: var(--btn-hover-bg);
+  color: #fff;
 }
 
 #backToHomeApps,
 #backToHomeGame {
-    padding: 5px 10px;
-    font-size: 14px;
-    background-color: var(--accent-color);
-    color: var(--nav-color);
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-top: 15px;
+  margin-top: 20px;
+  padding: 10px 22px;
+  border-radius: 8px;
+  background-color: var(--btn-bg);
+  color: var(--text-color);
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
 }
 
 #backToHomeApps:hover,
 #backToHomeGame:hover {
-    background-color: #777777;
+  background-color: var(--btn-hover-bg);
+  color: #fff;
 }
 
 .container {
-    max-width: 1200px;
-    margin: 20px auto;
-    padding: 20px;
-    text-align: center;
+  max-width: 1200px;
+  margin: 24px auto;
+  padding: 20px;
+  text-align: center;
 }
 
-.game-grid, .app-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
+.game-grid,
+.app-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
 }
 
-.game-card {
-    position: relative;
-    width: 250px;
-    height: 250px;
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
-    cursor: pointer;
-    background-color: #000;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-}
-
-.game-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.9);
-}
-
-.game-card img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 20px;
-    pointer-events: none;
-    user-select: none;
-}
-
-.game-card h3 {
-    position: relative;
-    margin: 0;
-    padding: 10px 15px;
-    background: transparent;
-    color: #fff;
-    font-size: 1em;
-    font-weight: 700;
-    text-align: center;
-    z-index: 10;
-    border-radius: 0 0 20px 20px;
-    user-select: none;
-}
-
+.game-card,
 .app-card {
-    position: relative;
-    width: 250px;
-    height: 250px;
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
-    cursor: pointer;
-    background-color: #000;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8);
+  cursor: pointer;
+  background-color: var(--nav-color);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
 }
 
+.game-card:hover,
 .app-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 10px 20px rgba(119, 119, 119, 0.4);
+  transform: translateY(-12px);
+  box-shadow: 0 18px 40px var(--btn-hover-bg);
 }
 
+.game-card img,
 .app-card img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 20px;
-    pointer-events: none;
-    user-select: none;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 24px;
+  pointer-events: none;
+  user-select: none;
+  top: 0;
+  left: 0;
 }
 
+.game-card h3,
 .app-card h3 {
-    position: relative;
-    margin: 0;
-    padding: 10px 15px;
-    background: transparent;
-    color: #fff;
-    font-size: 1em;
-    font-weight: 700;
-    text-align: center;
-    z-index: 10;
-    border-radius: 0 0 20px 20px;
-    user-select: none;
+  position: relative;
+  margin: 0;
+  padding: 14px 20px;
+  background: rgba(0,0,0,0.6);
+  color: var(--text-color);
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-align: center;
+  border-radius: 0 0 24px 24px;
+  user-select: none;
+  z-index: 10;
 }
 
 .game-play-area {
-    background-color: #000;
-    border: 2px solid var(--accent-color);
-    border-radius: 10px;
-    padding: 10px;
-    position: relative;
+  background-color: var(--bg-color);
+  border: 2px solid var(--accent-color);
+  border-radius: 12px;
+  padding: 16px;
+  position: relative;
+  margin: 24px auto;
+  max-width: 1200px;
 }
 
 .game-iframe {
-    width: 100%;
-    height: 600px;
-    border: none;
+  width: 100%;
+  height: 600px;
+  border: none;
+  border-radius: 12px;
+  background-color: #000;
 }
 
 .fullscreen {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    z-index: 9999 !important;
-    border-radius: 0 !important;
-    padding: 0 !important;
-    background-color: #000 !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 9999 !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  background-color: var(--bg-color) !important;
 }
 
 .fullscreen iframe {
-    height: 100vh !important;
+  height: 100vh !important;
+  border-radius: 0 !important;
 }
 
 .fullscreen-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: var(--accent-color);
-    color: var(--nav-color);
-    border: none;
-    border-radius: 5px;
-    padding: 5px 10px;
-    cursor: pointer;
-    z-index: 10000;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: var(--accent-color);
+  color: var(--nav-color);
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+  z-index: 10000;
+  font-weight: 700;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
 }
 
 .fullscreen-btn:hover {
-    background-color: #777777;
-    color: #fff;
+  background-color: var(--btn-hover-bg);
+  color: #fff;
 }
