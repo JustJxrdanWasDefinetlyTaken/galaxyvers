@@ -2,7 +2,7 @@
 
 - Havent done antything to this brodie im js a babey
 - This was made for my friends tho shoutout to them
-- Also creds to Jordan hes him
+- Also creds to <a href="https://github.com/JustJxrdanWasDefinetlyTaken">Jordan</a> check out his projects hes him
 
 ### Coming soon
 - More stuff
