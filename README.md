@@ -15,6 +15,11 @@
 - More games
 - VIP access
 - Idk ill ask chatgpt
+### UPD Log
+||Oct 4 1:24 am|| 0.0.1
+- Added snow
+- Centered Navbar
+- I forgot
 ### contributors:
 <a href="https://github.com/aanzoski/galaxyverse/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=aanzoski/galaxyverse" />
