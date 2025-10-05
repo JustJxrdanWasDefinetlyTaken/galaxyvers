@@ -21,6 +21,17 @@ const apps = [
     { name: "Soundboard", image: "https://placehold.co/512x512", url: "https://raw.githack.com/Teerths/TimelessDevelopments/refs/heads/main/game/soundboard/index.html" }
 ];
 
+// Tab Cloaking Presets
+const presets = {
+  google: { title: "Google", favicon: "https://www.google.com/favicon.ico" },
+  classroom: { title: "Home", favicon: "https://ssl.gstatic.com/classroom/favicon.png" },
+  bing: { title: "Bing", favicon: "https://bing.com/favicon.ico" },
+  nearpod: { title: "Nearpod", favicon: "https://nearpod.com/favicon.ico" },
+  powerschool: { title: "PowerSchool Sign In", favicon: "https://powerschool.com/favicon.ico" },
+  edge: { title: "New Tab", favicon: "https://www.bing.com/favicon.ico" },
+  chrome: { title: "New Tab", favicon: "https://www.google.com/favicon.ico" }
+};
+
 // Debounce utility
 function debounce(func, delay = 300) {
   let timeout;
@@ -35,7 +46,6 @@ function hideAll() {
   const contents = document.querySelectorAll('.content');
   contents.forEach(c => c.style.display = 'none');
   
-  // Remove active class from all nav links
   const navLinks = document.querySelectorAll('.navbar li a');
   navLinks.forEach(link => link.classList.remove('active'));
 }
@@ -169,58 +179,246 @@ function toggleFullscreen() {
   }
 }
 
-// Homepage search bar functionality - open YouTube search in new tab
+// Homepage search bar functionality
 function homepageSearch() {
   const input = document.getElementById('homepageSearchInput');
   if (!input) return;
   const query = input.value.trim();
   if (!query) return;
-  // Encode query for URL
   const encodedQuery = encodeURIComponent(query);
   const url = `https://www.youtube.com/results?search_query=${encodedQuery}`;
   window.open(url, '_blank');
 }
 
 // Snow effect implementation
+let snowEnabled = true;
+let snowInterval;
+
 function createSnowflake() {
+  if (!snowEnabled) return;
+  
   const snowflake = document.createElement('div');
   snowflake.classList.add('snowflake');
 
-  // Random size between 2px and 6px
   const size = Math.random() * 4 + 2;
   snowflake.style.width = `${size}px`;
   snowflake.style.height = `${size}px`;
-
-  // Random horizontal start position (viewport width)
   snowflake.style.left = `${Math.random() * window.innerWidth}px`;
 
-  // Animation duration between 5s and 15s
   const fallDuration = Math.random() * 10 + 5;
   snowflake.style.animationDuration = `${fallDuration}s`;
-
-  // Random delay so snowflakes don't fall all at once
   snowflake.style.animationDelay = `${Math.random() * 15}s`;
-
-  // Random opacity between 0.3 and 0.8
   snowflake.style.opacity = (Math.random() * 0.5 + 0.3).toFixed(2);
 
   const snowContainer = document.getElementById('snow-container');
   if (snowContainer) {
     snowContainer.appendChild(snowflake);
 
-    // Remove snowflake after animation completes
     setTimeout(() => {
       snowflake.remove();
     }, (fallDuration + 15) * 1000);
   }
 }
 
-// Continuously create snowflakes
-setInterval(createSnowflake, 200);
+function startSnow() {
+  if (snowInterval) return;
+  snowEnabled = true;
+  snowInterval = setInterval(createSnowflake, 200);
+}
+
+function stopSnow() {
+  snowEnabled = false;
+  if (snowInterval) {
+    clearInterval(snowInterval);
+    snowInterval = null;
+  }
+  const snowContainer = document.getElementById('snow-container');
+  if (snowContainer) {
+    snowContainer.innerHTML = '';
+  }
+}
+
+// Settings Modal Functions
+function applyTabCloaking(title, favicon) {
+  if (title) {
+    document.title = title;
+    localStorage.setItem('TabCloak_Title', title);
+  }
+  if (favicon) {
+    let link = document.querySelector("link[rel~='icon']");
+    if (!link) {
+      link = document.createElement('link');
+      link.rel = 'icon';
+      document.head.appendChild(link);
+    }
+    link.href = favicon;
+    localStorage.setItem('TabCloak_Favicon', favicon);
+  }
+}
+
+function loadSettings() {
+  const savedTitle = localStorage.getItem('TabCloak_Title');
+  const savedFavicon = localStorage.getItem('TabCloak_Favicon');
+  const savedSnow = localStorage.getItem('snowEffect');
+  const savedHotkey = localStorage.getItem('hotkey') || '`';
+  const savedRedirect = localStorage.getItem('redirectURL') || 'https://google.com';
+  const savedAboutBlank = localStorage.getItem('aboutBlank');
+
+  if (savedTitle) {
+    document.title = savedTitle;
+    document.getElementById('customTitle').value = savedTitle;
+  }
+  
+  if (savedFavicon) {
+    let link = document.querySelector("link[rel~='icon']");
+    if (!link) {
+      link = document.createElement('link');
+      link.rel = 'icon';
+      document.head.appendChild(link);
+    }
+    link.href = savedFavicon;
+    document.getElementById('customFavicon').value = savedFavicon;
+  }
+
+  if (savedSnow === 'disabled') {
+    snowEnabled = false;
+    document.getElementById('snowToggle').checked = false;
+    stopSnow();
+  } else {
+    startSnow();
+  }
+
+  document.getElementById('hotkey-input').value = savedHotkey;
+  document.getElementById('redirect-url-input').value = savedRedirect;
+
+  if (savedAboutBlank === null || savedAboutBlank === 'enabled') {
+    document.getElementById('aboutBlankToggle').checked = true;
+  } else {
+    document.getElementById('aboutBlankToggle').checked = false;
+  }
+}
 
 // Initialize on page load
 window.onload = () => {
+  loadSettings();
   showHome();
+
+  // Modal elements
+  const modal = document.getElementById('settingsModal');
+  const settingsBtn = document.getElementById('settingsBtn');
+  const closeBtn = document.querySelector('.close');
+
+  // Open settings modal
+  settingsBtn.onclick = () => {
+    modal.style.display = 'block';
+  };
+
+  // Close modal
+  closeBtn.onclick = () => {
+    modal.style.display = 'none';
+  };
+
+  // Close modal when clicking outside
+  window.onclick = (e) => {
+    if (e.target === modal) {
+      modal.style.display = 'none';
+    }
+  };
+
+  // Tab Cloaking - Apply button
+  document.getElementById('applyBtn').addEventListener('click', () => {
+    const title = document.getElementById('customTitle').value;
+    const favicon = document.getElementById('customFavicon').value;
+    applyTabCloaking(title, favicon);
+    alert('Tab cloaking applied!');
+  });
+
+  // Tab Cloaking - Reset button
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    localStorage.removeItem('TabCloak_Title');
+    localStorage.removeItem('TabCloak_Favicon');
+    document.title = 'GalaxyVerse';
+    let link = document.querySelector("link[rel~='icon']");
+    if (link) link.href = '';
+    document.getElementById('customTitle').value = '';
+    document.getElementById('customFavicon').value = '';
+    document.getElementById('presetSelect').value = '';
+    alert('Tab cloaking reset!');
+  });
+
+  // Tab Cloaking - Preset selector
+  document.getElementById('presetSelect').addEventListener('change', (e) => {
+    const selected = presets[e.target.value];
+    if (selected) {
+      document.getElementById('customTitle').value = selected.title;
+      document.getElementById('customFavicon').value = selected.favicon;
+      applyTabCloaking(selected.title, selected.favicon);
+    }
+  });
+
+  // Snow toggle
+  document.getElementById('snowToggle').addEventListener('change', (e) => {
+    if (e.target.checked) {
+      localStorage.setItem('snowEffect', 'enabled');
+      startSnow();
+    } else {
+      localStorage.setItem('snowEffect', 'disabled');
+      stopSnow();
+    }
+  });
+
+  // Panic button hotkey setup
+  const hotkeyInput = document.getElementById('hotkey-input');
+  const changeHotkeyBtn = document.getElementById('change-hotkey-btn');
+  
+  hotkeyInput.addEventListener('keydown', (e) => {
+    e.preventDefault();
+    if (e.key.length === 1 || e.key === 'Escape' || e.key.startsWith('F')) {
+      hotkeyInput.value = e.key;
+    }
+  });
+
+  changeHotkeyBtn.addEventListener('click', () => {
+    const newHotkey = hotkeyInput.value.trim();
+    if (newHotkey) {
+      localStorage.setItem('hotkey', newHotkey);
+      alert('Panic hotkey changed to: ' + newHotkey);
+    } else {
+      alert('Please enter a valid hotkey.');
+    }
+  });
+
+  // Redirect URL setup
+  document.getElementById('change-URL-btn').addEventListener('click', () => {
+    let newURL = document.getElementById('redirect-url-input').value.trim();
+    if (newURL && !/^https?:\/\//i.test(newURL)) {
+      newURL = 'https://' + newURL;
+    }
+    if (newURL) {
+      localStorage.setItem('redirectURL', newURL);
+      alert('Redirect URL changed to: ' + newURL);
+    } else {
+      alert('Please enter a valid URL.');
+    }
+  });
+
+  // Panic button listener
+  window.addEventListener('keydown', (e) => {
+    const savedHotkey = localStorage.getItem('hotkey') || '`';
+    const redirectURL = localStorage.getItem('redirectURL') || 'https://google.com';
+    if (e.key === savedHotkey) {
+      location.replace(redirectURL);
+    }
+  });
+
+  // About:blank toggle
+  document.getElementById('aboutBlankToggle').addEventListener('change', (e) => {
+    const value = e.target.checked ? 'enabled' : 'disabled';
+    localStorage.setItem('aboutBlank', value);
+    if (e.target.checked) {
+      alert('About:blank cloaking enabled. Reload the page to apply.');
+    }
+  });
 
   // Navigation event listeners
   document.getElementById('homeLink').addEventListener('click', e => { e.preventDefault(); showHome(); });
