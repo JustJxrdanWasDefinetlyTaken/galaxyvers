@@ -5,7 +5,7 @@ const games = [
     { name: "1v1.Older", image: "https://iili.io/K5IQqnn.jpg", url: "https://learn-with.jskjsv6.workers.dev/1v1-lol-online/1v1-lol-online.github.io/main/file/index.html" },
     { name: "1v1 Oldest", image: "https://iili.io/K5mxV4e.th.jpg", url: "https://portal1.statetestingstudies.com.cdn.cloudflare.net/scramjet/https%3A%2F%2Fraw.githack.com%2Fgameazzetz%2Fassets%2Frefs%2Fheads%2Fmain%2F1v1lolold.html" },
     { name: "Amazing Strange Police", image: "https://iili.io/K7FraGp.jpg", url: "https://script.google.com/macros/s/AKfycbwAoMJxFkkCGbz6H0x2lq5uVhb1vvQRKraex1znydX5Gm0jWse3HWUTvdU34ghoPqQauQ/exec"},
-    { name: "Cookie Clicker", image: "https://iili.io", url: "https://raw.githack.com/BinBashBanana/gfiles/master/gfiles/html5/cookieclicker/index.html"},
+    { name: "Cookie Clicker", image: "https://iili.io/dCXKd71.png", url: "https://raw.githack.com/BinBashBanana/gfiles/master/gfiles/html5/cookieclicker/index.html"},
     { name: "BasketBros.IO", image: "https://iili.io/2DOa1lR.md.png", url: "https://script.google.com/macros/s/AKfycbxUfaDSpH-0SJL0WPKt38JY7OOOGMmtpY9JTSbL8pvtjxS7jSpNHHu6MdZgWUshIU00Kw/exec"},
     { name: "Paper.io 2", image: "https://iili.io/Klmfuvj.webp", url: "https://html5.gamedistribution.com/rvvASBMg/paperio2/" },
     { name: "Slope", image: "https://iili.io/KlmT06Q.md.png", url: "https://deltamath111373269.netlify.app/games/slope/" },
@@ -16,9 +16,9 @@ const games = [
 
 // App data from your original file
 const apps = [
-    { name: "YouTube", image: "https://placehold.co/512x512", url: "https://www.youtube.com" },
-    { name: "Spotify", image: "https://placehold.co/512x512", url: "https://scramjet.mercurywork.shop/scramjet/https%3A%2F%2Fopen.spotify.com%2F" },
-    { name: "Soundboard", image: "https://placehold.co/512x512", url: "https://raw.githack.com/Teerths/TimelessDevelopments/refs/heads/main/game/soundboard/index.html" }
+    { name: "YouTube", image: "https://iili.io/dCXK4Lv.png", url: "https://www.youtube.com" },
+    { name: "Spotify", image: "https://iili.io/dCXKc6N.png", url: "https://scramjet.mercurywork.shop/scramjet/https%3A%2F%2Fopen.spotify.com%2F" },
+    { name: "Soundboard", image: "https://iili.io/dCXKMB2.png", url: "https://raw.githack.com/Teerths/TimelessDevelopments/refs/heads/main/game/soundboard/index.html" }
 ];
 
 // Tab Cloaking Presets
@@ -85,6 +85,14 @@ function showContact() {
   hideAll();
   document.getElementById('content-contact').style.display = 'block';
   document.getElementById('contactLink').classList.add('active');
+}
+
+// Show settings (opens modal instead of content)
+function showSettings() {
+  const modal = document.getElementById('settingsModal');
+  if (modal) {
+    modal.style.display = 'block';
+  }
 }
 
 // Render games
@@ -266,7 +274,8 @@ function loadSettings() {
 
   if (savedTitle) {
     document.title = savedTitle;
-    document.getElementById('customTitle').value = savedTitle;
+    const titleInput = document.getElementById('customTitle');
+    if (titleInput) titleInput.value = savedTitle;
   }
   
   if (savedFavicon) {
@@ -277,24 +286,31 @@ function loadSettings() {
       document.head.appendChild(link);
     }
     link.href = savedFavicon;
-    document.getElementById('customFavicon').value = savedFavicon;
+    const faviconInput = document.getElementById('customFavicon');
+    if (faviconInput) faviconInput.value = savedFavicon;
   }
 
   if (savedSnow === 'disabled') {
     snowEnabled = false;
-    document.getElementById('snowToggle').checked = false;
+    const snowToggle = document.getElementById('snowToggle');
+    if (snowToggle) snowToggle.checked = false;
     stopSnow();
   } else {
     startSnow();
   }
 
-  document.getElementById('hotkey-input').value = savedHotkey;
-  document.getElementById('redirect-url-input').value = savedRedirect;
+  const hotkeyInput = document.getElementById('hotkey-input');
+  const redirectInput = document.getElementById('redirect-url-input');
+  if (hotkeyInput) hotkeyInput.value = savedHotkey;
+  if (redirectInput) redirectInput.value = savedRedirect;
 
-  if (savedAboutBlank === null || savedAboutBlank === 'enabled') {
-    document.getElementById('aboutBlankToggle').checked = true;
-  } else {
-    document.getElementById('aboutBlankToggle').checked = false;
+  const aboutBlankToggle = document.getElementById('aboutBlankToggle');
+  if (aboutBlankToggle) {
+    if (savedAboutBlank === null || savedAboutBlank === 'enabled') {
+      aboutBlankToggle.checked = true;
+    } else {
+      aboutBlankToggle.checked = false;
+    }
   }
 }
 
@@ -305,18 +321,14 @@ window.onload = () => {
 
   // Modal elements
   const modal = document.getElementById('settingsModal');
-  const settingsBtn = document.getElementById('settingsBtn');
   const closeBtn = document.querySelector('.close');
 
-  // Open settings modal
-  settingsBtn.onclick = () => {
-    modal.style.display = 'block';
-  };
-
   // Close modal
-  closeBtn.onclick = () => {
-    modal.style.display = 'none';
-  };
+  if (closeBtn) {
+    closeBtn.onclick = () => {
+      if (modal) modal.style.display = 'none';
+    };
+  }
 
   // Close modal when clicking outside
   window.onclick = (e) => {
@@ -326,81 +338,100 @@ window.onload = () => {
   };
 
   // Tab Cloaking - Apply button
-  document.getElementById('applyBtn').addEventListener('click', () => {
-    const title = document.getElementById('customTitle').value;
-    const favicon = document.getElementById('customFavicon').value;
-    applyTabCloaking(title, favicon);
-    alert('Tab cloaking applied!');
-  });
+  const applyBtn = document.getElementById('applyBtn');
+  if (applyBtn) {
+    applyBtn.addEventListener('click', () => {
+      const title = document.getElementById('customTitle').value;
+      const favicon = document.getElementById('customFavicon').value;
+      applyTabCloaking(title, favicon);
+      alert('Tab cloaking applied!');
+    });
+  }
 
   // Tab Cloaking - Reset button
-  document.getElementById('resetBtn').addEventListener('click', () => {
-    localStorage.removeItem('TabCloak_Title');
-    localStorage.removeItem('TabCloak_Favicon');
-    document.title = 'GalaxyVerse';
-    let link = document.querySelector("link[rel~='icon']");
-    if (link) link.href = '';
-    document.getElementById('customTitle').value = '';
-    document.getElementById('customFavicon').value = '';
-    document.getElementById('presetSelect').value = '';
-    alert('Tab cloaking reset!');
-  });
+  const resetBtn = document.getElementById('resetBtn');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      localStorage.removeItem('TabCloak_Title');
+      localStorage.removeItem('TabCloak_Favicon');
+      document.title = 'GalaxyVerse';
+      let link = document.querySelector("link[rel~='icon']");
+      if (link) link.href = '';
+      document.getElementById('customTitle').value = '';
+      document.getElementById('customFavicon').value = '';
+      document.getElementById('presetSelect').value = '';
+      alert('Tab cloaking reset!');
+    });
+  }
 
   // Tab Cloaking - Preset selector
-  document.getElementById('presetSelect').addEventListener('change', (e) => {
-    const selected = presets[e.target.value];
-    if (selected) {
-      document.getElementById('customTitle').value = selected.title;
-      document.getElementById('customFavicon').value = selected.favicon;
-      applyTabCloaking(selected.title, selected.favicon);
-    }
-  });
+  const presetSelect = document.getElementById('presetSelect');
+  if (presetSelect) {
+    presetSelect.addEventListener('change', (e) => {
+      const selected = presets[e.target.value];
+      if (selected) {
+        document.getElementById('customTitle').value = selected.title;
+        document.getElementById('customFavicon').value = selected.favicon;
+        applyTabCloaking(selected.title, selected.favicon);
+      }
+    });
+  }
 
   // Snow toggle
-  document.getElementById('snowToggle').addEventListener('change', (e) => {
-    if (e.target.checked) {
-      localStorage.setItem('snowEffect', 'enabled');
-      startSnow();
-    } else {
-      localStorage.setItem('snowEffect', 'disabled');
-      stopSnow();
-    }
-  });
+  const snowToggle = document.getElementById('snowToggle');
+  if (snowToggle) {
+    snowToggle.addEventListener('change', (e) => {
+      if (e.target.checked) {
+        localStorage.setItem('snowEffect', 'enabled');
+        startSnow();
+      } else {
+        localStorage.setItem('snowEffect', 'disabled');
+        stopSnow();
+      }
+    });
+  }
 
   // Panic button hotkey setup
   const hotkeyInput = document.getElementById('hotkey-input');
   const changeHotkeyBtn = document.getElementById('change-hotkey-btn');
   
-  hotkeyInput.addEventListener('keydown', (e) => {
-    e.preventDefault();
-    if (e.key.length === 1 || e.key === 'Escape' || e.key.startsWith('F')) {
-      hotkeyInput.value = e.key;
-    }
-  });
+  if (hotkeyInput) {
+    hotkeyInput.addEventListener('keydown', (e) => {
+      e.preventDefault();
+      if (e.key.length === 1 || e.key === 'Escape' || e.key.startsWith('F')) {
+        hotkeyInput.value = e.key;
+      }
+    });
+  }
 
-  changeHotkeyBtn.addEventListener('click', () => {
-    const newHotkey = hotkeyInput.value.trim();
-    if (newHotkey) {
-      localStorage.setItem('hotkey', newHotkey);
-      alert('Panic hotkey changed to: ' + newHotkey);
-    } else {
-      alert('Please enter a valid hotkey.');
-    }
-  });
+  if (changeHotkeyBtn) {
+    changeHotkeyBtn.addEventListener('click', () => {
+      const newHotkey = hotkeyInput.value.trim();
+      if (newHotkey) {
+        localStorage.setItem('hotkey', newHotkey);
+        alert('Panic hotkey changed to: ' + newHotkey);
+      } else {
+        alert('Please enter a valid hotkey.');
+      }
+    });
+  }
 
   // Redirect URL setup
-  document.getElementById('change-URL-btn').addEventListener('click', () => {
-    let newURL = document.getElementById('redirect-url-input').value.trim();
-    if (newURL && !/^https?:\/\//i.test(newURL)) {
-      newURL = 'https://' + newURL;
-    }
-    if (newURL) {
-      localStorage.setItem('redirectURL', newURL);
-      alert('Redirect URL changed to: ' + newURL);
-    } else {
-      alert('Please enter a valid URL.');
-    }
-  });
+  const changeURLBtn = document.getElementById('change-URL-btn');
+  if (changeURLBtn) {
+    changeURLBtn.addEventListener('click', () => {
+      let newURL = document.getElementById('redirect-url-input').value.trim();
+      if (newURL && !/^https?:\/\//i.test(newURL)) {
+        newURL = 'https://' + newURL;
+      }
+      if (newURL) {
+        localStorage.setItem('redirectURL', newURL);
+        alert('Redirect URL changed to: ' + newURL);
+      } else {
+        alert('Please enter a valid URL.');
+      }
+    });
+  }
 
   // Panic button listener
   window.addEventListener('keydown', (e) => {
@@ -412,29 +443,35 @@ window.onload = () => {
   });
 
   // About:blank toggle
-  document.getElementById('aboutBlankToggle').addEventListener('change', (e) => {
-    const value = e.target.checked ? 'enabled' : 'disabled';
-    localStorage.setItem('aboutBlank', value);
-    if (e.target.checked) {
-      alert('About:blank cloaking enabled. Reload the page to apply.');
-    }
-  });
+  const aboutBlankToggle = document.getElementById('aboutBlankToggle');
+  if (aboutBlankToggle) {
+    aboutBlankToggle.addEventListener('change', (e) => {
+      const value = e.target.checked ? 'enabled' : 'disabled';
+      localStorage.setItem('aboutBlank', value);
+      if (e.target.checked) {
+        alert('About:blank cloaking enabled. Reload the page to apply.');
+      }
+    });
+  }
 
   // Navigation event listeners
   document.getElementById('homeLink').addEventListener('click', e => { e.preventDefault(); showHome(); });
   document.getElementById('gameLink').addEventListener('click', e => { e.preventDefault(); showGames(); });
   document.getElementById('aboutLink').addEventListener('click', e => { e.preventDefault(); showAbout(); });
   document.getElementById('appsLink').addEventListener('click', e => { e.preventDefault(); showApps(); });
+  document.getElementById('settingsLink').addEventListener('click', e => { e.preventDefault(); showSettings(); });
   document.getElementById('contactLink').addEventListener('click', e => { e.preventDefault(); showContact(); });
 
   // Search event listeners for game search
   const searchBtn = document.getElementById('searchBtn');
   const searchInput = document.getElementById('searchInput');
   if (searchBtn) searchBtn.addEventListener('click', searchGames);
-  if (searchInput) searchInput.addEventListener('input', debounce(searchGames));
-  if (searchInput) searchInput.addEventListener('keypress', e => {
-    if (e.key === 'Enter') searchGames();
-  });
+  if (searchInput) {
+    searchInput.addEventListener('input', debounce(searchGames));
+    searchInput.addEventListener('keypress', e => {
+      if (e.key === 'Enter') searchGames();
+    });
+  }
 
   // Back buttons
   const backToHomeApps = document.getElementById('backToHomeApps');
@@ -450,7 +487,9 @@ window.onload = () => {
   const homepageSearchBtn = document.getElementById('homepageSearchBtn');
   const homepageSearchInput = document.getElementById('homepageSearchInput');
   if (homepageSearchBtn) homepageSearchBtn.addEventListener('click', homepageSearch);
-  if (homepageSearchInput) homepageSearchInput.addEventListener('keypress', e => {
-    if (e.key === 'Enter') homepageSearch();
-  });
+  if (homepageSearchInput) {
+    homepageSearchInput.addEventListener('keypress', e => {
+      if (e.key === 'Enter') homepageSearch();
+    });
+  }
 };
