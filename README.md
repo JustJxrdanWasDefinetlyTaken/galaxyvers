@@ -7,8 +7,7 @@
 - This was made for my friends tho shoutout to them
 - Also creds to <a href="https://github.com/JustJxrdanWasDefinetlyTaken">Jordan</a> check out his projects hes him
 <br></br>
-<br></br>
-###Added:
+### Added:
 - Tab Cloaks
 - Credits
 - Update log 1.0.0
