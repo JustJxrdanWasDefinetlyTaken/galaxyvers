@@ -84,18 +84,20 @@ function renderGames(gamesToRender) {
   
   gameList.innerHTML = '';
   
+  if (gamesToRender.length === 0) {
+    gameList.innerHTML = '<p>No games found. Try a different search term.</p>';
+    return;
+  }
+  
   gamesToRender.forEach(game => {
     const card = document.createElement('div');
     card.className = 'game-card';
     card.innerHTML = `
       <img src="${game.image}" alt="${game.name}">
       <h3>${game.name}</h3>
-      <button class="play-btn">Play</button>
     `;
     
-    card.querySelector('.play-btn').addEventListener('click', () => {
-      loadGame(game.url);
-    });
+    card.onclick = () => loadGame(game.url);
     
     gameList.appendChild(card);
   });
@@ -114,12 +116,9 @@ function renderApps(appsToRender) {
     card.innerHTML = `
       <img src="${app.image}" alt="${app.name}">
       <h3>${app.name}</h3>
-      <button class="open-btn">Open</button>
     `;
     
-    card.querySelector('.open-btn').addEventListener('click', () => {
-      loadGame(app.url); // Using same iframe display
-    });
+    card.onclick = () => loadGame(app.url);
     
     appList.appendChild(card);
   });
@@ -170,13 +169,13 @@ function toggleFullscreen() {
   }
 }
 
-// Homepage search bar functionality
+// Homepage search bar functionality - open YouTube search in new tab
 function homepageSearch() {
   const input = document.getElementById('homepageSearchInput');
   if (!input) return;
   const query = input.value.trim();
   if (!query) return;
-  
+  // Encode query for URL
   const encodedQuery = encodeURIComponent(query);
   const url = `https://www.youtube.com/results?search_query=${encodedQuery}`;
   window.open(url, '_blank');
@@ -187,24 +186,36 @@ function createSnowflake() {
   const snowflake = document.createElement('div');
   snowflake.classList.add('snowflake');
 
+  // Random size between 2px and 6px
   const size = Math.random() * 4 + 2;
   snowflake.style.width = `${size}px`;
   snowflake.style.height = `${size}px`;
+
+  // Random horizontal start position (viewport width)
   snowflake.style.left = `${Math.random() * window.innerWidth}px`;
 
+  // Animation duration between 5s and 15s
   const fallDuration = Math.random() * 10 + 5;
   snowflake.style.animationDuration = `${fallDuration}s`;
+
+  // Random delay so snowflakes don't fall all at once
   snowflake.style.animationDelay = `${Math.random() * 15}s`;
+
+  // Random opacity between 0.3 and 0.8
   snowflake.style.opacity = (Math.random() * 0.5 + 0.3).toFixed(2);
 
-  document.getElementById('snow-container').appendChild(snowflake);
+  const snowContainer = document.getElementById('snow-container');
+  if (snowContainer) {
+    snowContainer.appendChild(snowflake);
 
-  setTimeout(() => {
-    snowflake.remove();
-  }, fallDuration * 1000);
+    // Remove snowflake after animation completes
+    setTimeout(() => {
+      snowflake.remove();
+    }, (fallDuration + 15) * 1000);
+  }
 }
 
-// Initialize snow effect
+// Continuously create snowflakes
 setInterval(createSnowflake, 200);
 
 // Initialize on page load
