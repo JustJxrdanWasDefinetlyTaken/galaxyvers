@@ -20,6 +20,8 @@
 - Added snow
 - Centered Navbar
 - I forgot
+- Patched bugs
+- Fixed games and apps
 ### contributors:
 <a href="https://github.com/aanzoski/galaxyverse/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=aanzoski/galaxyverse" />
