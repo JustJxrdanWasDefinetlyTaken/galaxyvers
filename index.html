@@ -24,7 +24,82 @@
         <li><a href="#" id="appsLink">Apps</a></li>
         <li><a href="#" id="contactLink">Contact</a></li>
     </ul>
+    <button id="settingsBtn" class="settings-btn" title="Settings">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M12 1v6m0 6v6m8.66-9.66l-5.2 3M8.54 14.66l-5.2 3m16.66-.8l-5.2-3M8.54 9.34l-5.2-3m16.66 8.8l-5.2-3m-7.32 0l-5.2 3"></path>
+        </svg>
+    </button>
 </nav>
+
+<!-- Settings Modal -->
+<div id="settingsModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Settings</h2>
+        
+        <div class="settings-section">
+            <h3>Tab Cloaking</h3>
+            <div class="setting-item">
+                <label for="customTitle">Custom Title:</label>
+                <input type="text" id="customTitle" placeholder="e.g., Google">
+            </div>
+            <div class="setting-item">
+                <label for="customFavicon">Custom Favicon URL:</label>
+                <input type="text" id="customFavicon" placeholder="e.g., https://google.com/favicon.ico">
+            </div>
+            <div class="setting-item">
+                <label for="presetSelect">Presets:</label>
+                <select id="presetSelect">
+                    <option value="">-- Select Preset --</option>
+                    <option value="google">Google</option>
+                    <option value="classroom">Google Classroom</option>
+                    <option value="bing">Bing</option>
+                    <option value="nearpod">Nearpod</option>
+                    <option value="powerschool">PowerSchool</option>
+                    <option value="chrome">Chrome New Tab</option>
+                    <option value="edge">Edge New Tab</option>
+                </select>
+            </div>
+            <div class="setting-buttons">
+                <button id="applyBtn" class="btn-primary">Apply</button>
+                <button id="resetBtn" class="btn-secondary">Reset</button>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h3>Theme</h3>
+            <div class="setting-item">
+                <label>
+                    <input type="checkbox" id="snowToggle" checked> Enable Snow Effect
+                </label>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h3>Panic Button</h3>
+            <div class="setting-item">
+                <label for="hotkey-input">Panic Hotkey:</label>
+                <input type="text" id="hotkey-input" placeholder="Press a key" readonly>
+                <button id="change-hotkey-btn" class="btn-small">Change</button>
+            </div>
+            <div class="setting-item">
+                <label for="redirect-url-input">Redirect URL:</label>
+                <input type="text" id="redirect-url-input" placeholder="https://google.com">
+                <button id="change-URL-btn" class="btn-small">Change</button>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h3>About Blank</h3>
+            <div class="setting-item">
+                <label>
+                    <input type="checkbox" id="aboutBlankToggle" checked> Enable About:Blank Cloaking
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="container">
     <div id="content-home" class="content">
