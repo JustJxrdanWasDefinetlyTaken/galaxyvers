@@ -43,7 +43,7 @@
         function requestNewAd() {
             unityAdFinishedCallback();
         }
-/*fix*/
+
         function unityAdFinishedCallback() {
             try {
                 if (gameInstance) gameInstance.SendMessage("AdsManager", "OnWebCallback");
@@ -55,3 +55,4 @@
    </body>
 
 </html>
+
