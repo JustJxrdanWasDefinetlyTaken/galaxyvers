@@ -19,8 +19,7 @@ const apps = [
     { name: "YouTube", image: "https://iili.io/KXL9RMx.md.png", url: "https://www.youtube.com" },
     { name: "Spotify", image: "https://iili.io/dCXKc6N.png", url: "https://scramjet.mercurywork.shop/scramjet/https%3A%2F%2Fopen.spotify.com%2F" },
     { name: "Soundboard", image: "https://iili.io/KXLHUe1.md.png", url: "https://raw.githack.com/Teerths/TimelessDevelopments/refs/heads/main/game/soundboard/index.html" },
-    { name: "Vscode", image: "https://iili.io/KXsbLQ4.md.png", url: "https://vscode.dev/" },
-    { name: "Calculator", image: "https://iili.io/KXsDGJn.md.png", url: "https://raw.githack.com/Teerths/TimelessDevelopments/refs/heads/main/calc/index.html" },
+    { name: "Vscode", image: "https://iili.io/KXsbLQ4.md.png", url: "https://vscode.dev/" }
 ];
 
 // Tab Cloaking Presets
