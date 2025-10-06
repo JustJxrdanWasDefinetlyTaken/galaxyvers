@@ -1,28 +1,28 @@
-// Game data from your original file
+// Game data
 const games = [
-    { name: "Suggestions", image: "https://iili.io/3OM27wv.th.jpg", url: "https://forms.gle/XbZtk1jfGcqLrVRn6" },
-    { name: "1v1.lol", image: "https://iili.io/K0FXGrg.md.jpg", url: "https://scramjet.mercurywork.shop/scramjet/https%3A%2F%2F1v1.lol%2F"},
-    { name: "1v1.Older", image: "https://iili.io/K5IQqnn.jpg", url: "https://learn-with.jskjsv6.workers.dev/1v1-lol-online/1v1-lol-online.github.io/main/file/index.html" },
-    { name: "1v1 Oldest", image: "https://iili.io/K5mxV4e.th.jpg", url: "https://portal1.statetestingstudies.com.cdn.cloudflare.net/scramjet/https%3A%2F%2Fraw.githack.com%2Fgameazzetz%2Fassets%2Frefs%2Fheads%2Fmain%2F1v1lolold.html" },
-    { name: "Amazing Strange Police", image: "https://iili.io/K7FraGp.jpg", url: "https://script.google.com/macros/s/AKfycbwAoMJxFkkCGbz6H0x2lq5uVhb1vvQRKraex1znydX5Gm0jWse3HWUTvdU34ghoPqQauQ/exec"},
-    { name: "Cookie Clicker", image: "https://iili.io/KXLJ3rl.md.jpg", url: "https://raw.githack.com/BinBashBanana/gfiles/master/gfiles/html5/cookieclicker/index.html"},
-    { name: "BasketBros.IO", image: "https://iili.io/2DOa1lR.md.png", url: "https://script.google.com/macros/s/AKfycbxUfaDSpH-0SJL0WPKt38JY7OOOGMmtpY9JTSbL8pvtjxS7jSpNHHu6MdZgWUshIU00Kw/exec"},
-    { name: "Paper.io 2", image: "https://iili.io/Klmfuvj.webp", url: "https://html5.gamedistribution.com/rvvASBMg/paperio2/" },
-    { name: "Slope", image: "https://iili.io/KlmT06Q.md.png", url: "https://deltamath111373269.netlify.app/games/slope/" },
-    { name: "Subway Surfers", image: "https://iili.io/KlmxoGV.md.jpg", url: "https://deltamath111373269.netlify.app/games/subwaysurfers/" },
-    { name: "Wordle", image: "https://iili.io/KIWKE12.md.png", url: "https://gregcameron.com/infinite-wordle/"},
-    { name: "Retro Bowl", image: "https://iili.io/K0FNvt4.jpg", url: "https://portal1.statetestingstudies.com.cdn.cloudflare.net/yalp/ela.html?book=retro-bowl&type=3kh0"}
+  { name: "Suggestions", image: "https://iili.io/3OM27wv.th.jpg", url: "https://forms.gle/XbZtk1jfGcqLrVRn6" },
+  { name: "1v1.lol", image: "https://iili.io/K0FXGrg.md.jpg", url: "https://scramjet.mercurywork.shop/scramjet/https%3A%2F%2F1v1.lol%2F" },
+  { name: "1v1.Older", image: "https://iili.io/K5IQqnn.jpg", url: "https://learn-with.jskjsv6.workers.dev/1v1-lol-online/1v1-lol-online.github.io/main/file/index.html" },
+  { name: "1v1 Oldest", image: "https://iili.io/K5mxV4e.th.jpg", url: "https://portal1.statetestingstudies.com.cdn.cloudflare.net/scramjet/https%3A%2F%2Fraw.githack.com%2Fgameazzetz%2Fassets%2Frefs%2Fheads%2Fmain%2F1v1lolold.html" },
+  { name: "Amazing Strange Police", image: "https://iili.io/K7FraGp.jpg", url: "https://script.google.com/macros/s/AKfycbwAoMJxFkkCGbz6H0x2lq5uVhb1vvQRKraex1znydX5Gm0jWse3HWUTvdU34ghoPqQauQ/exec" },
+  { name: "Cookie Clicker", image: "https://iili.io/KXLJ3rl.md.jpg", url: "https://raw.githack.com/BinBashBanana/gfiles/master/gfiles/html5/cookieclicker/index.html" },
+  { name: "BasketBros.IO", image: "https://iili.io/2DOa1lR.md.png", url: "https://script.google.com/macros/s/AKfycbxUfaDSpH-0SJL0WPKt38JY7OOOGMmtpY9JTSbL8pvtjxS7jSpNHHu6MdZgWUshIU00Kw/exec" },
+  { name: "Paper.io 2", image: "https://iili.io/Klmfuvj.webp", url: "https://html5.gamedistribution.com/rvvASBMg/paperio2/" },
+  { name: "Slope", image: "https://iili.io/KlmT06Q.md.png", url: "https://deltamath111373269.netlify.app/games/slope/" },
+  { name: "Subway Surfers", image: "https://iili.io/KlmxoGV.md.jpg", url: "https://deltamath111373269.netlify.app/games/subwaysurfers/" },
+  { name: "Wordle", image: "https://iili.io/KIWKE12.md.png", url: "https://gregcameron.com/infinite-wordle/" },
+  { name: "Retro Bowl", image: "https://iili.io/K0FNvt4.jpg", url: "https://portal1.statetestingstudies.com.cdn.cloudflare.net/yalp/ela.html?book=retro-bowl&type=3kh0" }
 ];
 
-// App data from your original file
+// App data
 const apps = [
-    { name: "YouTube", image: "https://iili.io/KXL9RMx.md.png", url: "https://www.youtube.com" },
-    { name: "Spotify", image: "https://iili.io/dCXKc6N.png", url: "https://scramjet.mercurywork.shop/scramjet/https%3A%2F%2Fopen.spotify.com%2F" },
-    { name: "Soundboard", image: "https://iili.io/KXLHUe1.md.png", url: "https://raw.githack.com/Teerths/TimelessDevelopments/refs/heads/main/game/soundboard/index.html" },
-    { name: "Vscode", image: "https://iili.io/KXsbLQ4.md.png", url: "https://vscode.dev/" }
+  { name: "YouTube", image: "https://iili.io/KXL9RMx.md.png", url: "https://www.youtube.com" },
+  { name: "Spotify", image: "https://iili.io/dCXKc6N.png", url: "https://scramjet.mercurywork.shop/scramjet/https%3A%2F%2Fopen.spotify.com%2F" },
+  { name: "Soundboard", image: "https://iili.io/KXLHUe1.md.png", url: "https://raw.githack.com/Teerths/TimelessDevelopments/refs/heads/main/game/soundboard/index.html" },
+  { name: "Vscode", image: "https://iili.io/KXsbLQ4.md.png", url: "https://vscode.dev/" }
 ];
 
-// Tab Cloaking Presets
+// Tab Cloaking presets
 const presets = {
   google: { title: "Google", favicon: "https://www.google.com/favicon.ico" },
   classroom: { title: "Home", favicon: "https://ssl.gstatic.com/classroom/favicon.png" },
@@ -33,146 +33,159 @@ const presets = {
   chrome: { title: "New Tab", favicon: "https://www.google.com/favicon.ico" }
 };
 
-// Debounce utility
+// Debounce helper
 function debounce(func, delay = 300) {
   let timeout;
-  return function(...args) {
+  return function (...args) {
     clearTimeout(timeout);
     timeout = setTimeout(() => func.apply(this, args), delay);
   };
 }
 
-// Hide all content sections
+// Hide all content sections and remove active nav links
 function hideAll() {
-  const contents = document.querySelectorAll('.content');
-  contents.forEach(c => c.style.display = 'none');
-  
-  const navLinks = document.querySelectorAll('.navbar li a');
-  navLinks.forEach(link => link.classList.remove('active'));
+  document.querySelectorAll('.content').forEach(c => (c.style.display = 'none'));
+  document.querySelectorAll('.navbar li a').forEach(link => link.classList.remove('active'));
 }
 
-// Show home page
+// Show home section
 function showHome() {
   hideAll();
-  document.getElementById('content-home').style.display = 'block';
-  document.getElementById('homeLink').classList.add('active');
+  const homeContent = document.getElementById('content-home');
+  if (homeContent) homeContent.style.display = 'block';
+  const homeLink = document.getElementById('homeLink');
+  if (homeLink) homeLink.classList.add('active');
 }
 
-// Show games section
+// Show games section and render games
 function showGames() {
   hideAll();
-  document.getElementById('content-games').style.display = 'block';
-  document.getElementById('gameLink').classList.add('active');
+  const gamesContent = document.getElementById('content-games');
+  if (gamesContent) gamesContent.style.display = 'block';
+  const gameLink = document.getElementById('gameLink');
+  if (gameLink) gameLink.classList.add('active');
   renderGames(games);
+}
+
+// Show apps section and render apps
+function showApps() {
+  hideAll();
+  const appsContent = document.getElementById('content-apps');
+  if (appsContent) appsContent.style.display = 'block';
+  const appsLink = document.getElementById('appsLink');
+  if (appsLink) appsLink.classList.add('active');
+  renderApps(apps);
 }
 
 // Show about section
 function showAbout() {
   hideAll();
-  document.getElementById('content-about').style.display = 'block';
-  document.getElementById('aboutLink').classList.add('active');
+  const aboutContent = document.getElementById('content-about');
+  if (aboutContent) aboutContent.style.display = 'block';
+  const aboutLink = document.getElementById('aboutLink');
+  if (aboutLink) aboutLink.classList.add('active');
 }
 
-// Show apps section
-function showApps() {
-  hideAll();
-  document.getElementById('content-apps').style.display = 'block';
-  document.getElementById('appsLink').classList.add('active');
-  renderApps(apps);
-}
-
-
-// Show settings (opens modal instead of content)
+// Show settings modal
 function showSettings() {
   const modal = document.getElementById('settingsModal');
-  if (modal) {
-    modal.style.display = 'block';
-  }
+  if (modal) modal.style.display = 'block';
 }
 
-// Render games
+// Render games list
 function renderGames(gamesToRender) {
   const gameList = document.getElementById('game-list');
   if (!gameList) return;
-  
   gameList.innerHTML = '';
-  
+
   if (gamesToRender.length === 0) {
     gameList.innerHTML = '<p>No games found. Try a different search term.</p>';
     return;
   }
-  
+
   gamesToRender.forEach(game => {
     const card = document.createElement('div');
     card.className = 'game-card';
+    card.tabIndex = 0; // Make card focusable for accessibility
     card.innerHTML = `
-      <img src="${game.image}" alt="${game.name}">
+      <img src="${game.image}" alt="${game.name}" loading="lazy" />
       <h3>${game.name}</h3>
     `;
-    
+
     card.onclick = () => loadGame(game.url);
-    
+    card.onkeypress = (e) => {
+      if (e.key === 'Enter') loadGame(game.url);
+    };
+
     gameList.appendChild(card);
   });
 }
 
-// Render apps
+// Render apps list
 function renderApps(appsToRender) {
   const appList = document.getElementById('app-list');
   if (!appList) return;
-  
   appList.innerHTML = '';
-  
+
+  if (appsToRender.length === 0) {
+    appList.innerHTML = '<p>No apps found.</p>';
+    return;
+  }
+
   appsToRender.forEach(app => {
     const card = document.createElement('div');
     card.className = 'app-card';
+    card.tabIndex = 0;
     card.innerHTML = `
-      <img src="${app.image}" alt="${app.name}">
+      <img src="${app.image}" alt="${app.name}" loading="lazy" />
       <h3>${app.name}</h3>
     `;
-    
+
     card.onclick = () => loadGame(app.url);
-    
+    card.onkeypress = (e) => {
+      if (e.key === 'Enter') loadGame(app.url);
+    };
+
     appList.appendChild(card);
   });
 }
 
-// Load game in iframe
+// Load game or app in iframe view
 function loadGame(url) {
   hideAll();
   const gameDisplay = document.getElementById('game-display');
   const gameIframe = document.getElementById('game-iframe');
-  
+
   if (gameDisplay && gameIframe) {
     gameIframe.src = url;
     gameDisplay.style.display = 'block';
   }
 }
 
-// Search games
+// Search games by name
 function searchGames() {
   const searchInput = document.getElementById('searchInput');
   if (!searchInput) return;
-  
+
   const query = searchInput.value.toLowerCase().trim();
-  
+
   if (!query) {
     renderGames(games);
     return;
   }
-  
-  const filtered = games.filter(game => 
+
+  const filtered = games.filter(game =>
     game.name.toLowerCase().includes(query)
   );
-  
+
   renderGames(filtered);
 }
 
-// Toggle fullscreen
+// Toggle fullscreen of game-play area
 function toggleFullscreen() {
   const gamePlayArea = document.getElementById('game-play-area');
   if (!gamePlayArea) return;
-  
+
   if (!document.fullscreenElement) {
     gamePlayArea.requestFullscreen().catch(err => {
       console.error('Error attempting to enable fullscreen:', err);
@@ -182,7 +195,7 @@ function toggleFullscreen() {
   }
 }
 
-// Homepage search bar functionality
+// Homepage search that opens YouTube search results in new tab
 function homepageSearch() {
   const input = document.getElementById('homepageSearchInput');
   if (!input) return;
@@ -193,13 +206,14 @@ function homepageSearch() {
   window.open(url, '_blank');
 }
 
-// Snow effect implementation
+// Snow effect variables
 let snowEnabled = true;
-let snowInterval;
+let snowInterval = null;
 
+// Create a snowflake element and animate it
 function createSnowflake() {
   if (!snowEnabled) return;
-  
+
   const snowflake = document.createElement('div');
   snowflake.classList.add('snowflake');
 
@@ -223,12 +237,14 @@ function createSnowflake() {
   }
 }
 
+// Start snow effect interval
 function startSnow() {
   if (snowInterval) return;
   snowEnabled = true;
   snowInterval = setInterval(createSnowflake, 200);
 }
 
+// Stop snow effect and clear snowflakes
 function stopSnow() {
   snowEnabled = false;
   if (snowInterval) {
@@ -241,7 +257,7 @@ function stopSnow() {
   }
 }
 
-// Settings Modal Functions
+// Apply tab cloaking: change title and favicon
 function applyTabCloaking(title, favicon) {
   if (title) {
     document.title = title;
@@ -259,6 +275,7 @@ function applyTabCloaking(title, favicon) {
   }
 }
 
+// Load saved settings from localStorage and apply them
 function loadSettings() {
   const savedTitle = localStorage.getItem('TabCloak_Title');
   const savedFavicon = localStorage.getItem('TabCloak_Favicon');
@@ -272,7 +289,7 @@ function loadSettings() {
     const titleInput = document.getElementById('customTitle');
     if (titleInput) titleInput.value = savedTitle;
   }
-  
+
   if (savedFavicon) {
     let link = document.querySelector("link[rel~='icon']");
     if (!link) {
@@ -301,15 +318,11 @@ function loadSettings() {
 
   const aboutBlankToggle = document.getElementById('aboutBlankToggle');
   if (aboutBlankToggle) {
-    if (savedAboutBlank === null || savedAboutBlank === 'enabled') {
-      aboutBlankToggle.checked = true;
-    } else {
-      aboutBlankToggle.checked = false;
-    }
+    aboutBlankToggle.checked = savedAboutBlank === null || savedAboutBlank === 'enabled';
   }
 }
 
-// Initialize on page load
+// Initialize event listeners and load settings on page load
 window.onload = () => {
   loadSettings();
   showHome();
@@ -318,61 +331,66 @@ window.onload = () => {
   const modal = document.getElementById('settingsModal');
   const closeBtn = document.querySelector('.close');
 
-  // Close modal
+  // Close modal button
   if (closeBtn) {
     closeBtn.onclick = () => {
       if (modal) modal.style.display = 'none';
     };
   }
 
-  // Close modal when clicking outside
+  // Close modal when clicking outside modal content
   window.onclick = (e) => {
     if (e.target === modal) {
       modal.style.display = 'none';
     }
   };
 
-  // Tab Cloaking - Apply button
+  // Apply tab cloaking button
   const applyBtn = document.getElementById('applyBtn');
   if (applyBtn) {
     applyBtn.addEventListener('click', () => {
-      const title = document.getElementById('customTitle').value;
-      const favicon = document.getElementById('customFavicon').value;
+      const title = document.getElementById('customTitle').value.trim();
+      const favicon = document.getElementById('customFavicon').value.trim();
       applyTabCloaking(title, favicon);
       alert('Tab cloaking applied!');
     });
   }
 
-  // Tab Cloaking - Reset button
+  // Reset tab cloaking button
   const resetBtn = document.getElementById('resetBtn');
   if (resetBtn) {
     resetBtn.addEventListener('click', () => {
       localStorage.removeItem('TabCloak_Title');
       localStorage.removeItem('TabCloak_Favicon');
       document.title = 'GalaxyVerse';
-      let link = document.querySelector("link[rel~='icon']");
+      const link = document.querySelector("link[rel~='icon']");
       if (link) link.href = '';
-      document.getElementById('customTitle').value = '';
-      document.getElementById('customFavicon').value = '';
-      document.getElementById('presetSelect').value = '';
+      const titleInput = document.getElementById('customTitle');
+      const faviconInput = document.getElementById('customFavicon');
+      if (titleInput) titleInput.value = '';
+      if (faviconInput) faviconInput.value = '';
+      const presetSelect = document.getElementById('presetSelect');
+      if (presetSelect) presetSelect.value = '';
       alert('Tab cloaking reset!');
     });
   }
 
-  // Tab Cloaking - Preset selector
+  // Preset select dropdown change
   const presetSelect = document.getElementById('presetSelect');
   if (presetSelect) {
     presetSelect.addEventListener('change', (e) => {
       const selected = presets[e.target.value];
       if (selected) {
-        document.getElementById('customTitle').value = selected.title;
-        document.getElementById('customFavicon').value = selected.favicon;
+        const titleInput = document.getElementById('customTitle');
+        const faviconInput = document.getElementById('customFavicon');
+        if (titleInput) titleInput.value = selected.title;
+        if (faviconInput) faviconInput.value = selected.favicon;
         applyTabCloaking(selected.title, selected.favicon);
       }
     });
   }
 
-  // Snow toggle
+  // Snow effect toggle
   const snowToggle = document.getElementById('snowToggle');
   if (snowToggle) {
     snowToggle.addEventListener('change', (e) => {
@@ -386,32 +404,32 @@ window.onload = () => {
     });
   }
 
-  // Panic button hotkey setup
+  // Panic hotkey input keydown for setting hotkey
   const hotkeyInput = document.getElementById('hotkey-input');
-  const changeHotkeyBtn = document.getElementById('change-hotkey-btn');
-  
   if (hotkeyInput) {
     hotkeyInput.addEventListener('keydown', (e) => {
       e.preventDefault();
-      if (e.key.length === 1 || e.key === 'Escape' || e.key.startsWith('F')) {
+      if (e.key.length === 1 || e.key === 'Escape' || /^F\d{1,2}$/.test(e.key)) {
         hotkeyInput.value = e.key;
       }
     });
   }
 
+  // Change panic hotkey button
+  const changeHotkeyBtn = document.getElementById('change-hotkey-btn');
   if (changeHotkeyBtn) {
     changeHotkeyBtn.addEventListener('click', () => {
       const newHotkey = hotkeyInput.value.trim();
       if (newHotkey) {
         localStorage.setItem('hotkey', newHotkey);
-        alert('Panic hotkey changed to: ' + newHotkey);
+        alert(`Panic hotkey changed to: ${newHotkey}`);
       } else {
         alert('Please enter a valid hotkey.');
       }
     });
   }
 
-  // Redirect URL setup
+  // Change redirect URL button
   const changeURLBtn = document.getElementById('change-URL-btn');
   if (changeURLBtn) {
     changeURLBtn.addEventListener('click', () => {
@@ -421,14 +439,14 @@ window.onload = () => {
       }
       if (newURL) {
         localStorage.setItem('redirectURL', newURL);
-        alert('Redirect URL changed to: ' + newURL);
+        alert(`Redirect URL changed to: ${newURL}`);
       } else {
         alert('Please enter a valid URL.');
       }
     });
   }
 
-  // Panic button listener
+  // Panic button key listener for redirect
   window.addEventListener('keydown', (e) => {
     const savedHotkey = localStorage.getItem('hotkey') || '`';
     const redirectURL = localStorage.getItem('redirectURL') || 'https://google.com';
@@ -449,14 +467,20 @@ window.onload = () => {
     });
   }
 
-  // Navigation event listeners
-  document.getElementById('homeLink').addEventListener('click', e => { e.preventDefault(); showHome(); });
-  document.getElementById('gameLink').addEventListener('click', e => { e.preventDefault(); showGames(); });
-  document.getElementById('aboutLink').addEventListener('click', e => { e.preventDefault(); showAbout(); });
-  document.getElementById('appsLink').addEventListener('click', e => { e.preventDefault(); showApps(); });
-  document.getElementById('settingsLink').addEventListener('click', e => { e.preventDefault(); showSettings(); });
+  // Navigation links event listeners
+  const navHome = document.getElementById('homeLink');
+  const navGames = document.getElementById('gameLink');
+  const navApps = document.getElementById('appsLink');
+  const navAbout = document.getElementById('aboutLink');
+  const navSettings = document.getElementById('settingsLink');
 
-  // Search event listeners for game search
+  if (navHome) navHome.addEventListener('click', e => { e.preventDefault(); showHome(); });
+  if (navGames) navGames.addEventListener('click', e => { e.preventDefault(); showGames(); });
+  if (navApps) navApps.addEventListener('click', e => { e.preventDefault(); showApps(); });
+  if (navAbout) navAbout.addEventListener('click', e => { e.preventDefault(); showAbout(); });
+  if (navSettings) navSettings.addEventListener('click', e => { e.preventDefault(); showSettings(); });
+
+  // Game search event listeners
   const searchBtn = document.getElementById('searchBtn');
   const searchInput = document.getElementById('searchInput');
   if (searchBtn) searchBtn.addEventListener('click', searchGames);
@@ -467,7 +491,7 @@ window.onload = () => {
     });
   }
 
-  // Back buttons
+  // Back buttons event listeners
   const backToHomeApps = document.getElementById('backToHomeApps');
   if (backToHomeApps) backToHomeApps.addEventListener('click', showHome);
   const backToHomeGame = document.getElementById('backToHomeGame');
@@ -475,7 +499,7 @@ window.onload = () => {
 
   // Fullscreen toggle button
   const fullscreenBtn = document.getElementById('fullscreenBtn');
-  if (fullscreenBtn) fullscreenBtn.addEventListener('click', () => toggleFullscreen());
+  if (fullscreenBtn) fullscreenBtn.addEventListener('click', toggleFullscreen);
 
   // Homepage search bar event listeners
   const homepageSearchBtn = document.getElementById('homepageSearchBtn');
