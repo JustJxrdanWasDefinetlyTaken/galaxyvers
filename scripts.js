@@ -82,12 +82,6 @@ function showApps() {
   renderApps(apps);
 }
 
-// Show contact section
-function showContact() {
-  hideAll();
-  document.getElementById('content-contact').style.display = 'block';
-  document.getElementById('contactLink').classList.add('active');
-}
 
 // Show settings (opens modal instead of content)
 function showSettings() {
@@ -462,7 +456,6 @@ window.onload = () => {
   document.getElementById('aboutLink').addEventListener('click', e => { e.preventDefault(); showAbout(); });
   document.getElementById('appsLink').addEventListener('click', e => { e.preventDefault(); showApps(); });
   document.getElementById('settingsLink').addEventListener('click', e => { e.preventDefault(); showSettings(); });
-  document.getElementById('contactLink').addEventListener('click', e => { e.preventDefault(); showContact(); });
 
   // Search event listeners for game search
   const searchBtn = document.getElementById('searchBtn');
