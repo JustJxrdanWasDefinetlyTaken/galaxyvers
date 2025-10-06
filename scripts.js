@@ -5,7 +5,7 @@ const games = [
     { name: "1v1.Older", image: "https://iili.io/K5IQqnn.jpg", url: "https://learn-with.jskjsv6.workers.dev/1v1-lol-online/1v1-lol-online.github.io/main/file/index.html" },
     { name: "1v1 Oldest", image: "https://iili.io/K5mxV4e.th.jpg", url: "https://portal1.statetestingstudies.com.cdn.cloudflare.net/scramjet/https%3A%2F%2Fraw.githack.com%2Fgameazzetz%2Fassets%2Frefs%2Fheads%2Fmain%2F1v1lolold.html" },
     { name: "Amazing Strange Police", image: "https://iili.io/K7FraGp.jpg", url: "https://script.google.com/macros/s/AKfycbwAoMJxFkkCGbz6H0x2lq5uVhb1vvQRKraex1znydX5Gm0jWse3HWUTvdU34ghoPqQauQ/exec"},
-    { name: "Cookie Clicker", image: "https://iili.io/dCXKd71.png", url: "https://raw.githack.com/BinBashBanana/gfiles/master/gfiles/html5/cookieclicker/index.html"},
+    { name: "Cookie Clicker", image: "https://iili.io/KXLJ3rl.md.jpg", url: "https://raw.githack.com/BinBashBanana/gfiles/master/gfiles/html5/cookieclicker/index.html"},
     { name: "BasketBros.IO", image: "https://iili.io/2DOa1lR.md.png", url: "https://script.google.com/macros/s/AKfycbxUfaDSpH-0SJL0WPKt38JY7OOOGMmtpY9JTSbL8pvtjxS7jSpNHHu6MdZgWUshIU00Kw/exec"},
     { name: "Paper.io 2", image: "https://iili.io/Klmfuvj.webp", url: "https://html5.gamedistribution.com/rvvASBMg/paperio2/" },
     { name: "Slope", image: "https://iili.io/KlmT06Q.md.png", url: "https://deltamath111373269.netlify.app/games/slope/" },
@@ -16,9 +16,11 @@ const games = [
 
 // App data from your original file
 const apps = [
-    { name: "YouTube", image: "https://iili.io/dCXK4Lv.png", url: "https://www.youtube.com" },
+    { name: "YouTube", image: "https://iili.io/KXL9RMx.md.png", url: "https://www.youtube.com" },
     { name: "Spotify", image: "https://iili.io/dCXKc6N.png", url: "https://scramjet.mercurywork.shop/scramjet/https%3A%2F%2Fopen.spotify.com%2F" },
-    { name: "Soundboard", image: "https://iili.io/dCXKMB2.png", url: "https://raw.githack.com/Teerths/TimelessDevelopments/refs/heads/main/game/soundboard/index.html" }
+    { name: "Soundboard", image: "https://iili.io/KXLHUe1.md.png", url: "https://raw.githack.com/Teerths/TimelessDevelopments/refs/heads/main/game/soundboard/index.html" },
+    { name: "Vscode", image: "https://iili.io/KXsbLQ4.md.png", url: "https://vscode.dev/" },
+    { name: "Calculator", image: "https://iili.io/KXsDGJn.md.png", "https://raw.githack.com/Teerths/TimelessDevelopments/refs/heads/main/calc/index.html" },
 ];
 
 // Tab Cloaking Presets
