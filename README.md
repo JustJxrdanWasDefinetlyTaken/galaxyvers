@@ -4,12 +4,12 @@
 - This was made for my friends tho shoutout to them
 - Also creds to <a href="https://github.com/JustJxrdanWasDefinetlyTaken">Jordan</a> check out his projects hes him
 <br></br>
-### Added:
+### Added: 1.0.1
 - Tab Cloaks
 - Credits
-- Update log 1.0.0
-- Snow for style
-- More games (Dont work)
+- Update Log
+- VsCode
+- I think more games
 ### Coming soon
 - More stuff
 - Like what?
