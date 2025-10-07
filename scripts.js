@@ -46,6 +46,10 @@ function debounce(func, delay = 300) {
 function hideAll() {
   document.querySelectorAll('.content').forEach(c => (c.style.display = 'none'));
   document.querySelectorAll('.navbar li a').forEach(link => link.classList.remove('active'));
+  
+  // Hide homepage info buttons when not on home
+  const infoButtons = document.querySelector('.homepage-info-buttons');
+  if (infoButtons) infoButtons.style.display = 'none';
 }
 
 // Show home section
@@ -55,6 +59,10 @@ function showHome() {
   if (homeContent) homeContent.style.display = 'block';
   const homeLink = document.getElementById('homeLink');
   if (homeLink) homeLink.classList.add('active');
+  
+  // Show homepage info buttons
+  const infoButtons = document.querySelector('.homepage-info-buttons');
+  if (infoButtons) infoButtons.style.display = 'flex';
 }
 
 // Show games section and render games
@@ -106,7 +114,7 @@ function renderGames(gamesToRender) {
   gamesToRender.forEach(game => {
     const card = document.createElement('div');
     card.className = 'game-card';
-    card.tabIndex = 0; // Make card focusable for accessibility
+    card.tabIndex = 0;
     card.innerHTML = `
       <img src="${game.image}" alt="${game.name}" loading="lazy" />
       <h3>${game.name}</h3>
@@ -343,7 +351,38 @@ window.onload = () => {
     if (e.target === modal) {
       modal.style.display = 'none';
     }
+    // Close info modals when clicking outside
+    if (e.target.classList.contains('info-modal')) {
+      e.target.style.display = 'none';
+    }
   };
+
+  // Credits and Update Log button handlers
+  const creditsBtn = document.getElementById('creditsBtn');
+  const updateLogBtn = document.getElementById('updateLogBtn');
+  const creditsModal = document.getElementById('creditsModal');
+  const updateLogModal = document.getElementById('updateLogModal');
+
+  if (creditsBtn) {
+    creditsBtn.addEventListener('click', () => {
+      if (creditsModal) creditsModal.style.display = 'block';
+    });
+  }
+
+  if (updateLogBtn) {
+    updateLogBtn.addEventListener('click', () => {
+      if (updateLogModal) updateLogModal.style.display = 'block';
+    });
+  }
+
+  // Close buttons for info modals
+  document.querySelectorAll('.info-close').forEach(closeBtn => {
+    closeBtn.addEventListener('click', function() {
+      const modalId = this.getAttribute('data-modal');
+      const modalElement = document.getElementById(modalId);
+      if (modalElement) modalElement.style.display = 'none';
+    });
+  });
 
   // Apply tab cloaking button
   const applyBtn = document.getElementById('applyBtn');
