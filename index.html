@@ -8,7 +8,7 @@
 <!-- Link to external CSS -->
 <link rel="stylesheet" href="styles.css" />
 
-<!-- Google Fonts loaded in CSS via @import; alternatively can be included here -->
+<!-- Google Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100..900&display=swap" rel="stylesheet" />
 
 </head>
@@ -95,6 +95,77 @@
     </div>
 </div>
 
+<!-- Credits Modal -->
+<div id="creditsModal" class="info-modal">
+    <div class="info-modal-content">
+        <span class="info-close" data-modal="creditsModal">&times;</span>
+        <h2>Credits</h2>
+        <div class="info-modal-body">
+            <p><strong>Created by:</strong></p>
+            <ul>
+                <li>Azrael (aanzoski)</li>
+                <li>Jordan (JustJxrdanWasDefinetlyTaken)</li>
+            </ul>
+            
+            <p><strong>Special Thanks:</strong></p>
+            <ul>
+                <li>All our friends who supported this project</li>
+                <li>The open-source community</li>
+            </ul>
+            
+            <p><strong>Technologies Used:</strong></p>
+            <ul>
+                <li>HTML5, CSS3, JavaScript</li>
+                <li>Google Fonts</li>
+                <li>Various game and app integrations</li>
+            </ul>
+            
+            <p><strong>Project Info:</strong></p>
+            <ul>
+                <li>Made in 3 days</li>
+                <li>Hosted on GitHub Pages</li>
+                <li>Open source project</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Update Log Modal -->
+<div id="updateLogModal" class="info-modal">
+    <div class="info-modal-content">
+        <span class="info-close" data-modal="updateLogModal">&times;</span>
+        <h2>Update Log V7.1.9</h2>
+        <div class="info-modal-body">
+            <ul>
+                <li>Added a little more ads.</li>
+                <li>Fixed chat, added admin panel.</li>
+                <li>Updated the AI, added more models.</li>
+                <li>Fixed VM a little bit.</li>
+                <li>Added more games like Doki Doki, Hollow Knight, Blood Money, Fears to fathom, Pizza tower, fixed deltarune & undertale, undertale yellow, etc etc.</li>
+            </ul>
+            
+            <h3>Previous Updates</h3>
+            
+            <h4>Version 1.0.0</h4>
+            <ul>
+                <li>Tab Cloaks</li>
+                <li>Credits</li>
+                <li>Update log</li>
+                <li>Snow for style</li>
+                <li>More games</li>
+            </ul>
+            
+            <h4>Coming Soon</h4>
+            <ul>
+                <li>More stuff</li>
+                <li>More games</li>
+                <li>VIP access</li>
+                <li>Maybe irl fortnite</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
 <div class="container">
     <div id="content-home" class="content">
         <h1>Welcome to GalaxyVerse</h1>
@@ -103,6 +174,12 @@
         <div class="homepage-search-container">
             <input type="text" id="homepageSearchInput" placeholder="Search YouTube or anything..." />
             <button id="homepageSearchBtn">Search</button>
+        </div>
+        
+        <!-- Credits and Update Log buttons -->
+        <div class="homepage-info-buttons">
+            <button id="creditsBtn" class="info-btn">Credits</button>
+            <button id="updateLogBtn" class="info-btn">Update Log</button>
         </div>
     </div>
 
@@ -129,7 +206,6 @@
         </div>
         <button id="backToHomeApps">Back to Home</button>
     </div>
-
 
     <div id="content-settings" class="content" style="display:none;">
         <h2>Settings</h2>
