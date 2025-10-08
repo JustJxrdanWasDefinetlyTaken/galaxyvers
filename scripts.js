@@ -39,12 +39,30 @@ const games = [
   // Format: { name: "Game Name", image: "others/assets/images/games/image.jpg", url: "others/assets/games/game.html" }
 ];
 
-// App data
+// App data - now using local file structure like games
 const apps = [
-  { name: "YouTube", image: "https://iili.io/KXL9RMx.md.png", url: "https://www.youtube.com" },
-  { name: "Spotify", image: "https://iili.io/dCXKc6N.png", url: "https://scramjet.mercurywork.shop/scramjet/https%3A%2F%2Fopen.spotify.com%2F" },
-  { name: "Soundboard", image: "https://iili.io/KXLHUe1.md.png", url: "https://raw.githack.com/Teerths/TimelessDevelopments/refs/heads/main/game/soundboard/index.html" },
-  { name: "Vscode", image: "https://iili.io/KXsbLQ4.md.png", url: "https://vscode.dev/" }
+  { 
+    name: "YouTube", 
+    image: "others/assets/images/apps/youtube.png", 
+    url: "others/assets/apps/YouTube.html" 
+  },
+  { 
+    name: "Spotify", 
+    image: "others/assets/images/apps/spotify.png", 
+    url: "others/assets/apps/Spotify.html" 
+  },
+  { 
+    name: "Soundboard", 
+    image: "others/assets/images/apps/soundboard.png", 
+    url: "others/assets/apps/Soundboard.html" 
+  },
+  { 
+    name: "Vscode", 
+    image: "others/assets/images/apps/vscode.png", 
+    url: "others/assets/apps/Vscode.html" 
+  }
+  // Add more apps here as you add them to the directory
+  // Format: { name: "App Name", image: "others/assets/images/apps/image.png", url: "others/assets/apps/app.html" }
 ];
 
 // Tab Cloaking presets
@@ -154,7 +172,7 @@ function renderGames(gamesToRender) {
   });
 }
 
-// Render apps list
+// Render apps list (now matches game format)
 function renderApps(appsToRender) {
   const appList = document.getElementById('app-list');
   if (!appList) return;
@@ -170,7 +188,7 @@ function renderApps(appsToRender) {
     card.className = 'app-card';
     card.tabIndex = 0;
     card.innerHTML = `
-      <img src="${app.image}" alt="${app.name}" loading="lazy" />
+      <img src="${app.image}" alt="${app.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/250x250?text=${encodeURIComponent(app.name)}'" />
       <h3>${app.name}</h3>
     `;
 
