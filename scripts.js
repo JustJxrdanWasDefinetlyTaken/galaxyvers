@@ -7,14 +7,29 @@ const games = [
   },
   { 
     name: "1v1 Oldest", 
-    image: "others/assets/images/games/1v1lololdest.jpeg", 
+    image: "others/assets/images/games/1v1lololdest.jpeg",//done
     url: "others/assets/games/1v1.lol_oldest.html" 
   },
   { 
-    name: "Bacon May Die", 
-    image: "others/assets/images/games/bacon-may-die.png", 
-    url: "others/assets/games/Bacon May Die.html" 
-  }
+    name: "Basketbros.IO", 
+    image: "others/assets/images/games/basketbros-io.jpg",//done
+    url: "others/assets/games/Basket Bros.html" 
+  },
+    { 
+    name: "BitLife", 
+    image: "others/assets/images/games/bitlife.jpeg",//done
+    url: "others/assets/games/BitLife.html" 
+  },
+    { 
+    name: "Cookie Clicker", 
+    image: "others/assets/images/games/cookie-clicker.png",//done
+    url: "others/assets/games/Cookie Clicker.html" 
+  },
+    { 
+    name: "Friday Night Funkin': Darkness Takeover", 
+    image: "others/assets/images/games/takeover.jpg",//done
+    url: "others/assets/games/Friday Night Funkin'_ Darkness Takeover.html" 
+  },
   // Add more games here as you add them to the directory
   // Format: { name: "Game Name", image: "others/assets/images/games/image.jpg", url: "others/assets/games/game.html" }
 ];
