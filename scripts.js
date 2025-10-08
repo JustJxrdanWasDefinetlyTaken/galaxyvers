@@ -55,6 +55,11 @@ const games = [
     image: "others/assets/images/games/Solar_smash.webp",//done
     url: "others/assets/games/Solar Smash.html" 
   },
+    { 
+    name: "Subway Surfers", 
+    image: "others/assets/images/games/subway-surfers.jpg",//done
+    url: "others/assets/games/Subway Surfers_ Winter Holiday.html" 
+  },
   // Add more games here as you add them to the directory
   // Format: { name: "Game Name", image: "others/assets/images/games/image.jpg", url: "others/assets/games/game.html" }
 ];
