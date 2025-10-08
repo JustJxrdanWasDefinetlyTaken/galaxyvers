@@ -10,6 +10,11 @@ const games = [
     image: "others/assets/images/games/1v1lololdest.jpeg",//done
     url: "others/assets/games/1v1.lol_oldest.html" 
   },
+    { 
+    name: "Bacon May Die", 
+    image: "others/assets/images/games/bacon-may-die.png",//done
+    url: "others/assets/games/Bacon May Die.html" 
+  },
   { 
     name: "Basketbros.IO", 
     image: "others/assets/images/games/basketbros-io.jpg",//done
