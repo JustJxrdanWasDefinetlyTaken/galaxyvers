@@ -31,9 +31,29 @@ const games = [
     url: "others/assets/games/Cookie Clicker.html" 
   },
     { 
+    name: "Crossy Road", 
+    image: "others/assets/images/games/crossyroad.png",//done
+    url: "others/assets/games/Crossy Road.html" 
+  },
+    { 
     name: "Friday Night Funkin': Darkness Takeover", 
     image: "others/assets/images/games/takeover.jpg",//done
     url: "others/assets/games/Friday Night Funkin'_ Darkness Takeover.html" 
+  },
+    { 
+    name: "Retro Bowl", 
+    image: "others/assets/images/games/retro-bowl.jpeg",//done
+    url: "others/assets/games/Retro Bowl.html" 
+  },
+    { 
+    name: "Rooftop Snipers", 
+    image: "others/assets/images/games/rooftopsnipers.jpg",//done
+    url: "others/assets/games/Rooftop Snipers.html" 
+  },
+    { 
+    name: "Solar Smash", 
+    image: "others/assets/images/games/Solar_smash.webp",//done
+    url: "others/assets/games/Solar Smash.html" 
   },
   // Add more games here as you add them to the directory
   // Format: { name: "Game Name", image: "others/assets/images/games/image.jpg", url: "others/assets/games/game.html" }
