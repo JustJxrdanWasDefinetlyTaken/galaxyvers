@@ -7,12 +7,12 @@ const games = [
   },
   { 
     name: "1v1 Oldest", 
-    image: "others/assets/images/games/1v1lol_oldest.jpg", 
+    image: "others/assets/images/games/1v1lololdest.jpeg", 
     url: "others/assets/games/1v1.lol_oldest.html" 
   },
   { 
     name: "Bacon May Die", 
-    image: "others/assets/images/games/bacon_may_die.jpg", 
+    image: "others/assets/images/games/bacon-may-die.png", 
     url: "others/assets/games/Bacon May Die.html" 
   }
   // Add more games here as you add them to the directory
