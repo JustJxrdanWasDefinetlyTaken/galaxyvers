@@ -4,13 +4,18 @@
 - This was made for my friends tho shoutout to them
 - Also creds to <a href="https://github.com/JustJxrdanWasDefinetlyTaken">Jordan</a> check out his projects hes him
 <br></br>
-### Added: 1.0.3 (Up till 2am)
-- Removed games and revamped so it is easier for me to configure in res
-- Fixed images
-- Added Bacon May die
-- Added more games
-- soon adding more doesnt look like alot but I did alot
-- theres alot in my file storage
+### Added: 1.0.5 (Eric, Will)
+- Added Monkeymart
+- Added Bad Time Simulator
+- Added Paper.io
+- Added RTS-2
+- Added Jetpack Joyride
+- Added Google Baseball
+  **SITE**
+- Fixed fullscreen
+- Added themes
+- Settings has an update
+- Fixed Presets
 ### Coming soon
 - More stuff
 - Like what?
