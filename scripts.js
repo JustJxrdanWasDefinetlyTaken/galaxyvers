@@ -15,6 +15,11 @@ const games = [
     image: "others/assets/images/games/bacon-may-die.png",//done
     url: "others/assets/games/Bacon May Die.html" 
   },
+    { 
+    name: "Bad Time Simulator", 
+    image: "others/assets/images/games/badtimesim.png",//done
+    url: "others/assets/games/Bad Time Simulator.html" 
+  },
   { 
     name: "Basketbros.IO", 
     image: "others/assets/images/games/basketbros-io.jpg",//done
@@ -41,6 +46,26 @@ const games = [
     url: "others/assets/games/Friday Night Funkin'_ Darkness Takeover.html" 
   },
     { 
+    name: "Google Baseball", 
+    image: "others/assets/images/games/baseball.png",//done
+    url: "others/assets/games/Google Baseball.html" 
+  },
+    { 
+    name: "Jetpack Joyride", 
+    image: "others/assets/images/games/jetpack.png",//done
+    url: "others/assets/games/Jetpack Joyride.html" 
+  },
+    { 
+    name: "Monkey Mart", 
+    image: "others/assets/images/games/monkey-mart.png",//done
+    url: "others/assets/games/Monkey Mart.html" 
+  },
+    { 
+    name: "Paper.IO", 
+    image: "others/assets/images/games/paperio2.png",//done
+    url: "others/assets/games/Paper.io 2.html" 
+  },
+    { 
     name: "Retro Bowl", 
     image: "others/assets/images/games/retro-bowl.jpeg",//done
     url: "others/assets/games/Retro Bowl.html" 
@@ -49,6 +74,11 @@ const games = [
     name: "Rooftop Snipers", 
     image: "others/assets/images/games/rooftopsnipers.jpg",//done
     url: "others/assets/games/Rooftop Snipers.html" 
+  },
+    { 
+    name: "Rooftop Snipers 2", 
+    image: "others/assets/images/games/rooftop-snipers-2.avif",//done
+    url: "others/assets/games/Rooftop Snipers 2.html" 
   },
     { 
     name: "Solar Smash", 
