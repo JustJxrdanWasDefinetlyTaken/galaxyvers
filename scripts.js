@@ -517,4 +517,224 @@ function loadSettings() {
     aboutBlankToggle.checked = savedAboutBlank === null || savedAboutBlank === 'enabled';
   }
 
-  applyTheme(save
+  applyTheme(savedTheme);
+}
+
+// Initialize event listeners and load settings on page load
+window.onload = () => {
+  loadSettings();
+  showHome();
+
+  // Theme selector
+  const themeSelect = document.getElementById('themeSelect');
+  if (themeSelect) {
+    const savedTheme = localStorage.getItem('selectedTheme') || 'original';
+    themeSelect.value = savedTheme;
+
+    themeSelect.addEventListener('change', (e) => {
+      const theme = e.target.value;
+      applyTheme(theme);
+      localStorage.setItem('selectedTheme', theme);
+    });
+  }
+
+  // Credits and Update Log button handlers
+  const creditsBtn = document.getElementById('creditsBtn');
+  const updateLogBtn = document.getElementById('updateLogBtn');
+  const creditsModal = document.getElementById('creditsModal');
+  const updateLogModal = document.getElementById('updateLogModal');
+
+  if (creditsBtn) {
+    creditsBtn.addEventListener('click', () => {
+      if (creditsModal) creditsModal.style.display = 'block';
+    });
+  }
+
+  if (updateLogBtn) {
+    updateLogBtn.addEventListener('click', () => {
+      if (updateLogModal) updateLogModal.style.display = 'block';
+    });
+  }
+
+  // Close buttons for info modals
+  document.querySelectorAll('.info-close').forEach(closeBtn => {
+    closeBtn.addEventListener('click', function() {
+      const modalId = this.getAttribute('data-modal');
+      const modalElement = document.getElementById(modalId);
+      if (modalElement) modalElement.style.display = 'none';
+    });
+  });
+
+  // Close info modals when clicking outside
+  window.onclick = (e) => {
+    if (e.target.classList.contains('info-modal')) {
+      e.target.style.display = 'none';
+    }
+  };
+
+  // Apply tab cloaking button
+  const applyBtn = document.getElementById('applyBtn');
+  if (applyBtn) {
+    applyBtn.addEventListener('click', () => {
+      const title = document.getElementById('customTitle').value.trim();
+      const favicon = document.getElementById('customFavicon').value.trim();
+      applyTabCloaking(title, favicon);
+      alert('Tab cloaking applied!');
+    });
+  }
+
+  // Reset tab cloaking button
+  const resetBtn = document.getElementById('resetBtn');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      localStorage.removeItem('TabCloak_Title');
+      localStorage.removeItem('TabCloak_Favicon');
+      document.title = 'GalaxyVerse';
+      const link = document.querySelector("link[rel~='icon']");
+      if (link) link.href = '';
+      const titleInput = document.getElementById('customTitle');
+      const faviconInput = document.getElementById('customFavicon');
+      if (titleInput) titleInput.value = '';
+      if (faviconInput) faviconInput.value = '';
+      const presetSelect = document.getElementById('presetSelect');
+      if (presetSelect) presetSelect.value = '';
+      alert('Tab cloaking reset!');
+    });
+  }
+
+  // Preset select dropdown change
+  const presetSelect = document.getElementById('presetSelect');
+  if (presetSelect) {
+    presetSelect.addEventListener('change', (e) => {
+      const selected = presets[e.target.value];
+      if (selected) {
+        const titleInput = document.getElementById('customTitle');
+        const faviconInput = document.getElementById('customFavicon');
+        if (titleInput) titleInput.value = selected.title;
+        if (faviconInput) faviconInput.value = selected.favicon;
+        applyTabCloaking(selected.title, selected.favicon);
+      }
+    });
+  }
+
+  // Snow effect toggle
+  const snowToggle = document.getElementById('snowToggle');
+  if (snowToggle) {
+    snowToggle.addEventListener('change', (e) => {
+      if (e.target.checked) {
+        localStorage.setItem('snowEffect', 'enabled');
+        startSnow();
+      } else {
+        localStorage.setItem('snowEffect', 'disabled');
+        stopSnow();
+      }
+    });
+  }
+
+  // Panic hotkey input keydown for setting hotkey
+  const hotkeyInput = document.getElementById('hotkey-input');
+  if (hotkeyInput) {
+    hotkeyInput.addEventListener('keydown', (e) => {
+      e.preventDefault();
+      if (e.key.length === 1 || e.key === 'Escape' || /^F\d{1,2}$/.test(e.key)) {
+        hotkeyInput.value = e.key;
+      }
+    });
+  }
+
+  // Change panic hotkey button
+  const changeHotkeyBtn = document.getElementById('change-hotkey-btn');
+  if (changeHotkeyBtn) {
+    changeHotkeyBtn.addEventListener('click', () => {
+      const newHotkey = hotkeyInput.value.trim();
+      if (newHotkey) {
+        localStorage.setItem('hotkey', newHotkey);
+        alert(`Panic hotkey changed to: ${newHotkey}`);
+      } else {
+        alert('Please enter a valid hotkey.');
+      }
+    });
+  }
+
+  // Change redirect URL button
+  const changeURLBtn = document.getElementById('change-URL-btn');
+  if (changeURLBtn) {
+    changeURLBtn.addEventListener('click', () => {
+      let newURL = document.getElementById('redirect-url-input').value.trim();
+      if (newURL && !/^https?:\/\//i.test(newURL)) {
+        newURL = 'https://' + newURL;
+      }
+      if (newURL) {
+        localStorage.setItem('redirectURL', newURL);
+        alert(`Redirect URL changed to: ${newURL}`);
+      } else {
+        alert('Please enter a valid URL.');
+      }
+    });
+  }
+
+  // Panic button key listener for redirect
+  window.addEventListener('keydown', (e) => {
+    const savedHotkey = localStorage.getItem('hotkey') || '`';
+    const redirectURL = localStorage.getItem('redirectURL') || 'https://google.com';
+    if (e.key === savedHotkey) {
+      location.replace(redirectURL);
+    }
+  });
+
+  // About:blank toggle
+  const aboutBlankToggle = document.getElementById('aboutBlankToggle');
+  if (aboutBlankToggle) {
+    aboutBlankToggle.addEventListener('change', (e) => {
+      const value = e.target.checked ? 'enabled' : 'disabled';
+      localStorage.setItem('aboutBlank', value);
+      if (e.target.checked) {
+        alert('About:blank cloaking enabled. Reload the page to apply.');
+      }
+    });
+  }
+
+  // Navigation links event listeners
+  const navHome = document.getElementById('homeLink');
+  const navGames = document.getElementById('gameLink');
+  const navApps = document.getElementById('appsLink');
+  const navAbout = document.getElementById('aboutLink');
+  const navSettings = document.getElementById('settingsLink');
+
+  if (navHome) navHome.addEventListener('click', e => { e.preventDefault(); showHome(); });
+  if (navGames) navGames.addEventListener('click', e => { e.preventDefault(); showGames(); });
+  if (navApps) navApps.addEventListener('click', e => { e.preventDefault(); showApps(); });
+  if (navAbout) navAbout.addEventListener('click', e => { e.preventDefault(); showAbout(); });
+  if (navSettings) navSettings.addEventListener('click', e => { e.preventDefault(); showSettings(); });
+
+  // Game search event listeners
+  const searchBtn = document.getElementById('searchBtn');
+  const searchInput = document.getElementById('searchInput');
+  if (searchBtn) searchBtn.addEventListener('click', searchGames);
+  if (searchInput) {
+    searchInput.addEventListener('input', debounce(searchGames));
+    searchInput.addEventListener('keypress', e => {
+      if (e.key === 'Enter') searchGames();
+    });
+  }
+
+  // Back buttons event listeners
+  const backToHomeApps = document.getElementById('backToHomeApps');
+  if (backToHomeApps) backToHomeApps.addEventListener('click', showHome);
+  const backToHomeGame = document.getElementById('backToHomeGame');
+  if (backToHomeGame) backToHomeGame.addEventListener('click', showHome);
+
+  // Fullscreen toggle button
+  const fullscreenBtn = document.getElementById('fullscreenBtn');
+  if (fullscreenBtn) fullscreenBtn.addEventListener('click', toggleFullscreen);
+
+  // Homepage search bar event listeners
+  const homepageSearchBtn = document.getElementById('homepageSearchBtn');
+  const homepageSearchInput = document.getElementById('homepageSearchInput');
+  if (homepageSearchBtn) homepageSearchBtn.addEventListener('click', homepageSearch);
+  if (homepageSearchInput) {
+    homepageSearchInput.addEventListener('keypress', e => {
+      if (e.key === 'Enter') homepageSearch();
+    });
+  }
+};
