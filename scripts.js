@@ -11,6 +11,11 @@ const games = [
     url: "others/assets/games/1v1.lol_oldest.html" 
   },
   { 
+    name: "8 Ball Pool", 
+    image: "others/assets/images/games/8-ball-pool-2021-08-05.webp",
+    url: "others/assets/games/8 Ball Pool.html" 
+  },
+  { 
     name: "Bacon May Die", 
     image: "others/assets/images/games/bacon-may-die.png",
     url: "others/assets/games/Bacon May Die.html" 
@@ -19,6 +24,11 @@ const games = [
     name: "Bad Time Simulator", 
     image: "others/assets/images/games/badtimesim.png",
     url: "others/assets/games/Bad Time Simulator.html" 
+  },
+  { 
+    name: "Baldi's Basics Plus", 
+    image: "others/assets/images/games/baldis.png",
+    url: "others/assets/games/Baldi's Basics Plus.html" 
   },
   { 
     name: "Basketbros.IO", 
