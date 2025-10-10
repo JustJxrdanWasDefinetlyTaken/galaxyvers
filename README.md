@@ -4,13 +4,13 @@
 - This was made for my friends tho shoutout to them
 - Also creds to <a href="https://github.com/JustJxrdanWasDefinetlyTaken">Jordan</a> check out his projects hes him
 <br></br>
-### Added: 1.0.5 (Eric, Will)
-- Added Monkeymart
-- Added Bad Time Simulator
-- Added Paper.io
-- Added RTS-2
-- Added Jetpack Joyride
-- Added Google Baseball
+### Added: 1.0.6 (Alyvia, Michael)
+- Added Infinite Craft
+- Added Subway Surfers San Francisco
+- Added Slope
+- Added Infinite Craft
+- Added Geometry Dash Lite
+- Added Crazy Cattle 3D
   **SITE**
 - Fixed fullscreen
 - Added themes
