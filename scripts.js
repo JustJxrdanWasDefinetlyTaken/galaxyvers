@@ -36,6 +36,11 @@ const games = [
     url: "others/assets/games/Cookie Clicker.html" 
   },
   { 
+    name: "Crazy Cattle 3D", 
+    image: "others/assets/images/games/crazy-cattle-3d-icon.jpg",
+    url: "others/assets/games/Crazy Cattle 3D.html" 
+  },
+  { 
     name: "Crossy Road", 
     image: "others/assets/images/games/crossyroad.png",
     url: "others/assets/games/Crossy Road.html" 
@@ -46,9 +51,19 @@ const games = [
     url: "others/assets/games/Friday Night Funkin'_ Darkness Takeover.html" 
   },
   { 
+    name: "Geometry Dash Lite", 
+    image: "others/assets/images/games/dashlite.png",
+    url: "others/assets/games/Geometry Dash Lite.html" 
+  },
+  { 
     name: "Google Baseball", 
     image: "others/assets/images/games/baseball.png",
     url: "others/assets/games/Google Baseball.html" 
+  },
+  { 
+    name: "Infinite Craft", 
+    image: "others/assets/images/games/infcraft.jpg",
+    url: "others/assets/games/Infinite Craft" 
   },
   { 
     name: "Jetpack Joyride", 
@@ -81,12 +96,22 @@ const games = [
     url: "others/assets/games/Rooftop Snipers 2.html" 
   },
   { 
+    name: "Slope", 
+    image: "others/assets/images/games/slope.png",
+    url: "others/assets/games/Slope.html" 
+  },
+  { 
     name: "Solar Smash", 
     image: "others/assets/images/games/Solar_smash.webp",
     url: "others/assets/games/Solar Smash.html" 
   },
   { 
-    name: "Subway Surfers", 
+    name: "Subway Surfers San Francisco", 
+    image: "others/assets/images/games/subwaysanfran.jpeg",
+    url: "others/assets/games/Subway Surfers_ San Francisco.html" 
+  },
+  { 
+    name: "Subway Surfers Winter Holiday", 
     image: "others/assets/images/games/subway-surfers.jpg",
     url: "others/assets/games/Subway Surfers_ Winter Holiday.html" 
   }
