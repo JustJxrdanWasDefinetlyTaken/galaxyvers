@@ -151,7 +151,7 @@ const games = [
   { 
     name: "Escape Road", 
     image: "others/assets/images/games/escaperoad.png",
-    url: "others/assets/games/Drift Hunters.html" 
+    url: "others/assets/games/Escape Road.html" 
   },
   { 
     name: "Escape Road 2", 
