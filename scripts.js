@@ -16,6 +16,11 @@ const games = [
     url: "others/assets/games/8 Ball Pool.html" 
   },
   { 
+    name: "A Small World Cup", 
+    image: "others/assets/images/games/asmallworldcup.png",
+    url: "others/assets/games/A Small World Cup.html" 
+  },
+  { 
     name: "Bacon May Die", 
     image: "others/assets/images/games/bacon-may-die.png",
     url: "others/assets/games/Bacon May Die.html" 
@@ -41,6 +46,11 @@ const games = [
     url: "others/assets/games/BitLife.html" 
   },
   { 
+    name: "Bloxorz", 
+    image: "others/assets/images/games/blockorz.jpeg",
+    url: "others/assets/games/Bloxorz.html" 
+  },
+  { 
     name: "Cookie Clicker", 
     image: "others/assets/images/games/cookie-clicker.png",
     url: "others/assets/games/Cookie Clicker.html" 
@@ -54,6 +64,31 @@ const games = [
     name: "Crossy Road", 
     image: "others/assets/images/games/crossyroad.png",
     url: "others/assets/games/Crossy Road.html" 
+  },
+  { 
+    name: "Drift Boss", 
+    image: "others/assets/images/games/driftboss.png",
+    url: "others/assets/games/Drift Boss.html" 
+  },
+  { 
+    name: "Drift Hunters ", 
+    image: "others/assets/images/games/drift-hunters.png",
+    url: "others/assets/games/Drift Hunters.html" 
+  },
+  { 
+    name: "Escape Road", 
+    image: "others/assets/images/games/escaperoad.png",
+    url: "others/assets/games/Drift Hunters.html" 
+  },
+  { 
+    name: "Escape Road 2", 
+    image: "others/assets/images/games/escape-road-2-game.png",
+    url: "others/assets/games/Escape Road 2.html" 
+  },
+  { 
+    name: "Football Bros", 
+    image: "others/assets/images/games/football-bros.webp",
+    url: "others/assets/games/Football Bros.html" 
   },
   { 
     name: "Friday Night Funkin': Darkness Takeover", 
