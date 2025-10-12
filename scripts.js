@@ -1,3 +1,73 @@
+// About:blank cloaking - runs before page loads
+(function() {
+  const aboutBlankEnabled = localStorage.getItem('aboutBlank');
+  
+  // If about:blank is enabled (or not set, defaulting to enabled) and we're not already in about:blank
+  if ((aboutBlankEnabled === null || aboutBlankEnabled === 'enabled') && !window.location.href.includes('about:blank')) {
+    const currentURL = window.location.href;
+    
+    // Open about:blank window
+    const win = window.open('about:blank', '_blank');
+    
+    if (win) {
+      // Write the content to the new window
+      win.document.open();
+      win.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>New Tab</title>
+          <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>">
+        </head>
+        <body style="margin:0;padding:0;overflow:hidden;">
+          <iframe src="${currentURL}" style="position:fixed;top:0;left:0;width:100%;height:100%;border:none;"></iframe>
+        </body>
+        </html>
+      `);
+      win.document.close();
+      
+      // Close the original tab
+      window.location.replace('about:blank');
+      window.close();
+    }
+  }
+})();
+
+// About:blank cloaking - runs before page loads
+(function() {
+  const aboutBlankEnabled = localStorage.getItem('aboutBlank');
+  
+  // If about:blank is enabled (or not set, defaulting to enabled) and we're not already in about:blank
+  if ((aboutBlankEnabled === null || aboutBlankEnabled === 'enabled') && !window.location.href.includes('about:blank')) {
+    const currentURL = window.location.href;
+    
+    // Open about:blank window
+    const win = window.open('about:blank', '_blank');
+    
+    if (win) {
+      // Write the content to the new window
+      win.document.open();
+      win.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>New Tab</title>
+          <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>">
+        </head>
+        <body style="margin:0;padding:0;overflow:hidden;">
+          <iframe src="${currentURL}" style="position:fixed;top:0;left:0;width:100%;height:100%;border:none;"></iframe>
+        </body>
+        </html>
+      `);
+      win.document.close();
+      
+      // Close the original tab
+      window.location.replace('about:blank');
+      window.close();
+    }
+  }
+})();
+
 // Game data - loaded from local files
 const games = [
   { 
@@ -759,7 +829,13 @@ window.onload = () => {
       const value = e.target.checked ? 'enabled' : 'disabled';
       localStorage.setItem('aboutBlank', value);
       if (e.target.checked) {
-        alert('About:blank cloaking enabled. Reload the page to apply.');
+        alert('About:blank cloaking enabled. The page will reload in about:blank mode to hide from history.');
+        // Reload to apply about:blank immediately
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      } else {
+        alert('About:blank cloaking disabled. Note: You may need to manually close this tab and reopen the site normally.');
       }
     });
   }
