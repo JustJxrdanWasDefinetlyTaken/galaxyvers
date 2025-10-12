@@ -2,8 +2,11 @@
 (function() {
   const aboutBlankEnabled = localStorage.getItem('aboutBlank');
   
-  // If about:blank is enabled (or not set, defaulting to enabled) and we're not already in about:blank
-  if ((aboutBlankEnabled === null || aboutBlankEnabled === 'enabled') && !window.location.href.includes('about:blank')) {
+  // Check if we're NOT already in an about:blank iframe
+  const isInAboutBlank = window.self !== window.top;
+  
+  // If about:blank is NOT explicitly disabled and we're not already in about:blank
+  if (aboutBlankEnabled !== 'disabled' && !isInAboutBlank) {
     const currentURL = window.location.href;
     
     // Open about:blank window
