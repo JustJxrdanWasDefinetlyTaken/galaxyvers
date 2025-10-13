@@ -149,21 +149,6 @@ const games = [
     url: "others/assets/games/Drift Hunters.html" 
   },
   { 
-    name: "Escape Road", 
-    image: "others/assets/images/games/escaperoad.png",
-    url: "others/assets/games/Escape Road.html" 
-  },
-  { 
-    name: "Escape Road 2", 
-    image: "others/assets/images/games/escape-road-2-game.png",
-    url: "others/assets/games/Escape Road 2.html" 
-  },
-  { 
-    name: "Football Bros", 
-    image: "others/assets/images/games/football-bros.webp",
-    url: "others/assets/games/Football Bros.html" 
-  },
-  { 
     name: "Friday Night Funkin': Darkness Takeover", 
     image: "others/assets/images/games/takeover.jpg",
     url: "others/assets/games/Friday Night Funkin'_ Darkness Takeover.html" 
