@@ -18,4 +18,4 @@
 </a>
 
 ### Discord Server
-https://discord.gg/FraNkZ4N
+[![Join us on Discord](https://invidget.switchblade.xyz/9sUDHyGQfC?theme=dark)](https://discord.gg/FraNkZ4N)
