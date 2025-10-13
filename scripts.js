@@ -1,4 +1,4 @@
-// About:blank cloaking - runs before page loads
+// About:blank cloaking - runs before page loads (FIXED - removed duplicate)
 (function() {
   const aboutBlankEnabled = localStorage.getItem('aboutBlank');
   
@@ -7,41 +7,6 @@
   
   // If about:blank is NOT explicitly disabled and we're not already in about:blank
   if (aboutBlankEnabled !== 'disabled' && !isInAboutBlank) {
-    const currentURL = window.location.href;
-    
-    // Open about:blank window
-    const win = window.open('about:blank', '_blank');
-    
-    if (win) {
-      // Write the content to the new window
-      win.document.open();
-      win.document.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>New Tab</title>
-          <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>">
-        </head>
-        <body style="margin:0;padding:0;overflow:hidden;">
-          <iframe src="${currentURL}" style="position:fixed;top:0;left:0;width:100%;height:100%;border:none;"></iframe>
-        </body>
-        </html>
-      `);
-      win.document.close();
-      
-      // Close the original tab
-      window.location.replace('about:blank');
-      window.close();
-    }
-  }
-})();
-
-// About:blank cloaking - runs before page loads
-(function() {
-  const aboutBlankEnabled = localStorage.getItem('aboutBlank');
-  
-  // If about:blank is enabled (or not set, defaulting to enabled) and we're not already in about:blank
-  if ((aboutBlankEnabled === null || aboutBlankEnabled === 'enabled') && !window.location.href.includes('about:blank')) {
     const currentURL = window.location.href;
     
     // Open about:blank window
@@ -329,6 +294,35 @@ const themes = {
   }
 };
 
+// Get Game of the Day - changes daily based on date
+function getGameOfTheDay() {
+  const today = new Date();
+  const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+  
+  // Filter out the Feedback game
+  const playableGames = games.filter(game => game.name !== "Feedback");
+  const index = dayOfYear % playableGames.length;
+  
+  return playableGames[index];
+}
+
+// Display Game of the Day on home page
+function displayGameOfTheDay() {
+  const gotdContainer = document.getElementById('game-of-the-day-container');
+  if (!gotdContainer) return;
+  
+  const game = getGameOfTheDay();
+  
+  gotdContainer.innerHTML = `
+    <div class="gotd-card">
+      <div class="gotd-badge">🌟 Game of the Day</div>
+      <img src="${game.image}" alt="${game.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x300?text=${encodeURIComponent(game.name)}'" />
+      <h3>${game.name}</h3>
+      <button class="gotd-play-btn" onclick="loadGame('${game.url}')">Play Now</button>
+    </div>
+  `;
+}
+
 // Apply theme function
 function applyTheme(themeName) {
   const theme = themes[themeName];
@@ -375,6 +369,9 @@ function showHome() {
   // Show homepage info buttons
   const infoButtons = document.querySelector('.homepage-info-buttons');
   if (infoButtons) infoButtons.style.display = 'flex';
+  
+  // Display Game of the Day
+  displayGameOfTheDay();
 }
 
 // Show games section and render games
@@ -753,32 +750,6 @@ window.onload = () => {
         localStorage.setItem('snowEffect', 'enabled');
         startSnow();
       } else {
-        localStorage.setItem('snowEffect', 'disabled');
-        stopSnow();
-      }
-    });
-  }
-
-  // Panic hotkey input keydown for setting hotkey
-  const hotkeyInput = document.getElementById('hotkey-input');
-  if (hotkeyInput) {
-    hotkeyInput.addEventListener('keydown', (e) => {
-      e.preventDefault();
-      if (e.key.length === 1 || e.key === 'Escape' || /^F\d{1,2}$/.test(e.key)) {
-        hotkeyInput.value = e.key;
-      }
-    });
-  }
-
-  // Change panic hotkey button
-  const changeHotkeyBtn = document.getElementById('change-hotkey-btn');
-  if (changeHotkeyBtn) {
-    changeHotkeyBtn.addEventListener('click', () => {
-      const newHotkey = hotkeyInput.value.trim();
-      if (newHotkey) {
-        localStorage.setItem('hotkey', newHotkey);
-        alert(`Panic hotkey changed to: ${newHotkey}`);
-      } else {
         alert('Please enter a valid hotkey.');
       }
     });
@@ -872,3 +843,29 @@ window.onload = () => {
     });
   }
 };
+        localStorage.setItem('snowEffect', 'disabled');
+        stopSnow();
+      }
+    });
+  }
+
+  // Panic hotkey input keydown for setting hotkey
+  const hotkeyInput = document.getElementById('hotkey-input');
+  if (hotkeyInput) {
+    hotkeyInput.addEventListener('keydown', (e) => {
+      e.preventDefault();
+      if (e.key.length === 1 || e.key === 'Escape' || /^F\d{1,2}$/.test(e.key)) {
+        hotkeyInput.value = e.key;
+      }
+    });
+  }
+
+  // Change panic hotkey button
+  const changeHotkeyBtn = document.getElementById('change-hotkey-btn');
+  if (changeHotkeyBtn) {
+    changeHotkeyBtn.addEventListener('click', () => {
+      const newHotkey = hotkeyInput.value.trim();
+      if (newHotkey) {
+        localStorage.setItem('hotkey', newHotkey);
+        alert(`Panic hotkey changed to: ${newHotkey}`);
+      } else {
