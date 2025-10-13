@@ -158,9 +158,12 @@
 <div id="updateLogModal" class="info-modal">
     <div class="info-modal-content">
         <span class="info-close" data-modal="updateLogModal">&times;</span>
-        <h2>Update Log V1.0.8</h2>
+        <h2>Update Log V1.0.9</h2>
         <div class="info-modal-body">
             <ul>
+                <li>Game of the Day now switches at midnight CDT</li>
+                <li>About:blank default changed to OFF</li>
+                <li>Added 7 new themes (Purple, Cyberpunk, Matrix, Neon, Fire, Ice, Retro)</li>
                 <li>Added A small World Cup</li>
                 <li>Added Bloxorz</li>
                 <li>Added Drift Boss</li>
@@ -273,6 +276,13 @@
                         <option value="ocean">Ocean</option>
                         <option value="sunset">Sunset</option>
                         <option value="forest">Forest</option>
+                        <option value="purple">Purple Dream</option>
+                        <option value="cyberpunk">Cyberpunk</option>
+                        <option value="matrix">Matrix</option>
+                        <option value="neon">Neon Lights</option>
+                        <option value="fire">Fire</option>
+                        <option value="ice">Ice</option>
+                        <option value="retro">Retro</option>
                     </select>
                 </div>
                 <div class="setting-item">
@@ -300,8 +310,11 @@
                 <h3>About Blank</h3>
                 <div class="setting-item">
                     <label>
-                        <input type="checkbox" id="aboutBlankToggle" checked> Enable About:Blank Cloaking
+                        <input type="checkbox" id="aboutBlankToggle"> Enable About:Blank Cloaking
                     </label>
+                    <p style="font-size: 12px; color: var(--text-color); margin-top: 8px; opacity: 0.8;">
+                        When enabled, the site will open in an about:blank window to hide from browser history.
+                    </p>
                 </div>
             </div>
         </div>
