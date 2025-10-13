@@ -5,8 +5,8 @@
   // Check if we're NOT already in an about:blank iframe
   const isInAboutBlank = window.self !== window.top;
   
-  // If about:blank is NOT explicitly disabled and we're not already in about:blank
-  if (aboutBlankEnabled !== 'disabled' && !isInAboutBlank) {
+  // Only enable if explicitly enabled (default is OFF)
+  if (aboutBlankEnabled === 'enabled' && !isInAboutBlank) {
     const currentURL = window.location.href;
     
     // Open about:blank window
@@ -291,13 +291,92 @@ const themes = {
     hoverBg: '#3a4f3a',
     btnBg: '#4a6f4a',
     btnHoverBg: '#7cb342'
+  },
+  purple: {
+    bgColor: '#1a0a2e',
+    navColor: '#2a1a3e',
+    accentColor: '#b744f7',
+    textColor: '#f0e6ff',
+    borderColor: '#4a3a5e',
+    hoverBg: '#3a2a4e',
+    btnBg: '#5a4a6e',
+    btnHoverBg: '#b744f7'
+  },
+  cyberpunk: {
+    bgColor: '#0d0221',
+    navColor: '#1a0b3a',
+    accentColor: '#ff006e',
+    textColor: '#00f5ff',
+    borderColor: '#8338ec',
+    hoverBg: '#2a1a4a',
+    btnBg: '#3a2a5a',
+    btnHoverBg: '#ff006e'
+  },
+  matrix: {
+    bgColor: '#000000',
+    navColor: '#0a1a0a',
+    accentColor: '#00ff41',
+    textColor: '#00ff41',
+    borderColor: '#003b00',
+    hoverBg: '#0a2a0a',
+    btnBg: '#1a3a1a',
+    btnHoverBg: '#00ff41'
+  },
+  neon: {
+    bgColor: '#1a0033',
+    navColor: '#2a0a4a',
+    accentColor: '#ff00ff',
+    textColor: '#00ffff',
+    borderColor: '#4a1a6a',
+    hoverBg: '#3a1a5a',
+    btnBg: '#5a2a7a',
+    btnHoverBg: '#ff00ff'
+  },
+  fire: {
+    bgColor: '#1a0a00',
+    navColor: '#2a1a0a',
+    accentColor: '#ff4500',
+    textColor: '#ffe4b5',
+    borderColor: '#4a2a1a',
+    hoverBg: '#3a1a0a',
+    btnBg: '#5a3a2a',
+    btnHoverBg: '#ff4500'
+  },
+  ice: {
+    bgColor: '#0a1a2a',
+    navColor: '#1a2a3a',
+    accentColor: '#00bfff',
+    textColor: '#e0f7ff',
+    borderColor: '#2a3a4a',
+    hoverBg: '#1a2a3a',
+    btnBg: '#2a4a5a',
+    btnHoverBg: '#00bfff'
+  },
+  retro: {
+    bgColor: '#2b1b17',
+    navColor: '#3d2b27',
+    accentColor: '#ff9966',
+    textColor: '#ffeaa7',
+    borderColor: '#5d4b47',
+    hoverBg: '#4d3b37',
+    btnBg: '#6d5b57',
+    btnHoverBg: '#ff9966'
   }
 };
 
-// Get Game of the Day - changes daily based on date
+// Get Game of the Day - changes daily at midnight CDT
 function getGameOfTheDay() {
-  const today = new Date();
-  const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+  // Create date in CDT timezone (UTC-5)
+  const now = new Date();
+  const cdtOffset = -5; // CDT is UTC-5
+  const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+  const cdtTime = new Date(utc + (3600000 * cdtOffset));
+  
+  // Calculate day of year in CDT
+  const startOfYear = new Date(cdtTime.getFullYear(), 0, 0);
+  startOfYear.setHours(0, 0, 0, 0);
+  const diff = cdtTime - startOfYear;
+  const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
   
   // Filter out the Feedback game
   const playableGames = games.filter(game => game.name !== "Feedback");
@@ -639,7 +718,8 @@ function loadSettings() {
 
   const aboutBlankToggle = document.getElementById('aboutBlankToggle');
   if (aboutBlankToggle) {
-    aboutBlankToggle.checked = savedAboutBlank === null || savedAboutBlank === 'enabled';
+    // Default to disabled (unchecked)
+    aboutBlankToggle.checked = savedAboutBlank === 'enabled';
   }
 
   applyTheme(savedTheme);
