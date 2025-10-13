@@ -750,6 +750,32 @@ window.onload = () => {
         localStorage.setItem('snowEffect', 'enabled');
         startSnow();
       } else {
+        localStorage.setItem('snowEffect', 'disabled');
+        stopSnow();
+      }
+    });
+  }
+
+  // Panic hotkey input keydown for setting hotkey
+  const hotkeyInput = document.getElementById('hotkey-input');
+  if (hotkeyInput) {
+    hotkeyInput.addEventListener('keydown', (e) => {
+      e.preventDefault();
+      if (e.key.length === 1 || e.key === 'Escape' || /^F\d{1,2}$/.test(e.key)) {
+        hotkeyInput.value = e.key;
+      }
+    });
+  }
+
+  // Change panic hotkey button
+  const changeHotkeyBtn = document.getElementById('change-hotkey-btn');
+  if (changeHotkeyBtn) {
+    changeHotkeyBtn.addEventListener('click', () => {
+      const newHotkey = hotkeyInput.value.trim();
+      if (newHotkey) {
+        localStorage.setItem('hotkey', newHotkey);
+        alert(`Panic hotkey changed to: ${newHotkey}`);
+      } else {
         alert('Please enter a valid hotkey.');
       }
     });
@@ -843,29 +869,3 @@ window.onload = () => {
     });
   }
 };
-        localStorage.setItem('snowEffect', 'disabled');
-        stopSnow();
-      }
-    });
-  }
-
-  // Panic hotkey input keydown for setting hotkey
-  const hotkeyInput = document.getElementById('hotkey-input');
-  if (hotkeyInput) {
-    hotkeyInput.addEventListener('keydown', (e) => {
-      e.preventDefault();
-      if (e.key.length === 1 || e.key === 'Escape' || /^F\d{1,2}$/.test(e.key)) {
-        hotkeyInput.value = e.key;
-      }
-    });
-  }
-
-  // Change panic hotkey button
-  const changeHotkeyBtn = document.getElementById('change-hotkey-btn');
-  if (changeHotkeyBtn) {
-    changeHotkeyBtn.addEventListener('click', () => {
-      const newHotkey = hotkeyInput.value.trim();
-      if (newHotkey) {
-        localStorage.setItem('hotkey', newHotkey);
-        alert(`Panic hotkey changed to: ${newHotkey}`);
-      } else {
