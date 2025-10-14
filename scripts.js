@@ -1,19 +1,239 @@
-// About:blank cloaking - runs before page loads (FIXED - removed duplicate)
+// ===== KEY SYSTEM - MUST BE FIRST =====
+(function() {
+  // Valid keys - these can only be used once globally
+  const validKeys = {
+    'freekey': false,
+    'newkey123': false,
+    'davidishere': false,
+    'azthedev': false,
+    'msanchez': false
+  };
+
+  // Check if user has already activated a key
+  const hasAccess = localStorage.getItem('galaxyverse_access');
+  const usedKeys = JSON.parse(localStorage.getItem('galaxyverse_used_keys') || '[]');
+
+  // Mark previously used keys as unavailable
+  usedKeys.forEach(key => {
+    if (validKeys.hasOwnProperty(key)) {
+      validKeys[key] = true;
+    }
+  });
+
+  // If user doesn't have access, show key entry screen
+  if (hasAccess !== 'granted') {
+    // Create key entry overlay
+    const keyOverlay = document.createElement('div');
+    keyOverlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 999999;
+      font-family: 'Roboto', sans-serif;
+    `;
+
+    keyOverlay.innerHTML = `
+      <div style="
+        background: rgba(30, 36, 51, 0.95);
+        border: 2px solid #4f90ff;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 15px 50px rgba(79, 144, 255, 0.3);
+        text-align: center;
+        max-width: 450px;
+        width: 90%;
+      ">
+        <div style="
+          width: 80px;
+          height: 80px;
+          margin: 0 auto 20px;
+          background: linear-gradient(135deg, #4f90ff, #9d4edd);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 40px;
+          box-shadow: 0 8px 20px rgba(79, 144, 255, 0.4);
+        ">
+          🔐
+        </div>
+        
+        <h1 style="
+          color: #e0e6f1;
+          font-size: 32px;
+          margin: 0 0 10px 0;
+          font-weight: 700;
+        ">GalaxyVerse</h1>
+        
+        <p style="
+          color: #9ca3af;
+          font-size: 16px;
+          margin: 0 0 30px 0;
+        ">Enter your access key to continue</p>
+        
+        <input type="text" id="keyInput" placeholder="Enter your key" style="
+          width: 100%;
+          padding: 15px;
+          font-size: 16px;
+          border: 2px solid #38415d;
+          border-radius: 10px;
+          background: #121826;
+          color: #e0e6f1;
+          outline: none;
+          box-sizing: border-box;
+          transition: all 0.3s ease;
+          margin-bottom: 20px;
+        " />
+        
+        <button id="submitKey" style="
+          width: 100%;
+          padding: 15px;
+          font-size: 16px;
+          font-weight: bold;
+          background: linear-gradient(135deg, #4f90ff, #9d4edd);
+          color: white;
+          border: none;
+          border-radius: 10px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 15px rgba(79, 144, 255, 0.3);
+        ">Verify Key</button>
+        
+        <div id="keyError" style="
+          color: #ff4444;
+          margin-top: 15px;
+          font-size: 14px;
+          display: none;
+        "></div>
+        
+        <div style="
+          margin-top: 30px;
+          padding-top: 20px;
+          border-top: 1px solid #38415d;
+          color: #6b7280;
+          font-size: 12px;
+        ">
+          🌟 Each key can only be used once<br>
+          Contact the admins if you need a key
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(keyOverlay);
+    document.body.style.overflow = 'hidden';
+
+    // Focus on input
+    const keyInput = document.getElementById('keyInput');
+    const submitBtn = document.getElementById('submitKey');
+    const keyError = document.getElementById('keyError');
+
+    // Add hover effect to button
+    submitBtn.addEventListener('mouseenter', function() {
+      this.style.transform = 'translateY(-2px)';
+      this.style.boxShadow = '0 6px 20px rgba(79, 144, 255, 0.5)';
+    });
+
+    submitBtn.addEventListener('mouseleave', function() {
+      this.style.transform = 'translateY(0)';
+      this.style.boxShadow = '0 4px 15px rgba(79, 144, 255, 0.3)';
+    });
+
+    // Add focus effect to input
+    keyInput.addEventListener('focus', function() {
+      this.style.borderColor = '#4f90ff';
+      this.style.boxShadow = '0 0 0 3px rgba(79, 144, 255, 0.1)';
+    });
+
+    keyInput.addEventListener('blur', function() {
+      this.style.borderColor = '#38415d';
+      this.style.boxShadow = 'none';
+    });
+
+    function verifyKey() {
+      const enteredKey = keyInput.value.trim();
+      
+      if (!enteredKey) {
+        keyError.textContent = '❌ Please enter a key';
+        keyError.style.display = 'block';
+        keyInput.style.borderColor = '#ff4444';
+        return;
+      }
+
+      // Check if key exists and hasn't been used
+      if (validKeys.hasOwnProperty(enteredKey) && !validKeys[enteredKey]) {
+        // Mark key as used globally
+        validKeys[enteredKey] = true;
+        usedKeys.push(enteredKey);
+        localStorage.setItem('galaxyverse_used_keys', JSON.stringify(usedKeys));
+        localStorage.setItem('galaxyverse_access', 'granted');
+        localStorage.setItem('galaxyverse_user_key', enteredKey);
+
+        // Success animation
+        keyError.style.color = '#4ade80';
+        keyError.textContent = '✅ Access granted! Welcome to GalaxyVerse';
+        keyError.style.display = 'block';
+        keyInput.style.borderColor = '#4ade80';
+        submitBtn.style.background = 'linear-gradient(135deg, #4ade80, #22c55e)';
+        submitBtn.textContent = 'Loading...';
+        submitBtn.disabled = true;
+
+        setTimeout(() => {
+          keyOverlay.style.opacity = '0';
+          keyOverlay.style.transition = 'opacity 0.5s ease';
+          setTimeout(() => {
+            keyOverlay.remove();
+            document.body.style.overflow = '';
+          }, 500);
+        }, 1500);
+      } else if (validKeys.hasOwnProperty(enteredKey) && validKeys[enteredKey]) {
+        // Key has already been used
+        keyError.textContent = '❌ This key has already been used. Please use a different key.';
+        keyError.style.display = 'block';
+        keyInput.style.borderColor = '#ff4444';
+        keyInput.value = '';
+      } else {
+        // Invalid key
+        keyError.textContent = '❌ Invalid key. Please try again';
+        keyError.style.display = 'block';
+        keyInput.style.borderColor = '#ff4444';
+        keyInput.value = '';
+      }
+    }
+
+    // Submit key on button click
+    submitBtn.addEventListener('click', verifyKey);
+
+    // Submit key on Enter press
+    keyInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        verifyKey();
+      }
+    });
+
+    // Prevent access to the rest of the page
+    keyInput.focus();
+    
+    // Stop execution of rest of script until key is verified
+    throw new Error('Access denied - valid key required');
+  }
+})();
+
+// ===== ABOUT:BLANK CLOAKING =====
 (function() {
   const aboutBlankEnabled = localStorage.getItem('aboutBlank');
-  
-  // Check if we're NOT already in an about:blank iframe
   const isInAboutBlank = window.self !== window.top;
   
-  // Only enable if explicitly enabled (default is OFF)
   if (aboutBlankEnabled === 'enabled' && !isInAboutBlank) {
     const currentURL = window.location.href;
-    
-    // Open about:blank window
     const win = window.open('about:blank', '_blank');
     
     if (win) {
-      // Write the content to the new window
       win.document.open();
       win.document.write(`
         <!DOCTYPE html>
@@ -28,188 +248,54 @@
         </html>
       `);
       win.document.close();
-      
-      // Close the original tab
       window.location.replace('about:blank');
       window.close();
     }
   }
 })();
 
-// Game data - loaded from local files
+// ===== GAME DATA =====
 const games = [
-  { 
-    name: "Feedback", 
-    image: "https://iili.io/3OM27wv.th.jpg", 
-    url: "https://forms.gle/GhMEg7s8H9aRSy4d9" 
-  },
-  { 
-    name: "1v1 Oldest", 
-    image: "others/assets/images/games/1v1lololdest.jpeg",
-    url: "others/assets/games/1v1.lol_oldest.html" 
-  },
-  { 
-    name: "8 Ball Pool", 
-    image: "others/assets/images/games/8-ball-pool-2021-08-05.webp",
-    url: "others/assets/games/8 Ball Pool.html" 
-  },
-  { 
-    name: "A Small World Cup", 
-    image: "others/assets/images/games/asmallworldcup.png",
-    url: "others/assets/games/A Small World Cup.html" 
-  },
-  { 
-    name: "Bacon May Die", 
-    image: "others/assets/images/games/bacon-may-die.png",
-    url: "others/assets/games/Bacon May Die.html" 
-  },
-  { 
-    name: "Bad Time Simulator", 
-    image: "others/assets/images/games/badtimesim.png",
-    url: "others/assets/games/Bad Time Simulator.html" 
-  },
-  { 
-    name: "Baldi's Basics Plus", 
-    image: "others/assets/images/games/baldis.png",
-    url: "others/assets/games/Baldi's Basics Plus.html" 
-  },
-  { 
-    name: "Basketbros.IO", 
-    image: "others/assets/images/games/basketbros-io.jpg",
-    url: "others/assets/games/Basket Bros.html" 
-  },
-  { 
-    name: "BitLife", 
-    image: "others/assets/images/games/bitlife.jpeg",
-    url: "others/assets/games/BitLife.html" 
-  },
-  { 
-    name: "Bloxorz", 
-    image: "others/assets/images/games/blockorz.jpeg",
-    url: "others/assets/games/Bloxorz.html" 
-  },
-  { 
-    name: "Cookie Clicker", 
-    image: "others/assets/images/games/cookie-clicker.png",
-    url: "others/assets/games/Cookie Clicker.html" 
-  },
-  { 
-    name: "Crazy Cattle 3D", 
-    image: "others/assets/images/games/crazy-cattle-3d-icon.jpg",
-    url: "others/assets/games/Crazy Cattle 3D.html" 
-  },
-  { 
-    name: "Crossy Road", 
-    image: "others/assets/images/games/crossyroad.png",
-    url: "others/assets/games/Crossy Road.html" 
-  },
-  { 
-    name: "Drift Boss", 
-    image: "others/assets/images/games/driftboss.png",
-    url: "others/assets/games/Drift Boss.html" 
-  },
-  { 
-    name: "Drift Hunters ", 
-    image: "others/assets/images/games/drift-hunters.png",
-    url: "others/assets/games/Drift Hunters.html" 
-  },
-  { 
-    name: "Friday Night Funkin': Darkness Takeover", 
-    image: "others/assets/images/games/takeover.jpg",
-    url: "others/assets/games/Friday Night Funkin'_ Darkness Takeover.html" 
-  },
-  { 
-    name: "Geometry Dash Lite", 
-    image: "others/assets/images/games/dashlite.png",
-    url: "others/assets/games/Geometry Dash Lite.html" 
-  },
-  { 
-    name: "Google Baseball", 
-    image: "others/assets/images/games/baseball.png",
-    url: "others/assets/games/Google Baseball.html" 
-  },
-  { 
-    name: "Infinite Craft", 
-    image: "others/assets/images/games/infcraft.jpg",
-    url: "others/assets/games/Infinite Craft" 
-  },
-  { 
-    name: "Jetpack Joyride", 
-    image: "others/assets/images/games/jetpack.png",
-    url: "others/assets/games/Jetpack Joyride.html" 
-  },
-  { 
-    name: "Monkey Mart", 
-    image: "others/assets/images/games/monkey-mart.png",
-    url: "others/assets/games/Monkey Mart.html" 
-  },
-  { 
-    name: "Paper.IO", 
-    image: "others/assets/images/games/paperio2.png",
-    url: "others/assets/games/Paper.io 2.html" 
-  },
-  { 
-    name: "Retro Bowl", 
-    image: "others/assets/images/games/retro-bowl.jpeg",
-    url: "others/assets/games/Retro Bowl.html" 
-  },
-  { 
-    name: "Rooftop Snipers", 
-    image: "others/assets/images/games/rooftopsnipers.jpg",
-    url: "others/assets/games/Rooftop Snipers.html" 
-  },
-  { 
-    name: "Rooftop Snipers 2", 
-    image: "others/assets/images/games/rooftop-snipers-2.avif",
-    url: "others/assets/games/Rooftop Snipers 2.html" 
-  },
-  { 
-    name: "Slope", 
-    image: "others/assets/images/games/slope.png",
-    url: "others/assets/games/Slope.html" 
-  },
-  { 
-    name: "Solar Smash", 
-    image: "others/assets/images/games/Solar_smash.webp",
-    url: "others/assets/games/Solar Smash.html" 
-  },
-  { 
-    name: "Subway Surfers San Francisco", 
-    image: "others/assets/images/games/subwaysanfran.jpeg",
-    url: "others/assets/games/Subway Surfers_ San Francisco.html" 
-  },
-  { 
-    name: "Subway Surfers Winter Holiday", 
-    image: "others/assets/images/games/subway-surfers.jpg",
-    url: "others/assets/games/Subway Surfers_ Winter Holiday.html" 
-  }
+  { name: "Feedback", image: "https://iili.io/3OM27wv.th.jpg", url: "https://forms.gle/GhMEg7s8H9aRSy4d9" },
+  { name: "1v1 Oldest", image: "others/assets/images/games/1v1lololdest.jpeg", url: "others/assets/games/1v1.lol_oldest.html" },
+  { name: "8 Ball Pool", image: "others/assets/images/games/8-ball-pool-2021-08-05.webp", url: "others/assets/games/8 Ball Pool.html" },
+  { name: "A Small World Cup", image: "others/assets/images/games/asmallworldcup.png", url: "others/assets/games/A Small World Cup.html" },
+  { name: "Bacon May Die", image: "others/assets/images/games/bacon-may-die.png", url: "others/assets/games/Bacon May Die.html" },
+  { name: "Bad Time Simulator", image: "others/assets/images/games/badtimesim.png", url: "others/assets/games/Bad Time Simulator.html" },
+  { name: "Baldi's Basics Plus", image: "others/assets/images/games/baldis.png", url: "others/assets/games/Baldi's Basics Plus.html" },
+  { name: "Basketbros.IO", image: "others/assets/images/games/basketbros-io.jpg", url: "others/assets/games/Basket Bros.html" },
+  { name: "BitLife", image: "others/assets/images/games/bitlife.jpeg", url: "others/assets/games/BitLife.html" },
+  { name: "Bloxorz", image: "others/assets/images/games/blockorz.jpeg", url: "others/assets/games/Bloxorz.html" },
+  { name: "Cookie Clicker", image: "others/assets/images/games/cookie-clicker.png", url: "others/assets/games/Cookie Clicker.html" },
+  { name: "Crazy Cattle 3D", image: "others/assets/images/games/crazy-cattle-3d-icon.jpg", url: "others/assets/games/Crazy Cattle 3D.html" },
+  { name: "Crossy Road", image: "others/assets/images/games/crossyroad.png", url: "others/assets/games/Crossy Road.html" },
+  { name: "Drift Boss", image: "others/assets/images/games/driftboss.png", url: "others/assets/games/Drift Boss.html" },
+  { name: "Drift Hunters ", image: "others/assets/images/games/drift-hunters.png", url: "others/assets/games/Drift Hunters.html" },
+  { name: "Friday Night Funkin': Darkness Takeover", image: "others/assets/images/games/takeover.jpg", url: "others/assets/games/Friday Night Funkin'_ Darkness Takeover.html" },
+  { name: "Geometry Dash Lite", image: "others/assets/images/games/dashlite.png", url: "others/assets/games/Geometry Dash Lite.html" },
+  { name: "Google Baseball", image: "others/assets/images/games/baseball.png", url: "others/assets/games/Google Baseball.html" },
+  { name: "Infinite Craft", image: "others/assets/images/games/infcraft.jpg", url: "others/assets/games/Infinite Craft" },
+  { name: "Jetpack Joyride", image: "others/assets/images/games/jetpack.png", url: "others/assets/games/Jetpack Joyride.html" },
+  { name: "Monkey Mart", image: "others/assets/images/games/monkey-mart.png", url: "others/assets/games/Monkey Mart.html" },
+  { name: "Paper.IO", image: "others/assets/images/games/paperio2.png", url: "others/assets/games/Paper.io 2.html" },
+  { name: "Retro Bowl", image: "others/assets/images/games/retro-bowl.jpeg", url: "others/assets/games/Retro Bowl.html" },
+  { name: "Rooftop Snipers", image: "others/assets/images/games/rooftopsnipers.jpg", url: "others/assets/games/Rooftop Snipers.html" },
+  { name: "Rooftop Snipers 2", image: "others/assets/images/games/rooftop-snipers-2.avif", url: "others/assets/games/Rooftop Snipers 2.html" },
+  { name: "Slope", image: "others/assets/images/games/slope.png", url: "others/assets/games/Slope.html" },
+  { name: "Solar Smash", image: "others/assets/images/games/Solar_smash.webp", url: "others/assets/games/Solar Smash.html" },
+  { name: "Subway Surfers San Francisco", image: "others/assets/images/games/subwaysanfran.jpeg", url: "others/assets/games/Subway Surfers_ San Francisco.html" },
+  { name: "Subway Surfers Winter Holiday", image: "others/assets/images/games/subway-surfers.jpg", url: "others/assets/games/Subway Surfers_ Winter Holiday.html" }
 ];
 
-// App data
+// ===== APP DATA =====
 const apps = [
-  { 
-    name: "YouTube", 
-    image: "others/assets/images/apps/youtube.png", 
-    url: "others/assets/apps/YouTube.html" 
-  },
-  { 
-    name: "Spotify", 
-    image: "others/assets/images/apps/spotify.png", 
-    url: "others/assets/apps/Spotify.html" 
-  },
-  { 
-    name: "Soundboard", 
-    image: "others/assets/images/apps/soundboard.png", 
-    url: "others/assets/apps/Soundboard.html" 
-  },
-  { 
-    name: "Vscode", 
-    image: "others/assets/images/apps/vscode.png", 
-    url: "others/assets/apps/Vscode.html" 
-  }
+  { name: "YouTube", image: "others/assets/images/apps/youtube.png", url: "others/assets/apps/YouTube.html" },
+  { name: "Spotify", image: "others/assets/images/apps/spotify.png", url: "others/assets/apps/Spotify.html" },
+  { name: "Soundboard", image: "others/assets/images/apps/soundboard.png", url: "others/assets/apps/Soundboard.html" },
+  { name: "Vscode", image: "others/assets/images/apps/vscode.png", url: "others/assets/apps/Vscode.html" }
 ];
 
-// Tab Cloaking presets
+// ===== TAB CLOAKING PRESETS =====
 const presets = {
   google: { title: "Google", favicon: "https://www.google.com/favicon.ico" },
   classroom: { title: "Home", favicon: "https://ssl.gstatic.com/classroom/favicon.png" },
@@ -220,178 +306,43 @@ const presets = {
   chrome: { title: "New Tab", favicon: "https://www.google.com/favicon.ico" }
 };
 
-// Theme configurations
+// ===== THEME CONFIGURATIONS =====
 const themes = {
-  original: {
-    bgColor: '#121826',
-    navColor: '#1e2433',
-    accentColor: '#4f90ff',
-    textColor: '#e0e6f1',
-    borderColor: '#38415d',
-    hoverBg: '#2a2f48',
-    btnBg: '#3b466f',
-    btnHoverBg: '#4f90ff'
-  },
-  dark: {
-    bgColor: '#0a0a0a',
-    navColor: '#1a1a1a',
-    accentColor: '#00ff00',
-    textColor: '#ffffff',
-    borderColor: '#333333',
-    hoverBg: '#2a2a2a',
-    btnBg: '#262626',
-    btnHoverBg: '#00ff00'
-  },
-  light: {
-    bgColor: '#f5f5f5',
-    navColor: '#ffffff',
-    accentColor: '#2563eb',
-    textColor: '#1f2937',
-    borderColor: '#e5e7eb',
-    hoverBg: '#e5e7eb',
-    btnBg: '#d1d5db',
-    btnHoverBg: '#2563eb'
-  },
-  midnight: {
-    bgColor: '#0f0f23',
-    navColor: '#1a1a2e',
-    accentColor: '#9d4edd',
-    textColor: '#e0e0e0',
-    borderColor: '#3c3c5a',
-    hoverBg: '#2a2a4e',
-    btnBg: '#3c3c6f',
-    btnHoverBg: '#9d4edd'
-  },
-  ocean: {
-    bgColor: '#001f3f',
-    navColor: '#0a2f4f',
-    accentColor: '#00d4ff',
-    textColor: '#cfe2f3',
-    borderColor: '#1a4f6f',
-    hoverBg: '#1a3f5f',
-    btnBg: '#2a5f7f',
-    btnHoverBg: '#00d4ff'
-  },
-  sunset: {
-    bgColor: '#2d1b2e',
-    navColor: '#3d2b3e',
-    accentColor: '#ff6b9d',
-    textColor: '#fce4ec',
-    borderColor: '#5d4b5e',
-    hoverBg: '#4d3b4e',
-    btnBg: '#6d5b6e',
-    btnHoverBg: '#ff6b9d'
-  },
-  forest: {
-    bgColor: '#1a2f1a',
-    navColor: '#2a3f2a',
-    accentColor: '#7cb342',
-    textColor: '#e8f5e9',
-    borderColor: '#3a5f3a',
-    hoverBg: '#3a4f3a',
-    btnBg: '#4a6f4a',
-    btnHoverBg: '#7cb342'
-  },
-  purple: {
-    bgColor: '#1a0a2e',
-    navColor: '#2a1a3e',
-    accentColor: '#b744f7',
-    textColor: '#f0e6ff',
-    borderColor: '#4a3a5e',
-    hoverBg: '#3a2a4e',
-    btnBg: '#5a4a6e',
-    btnHoverBg: '#b744f7'
-  },
-  cyberpunk: {
-    bgColor: '#0d0221',
-    navColor: '#1a0b3a',
-    accentColor: '#ff006e',
-    textColor: '#00f5ff',
-    borderColor: '#8338ec',
-    hoverBg: '#2a1a4a',
-    btnBg: '#3a2a5a',
-    btnHoverBg: '#ff006e'
-  },
-  matrix: {
-    bgColor: '#000000',
-    navColor: '#0a1a0a',
-    accentColor: '#00ff41',
-    textColor: '#00ff41',
-    borderColor: '#003b00',
-    hoverBg: '#0a2a0a',
-    btnBg: '#1a3a1a',
-    btnHoverBg: '#00ff41'
-  },
-  neon: {
-    bgColor: '#1a0033',
-    navColor: '#2a0a4a',
-    accentColor: '#ff00ff',
-    textColor: '#00ffff',
-    borderColor: '#4a1a6a',
-    hoverBg: '#3a1a5a',
-    btnBg: '#5a2a7a',
-    btnHoverBg: '#ff00ff'
-  },
-  fire: {
-    bgColor: '#1a0a00',
-    navColor: '#2a1a0a',
-    accentColor: '#ff4500',
-    textColor: '#ffe4b5',
-    borderColor: '#4a2a1a',
-    hoverBg: '#3a1a0a',
-    btnBg: '#5a3a2a',
-    btnHoverBg: '#ff4500'
-  },
-  ice: {
-    bgColor: '#0a1a2a',
-    navColor: '#1a2a3a',
-    accentColor: '#00bfff',
-    textColor: '#e0f7ff',
-    borderColor: '#2a3a4a',
-    hoverBg: '#1a2a3a',
-    btnBg: '#2a4a5a',
-    btnHoverBg: '#00bfff'
-  },
-  retro: {
-    bgColor: '#2b1b17',
-    navColor: '#3d2b27',
-    accentColor: '#ff9966',
-    textColor: '#ffeaa7',
-    borderColor: '#5d4b47',
-    hoverBg: '#4d3b37',
-    btnBg: '#6d5b57',
-    btnHoverBg: '#ff9966'
-  }
+  original: { bgColor: '#121826', navColor: '#1e2433', accentColor: '#4f90ff', textColor: '#e0e6f1', borderColor: '#38415d', hoverBg: '#2a2f48', btnBg: '#3b466f', btnHoverBg: '#4f90ff' },
+  dark: { bgColor: '#0a0a0a', navColor: '#1a1a1a', accentColor: '#00ff00', textColor: '#ffffff', borderColor: '#333333', hoverBg: '#2a2a2a', btnBg: '#262626', btnHoverBg: '#00ff00' },
+  light: { bgColor: '#f5f5f5', navColor: '#ffffff', accentColor: '#2563eb', textColor: '#1f2937', borderColor: '#e5e7eb', hoverBg: '#e5e7eb', btnBg: '#d1d5db', btnHoverBg: '#2563eb' },
+  midnight: { bgColor: '#0f0f23', navColor: '#1a1a2e', accentColor: '#9d4edd', textColor: '#e0e0e0', borderColor: '#3c3c5a', hoverBg: '#2a2a4e', btnBg: '#3c3c6f', btnHoverBg: '#9d4edd' },
+  ocean: { bgColor: '#001f3f', navColor: '#0a2f4f', accentColor: '#00d4ff', textColor: '#cfe2f3', borderColor: '#1a4f6f', hoverBg: '#1a3f5f', btnBg: '#2a5f7f', btnHoverBg: '#00d4ff' },
+  sunset: { bgColor: '#2d1b2e', navColor: '#3d2b3e', accentColor: '#ff6b9d', textColor: '#fce4ec', borderColor: '#5d4b5e', hoverBg: '#4d3b4e', btnBg: '#6d5b6e', btnHoverBg: '#ff6b9d' },
+  forest: { bgColor: '#1a2f1a', navColor: '#2a3f2a', accentColor: '#7cb342', textColor: '#e8f5e9', borderColor: '#3a5f3a', hoverBg: '#3a4f3a', btnBg: '#4a6f4a', btnHoverBg: '#7cb342' },
+  purple: { bgColor: '#1a0a2e', navColor: '#2a1a3e', accentColor: '#b744f7', textColor: '#f0e6ff', borderColor: '#4a3a5e', hoverBg: '#3a2a4e', btnBg: '#5a4a6e', btnHoverBg: '#b744f7' },
+  cyberpunk: { bgColor: '#0d0221', navColor: '#1a0b3a', accentColor: '#ff006e', textColor: '#00f5ff', borderColor: '#8338ec', hoverBg: '#2a1a4a', btnBg: '#3a2a5a', btnHoverBg: '#ff006e' },
+  matrix: { bgColor: '#000000', navColor: '#0a1a0a', accentColor: '#00ff41', textColor: '#00ff41', borderColor: '#003b00', hoverBg: '#0a2a0a', btnBg: '#1a3a1a', btnHoverBg: '#00ff41' },
+  neon: { bgColor: '#1a0033', navColor: '#2a0a4a', accentColor: '#ff00ff', textColor: '#00ffff', borderColor: '#4a1a6a', hoverBg: '#3a1a5a', btnBg: '#5a2a7a', btnHoverBg: '#ff00ff' },
+  fire: { bgColor: '#1a0a00', navColor: '#2a1a0a', accentColor: '#ff4500', textColor: '#ffe4b5', borderColor: '#4a2a1a', hoverBg: '#3a1a0a', btnBg: '#5a3a2a', btnHoverBg: '#ff4500' },
+  ice: { bgColor: '#0a1a2a', navColor: '#1a2a3a', accentColor: '#00bfff', textColor: '#e0f7ff', borderColor: '#2a3a4a', hoverBg: '#1a2a3a', btnBg: '#2a4a5a', btnHoverBg: '#00bfff' },
+  retro: { bgColor: '#2b1b17', navColor: '#3d2b27', accentColor: '#ff9966', textColor: '#ffeaa7', borderColor: '#5d4b47', hoverBg: '#4d3b37', btnBg: '#6d5b57', btnHoverBg: '#ff9966' }
 };
 
-// Get Game of the Day - changes daily at midnight CDT
+// ===== GAME OF THE DAY =====
 function getGameOfTheDay() {
-  // Create date in CDT timezone (UTC-5)
   const now = new Date();
-  const cdtOffset = -5; // CDT is UTC-5
+  const cdtOffset = -5;
   const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
   const cdtTime = new Date(utc + (3600000 * cdtOffset));
-  
-  // Calculate day of year in CDT
   const startOfYear = new Date(cdtTime.getFullYear(), 0, 0);
   startOfYear.setHours(0, 0, 0, 0);
   const diff = cdtTime - startOfYear;
   const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
-  
-  // Filter out the Feedback game
   const playableGames = games.filter(game => game.name !== "Feedback");
   const index = dayOfYear % playableGames.length;
-  
   return playableGames[index];
 }
 
-// Display Game of the Day on home page
 function displayGameOfTheDay() {
   const gotdContainer = document.getElementById('game-of-the-day-container');
   if (!gotdContainer) return;
-  
   const game = getGameOfTheDay();
-  
   gotdContainer.innerHTML = `
     <div class="gotd-card">
       <div class="gotd-badge">🌟 Game of the Day</div>
@@ -402,11 +353,10 @@ function displayGameOfTheDay() {
   `;
 }
 
-// Apply theme function
+// ===== THEME SYSTEM =====
 function applyTheme(themeName) {
   const theme = themes[themeName];
   if (!theme) return;
-
   const root = document.documentElement;
   root.style.setProperty('--bg-color', theme.bgColor);
   root.style.setProperty('--nav-color', theme.navColor);
@@ -418,7 +368,7 @@ function applyTheme(themeName) {
   root.style.setProperty('--btn-hover-bg', theme.btnHoverBg);
 }
 
-// Debounce helper
+// ===== UTILITY FUNCTIONS =====
 function debounce(func, delay = 300) {
   let timeout;
   return function (...args) {
@@ -427,33 +377,25 @@ function debounce(func, delay = 300) {
   };
 }
 
-// Hide all content sections and remove active nav links
 function hideAll() {
   document.querySelectorAll('.content').forEach(c => (c.style.display = 'none'));
   document.querySelectorAll('.navbar li a').forEach(link => link.classList.remove('active'));
-  
-  // Hide homepage info buttons when not on home
   const infoButtons = document.querySelector('.homepage-info-buttons');
   if (infoButtons) infoButtons.style.display = 'none';
 }
 
-// Show home section
+// ===== NAVIGATION FUNCTIONS =====
 function showHome() {
   hideAll();
   const homeContent = document.getElementById('content-home');
   if (homeContent) homeContent.style.display = 'block';
   const homeLink = document.getElementById('homeLink');
   if (homeLink) homeLink.classList.add('active');
-  
-  // Show homepage info buttons
   const infoButtons = document.querySelector('.homepage-info-buttons');
   if (infoButtons) infoButtons.style.display = 'flex';
-  
-  // Display Game of the Day
   displayGameOfTheDay();
 }
 
-// Show games section and render games
 function showGames() {
   hideAll();
   const gamesContent = document.getElementById('content-games');
@@ -463,7 +405,6 @@ function showGames() {
   renderGames(games);
 }
 
-// Show apps section and render apps
 function showApps() {
   hideAll();
   const appsContent = document.getElementById('content-apps');
@@ -473,7 +414,6 @@ function showApps() {
   renderApps(apps);
 }
 
-// Show about section
 function showAbout() {
   hideAll();
   const aboutContent = document.getElementById('content-about');
@@ -482,7 +422,6 @@ function showAbout() {
   if (aboutLink) aboutLink.classList.add('active');
 }
 
-// Show settings section
 function showSettings() {
   hideAll();
   const settingsContent = document.getElementById('content-settings');
@@ -491,17 +430,15 @@ function showSettings() {
   if (settingsLink) settingsLink.classList.add('active');
 }
 
-// Render games list
+// ===== RENDER FUNCTIONS =====
 function renderGames(gamesToRender) {
   const gameList = document.getElementById('game-list');
   if (!gameList) return;
   gameList.innerHTML = '';
-
   if (gamesToRender.length === 0) {
     gameList.innerHTML = '<p>No games found. Try a different search term.</p>';
     return;
   }
-
   gamesToRender.forEach(game => {
     const card = document.createElement('div');
     card.className = 'game-card';
@@ -510,27 +447,20 @@ function renderGames(gamesToRender) {
       <img src="${game.image}" alt="${game.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/250x250?text=${encodeURIComponent(game.name)}'" />
       <h3>${game.name}</h3>
     `;
-
     card.onclick = () => loadGame(game.url);
-    card.onkeypress = (e) => {
-      if (e.key === 'Enter') loadGame(game.url);
-    };
-
+    card.onkeypress = (e) => { if (e.key === 'Enter') loadGame(game.url); };
     gameList.appendChild(card);
   });
 }
 
-// Render apps list
 function renderApps(appsToRender) {
   const appList = document.getElementById('app-list');
   if (!appList) return;
   appList.innerHTML = '';
-
   if (appsToRender.length === 0) {
     appList.innerHTML = '<p>No apps found.</p>';
     return;
   }
-
   appsToRender.forEach(app => {
     const card = document.createElement('div');
     card.className = 'app-card';
@@ -539,52 +469,37 @@ function renderApps(appsToRender) {
       <img src="${app.image}" alt="${app.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/250x250?text=${encodeURIComponent(app.name)}'" />
       <h3>${app.name}</h3>
     `;
-
     card.onclick = () => loadGame(app.url);
-    card.onkeypress = (e) => {
-      if (e.key === 'Enter') loadGame(app.url);
-    };
-
+    card.onkeypress = (e) => { if (e.key === 'Enter') loadGame(app.url); };
     appList.appendChild(card);
   });
 }
 
-// Load game or app in iframe view
 function loadGame(url) {
   hideAll();
   const gameDisplay = document.getElementById('game-display');
   const gameIframe = document.getElementById('game-iframe');
-
   if (gameDisplay && gameIframe) {
     gameIframe.src = url;
     gameDisplay.style.display = 'block';
   }
 }
 
-// Search games by name
 function searchGames() {
   const searchInput = document.getElementById('searchInput');
   if (!searchInput) return;
-
   const query = searchInput.value.toLowerCase().trim();
-
   if (!query) {
     renderGames(games);
     return;
   }
-
-  const filtered = games.filter(game =>
-    game.name.toLowerCase().includes(query)
-  );
-
+  const filtered = games.filter(game => game.name.toLowerCase().includes(query));
   renderGames(filtered);
 }
 
-// Toggle fullscreen of game iframe
 function toggleFullscreen() {
   const gameIframe = document.getElementById('game-iframe');
   if (!gameIframe) return;
-
   if (!document.fullscreenElement) {
     gameIframe.requestFullscreen().catch(err => {
       console.error('Error attempting to enable fullscreen:', err);
@@ -594,7 +509,6 @@ function toggleFullscreen() {
   }
 }
 
-// Homepage search that opens YouTube search results in new tab
 function homepageSearch() {
   const input = document.getElementById('homepageSearchInput');
   if (!input) return;
@@ -605,45 +519,35 @@ function homepageSearch() {
   window.open(url, '_blank');
 }
 
-// Snow effect variables
+// ===== SNOW EFFECT =====
 let snowEnabled = true;
 let snowInterval = null;
 
-// Create a snowflake element and animate it
 function createSnowflake() {
   if (!snowEnabled) return;
-
   const snowflake = document.createElement('div');
   snowflake.classList.add('snowflake');
-
   const size = Math.random() * 4 + 2;
   snowflake.style.width = `${size}px`;
   snowflake.style.height = `${size}px`;
   snowflake.style.left = `${Math.random() * window.innerWidth}px`;
-
   const fallDuration = Math.random() * 10 + 5;
   snowflake.style.animationDuration = `${fallDuration}s`;
   snowflake.style.animationDelay = `${Math.random() * 15}s`;
   snowflake.style.opacity = (Math.random() * 0.5 + 0.3).toFixed(2);
-
   const snowContainer = document.getElementById('snow-container');
   if (snowContainer) {
     snowContainer.appendChild(snowflake);
-
-    setTimeout(() => {
-      snowflake.remove();
-    }, (fallDuration + 15) * 1000);
+    setTimeout(() => { snowflake.remove(); }, (fallDuration + 15) * 1000);
   }
 }
 
-// Start snow effect interval
 function startSnow() {
   if (snowInterval) return;
   snowEnabled = true;
   snowInterval = setInterval(createSnowflake, 200);
 }
 
-// Stop snow effect and clear snowflakes
 function stopSnow() {
   snowEnabled = false;
   if (snowInterval) {
@@ -651,12 +555,10 @@ function stopSnow() {
     snowInterval = null;
   }
   const snowContainer = document.getElementById('snow-container');
-  if (snowContainer) {
-    snowContainer.innerHTML = '';
-  }
+  if (snowContainer) snowContainer.innerHTML = '';
 }
 
-// Apply tab cloaking: change title and favicon
+// ===== TAB CLOAKING =====
 function applyTabCloaking(title, favicon) {
   if (title) {
     document.title = title;
@@ -674,7 +576,7 @@ function applyTabCloaking(title, favicon) {
   }
 }
 
-// Load saved settings from localStorage and apply them
+// ===== LOAD SETTINGS =====
 function loadSettings() {
   const savedTitle = localStorage.getItem('TabCloak_Title');
   const savedFavicon = localStorage.getItem('TabCloak_Favicon');
@@ -718,14 +620,13 @@ function loadSettings() {
 
   const aboutBlankToggle = document.getElementById('aboutBlankToggle');
   if (aboutBlankToggle) {
-    // Default to disabled (unchecked)
     aboutBlankToggle.checked = savedAboutBlank === 'enabled';
   }
 
   applyTheme(savedTheme);
 }
 
-// Initialize event listeners and load settings on page load
+// ===== INITIALIZATION =====
 window.onload = () => {
   loadSettings();
   showHome();
@@ -735,7 +636,6 @@ window.onload = () => {
   if (themeSelect) {
     const savedTheme = localStorage.getItem('selectedTheme') || 'original';
     themeSelect.value = savedTheme;
-
     themeSelect.addEventListener('change', (e) => {
       const theme = e.target.value;
       applyTheme(theme);
@@ -743,7 +643,7 @@ window.onload = () => {
     });
   }
 
-  // Credits and Update Log button handlers
+  // Credits and Update Log buttons
   const creditsBtn = document.getElementById('creditsBtn');
   const updateLogBtn = document.getElementById('updateLogBtn');
   const creditsModal = document.getElementById('creditsModal');
@@ -807,7 +707,7 @@ window.onload = () => {
     });
   }
 
-  // Preset select dropdown change
+  // Preset select dropdown
   const presetSelect = document.getElementById('presetSelect');
   if (presetSelect) {
     presetSelect.addEventListener('change', (e) => {
@@ -836,7 +736,7 @@ window.onload = () => {
     });
   }
 
-  // Panic hotkey input keydown for setting hotkey
+  // Panic hotkey input
   const hotkeyInput = document.getElementById('hotkey-input');
   if (hotkeyInput) {
     hotkeyInput.addEventListener('keydown', (e) => {
@@ -878,7 +778,7 @@ window.onload = () => {
     });
   }
 
-  // Panic button key listener for redirect
+  // Panic button key listener
   window.addEventListener('keydown', (e) => {
     const savedHotkey = localStorage.getItem('hotkey') || '`';
     const redirectURL = localStorage.getItem('redirectURL') || 'https://google.com';
@@ -895,17 +795,14 @@ window.onload = () => {
       localStorage.setItem('aboutBlank', value);
       if (e.target.checked) {
         alert('About:blank cloaking enabled. The page will reload in about:blank mode to hide from history.');
-        // Reload to apply about:blank immediately
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
+        setTimeout(() => { window.location.reload(); }, 1000);
       } else {
         alert('About:blank cloaking disabled. Note: You may need to manually close this tab and reopen the site normally.');
       }
     });
   }
 
-  // Navigation links event listeners
+  // Navigation links
   const navHome = document.getElementById('homeLink');
   const navGames = document.getElementById('gameLink');
   const navApps = document.getElementById('appsLink');
@@ -918,7 +815,7 @@ window.onload = () => {
   if (navAbout) navAbout.addEventListener('click', e => { e.preventDefault(); showAbout(); });
   if (navSettings) navSettings.addEventListener('click', e => { e.preventDefault(); showSettings(); });
 
-  // Game search event listeners
+  // Game search
   const searchBtn = document.getElementById('searchBtn');
   const searchInput = document.getElementById('searchInput');
   if (searchBtn) searchBtn.addEventListener('click', searchGames);
@@ -929,17 +826,17 @@ window.onload = () => {
     });
   }
 
-  // Back buttons event listeners
+  // Back buttons
   const backToHomeApps = document.getElementById('backToHomeApps');
   if (backToHomeApps) backToHomeApps.addEventListener('click', showHome);
   const backToHomeGame = document.getElementById('backToHomeGame');
   if (backToHomeGame) backToHomeGame.addEventListener('click', showHome);
 
-  // Fullscreen toggle button
+  // Fullscreen toggle
   const fullscreenBtn = document.getElementById('fullscreenBtn');
   if (fullscreenBtn) fullscreenBtn.addEventListener('click', toggleFullscreen);
 
-  // Homepage search bar event listeners
+  // Homepage search
   const homepageSearchBtn = document.getElementById('homepageSearchBtn');
   const homepageSearchInput = document.getElementById('homepageSearchInput');
   if (homepageSearchBtn) homepageSearchBtn.addEventListener('click', homepageSearch);
