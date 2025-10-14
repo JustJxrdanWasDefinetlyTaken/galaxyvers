@@ -9,13 +9,13 @@
 (function() {
   // Firebase configuration - REPLACE WITH YOUR OWN CONFIG
 const firebaseConfig = {
-  apiKey: "AIzaSyXXXXXXXXXXXXXXXXXXXXXXXX",
-  authDomain: "your-project.firebaseapp.com",
-  databaseURL: "https://your-project-default-rtdb.firebaseio.com",
-  projectId: "your-project",
-  storageBucket: "your-project.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:xxxxxxxxxxxxx"
+  apiKey: "AIzaSyBEAf_wxxWQtaYdIfgKTTl5ls5o7e3qfAU",
+  authDomain: "galaxyverse-keys.firebaseapp.com",
+  databaseURL: "https://galaxyverse-keys-default-rtdb.firebaseio.com",
+  projectId: "galaxyverse-keys",
+  storageBucket: "galaxyverse-keys.firebasestorage.app",
+  messagingSenderId: "571215796975",
+  appId: "1:571215796975:web:820d004292cb4159f1d91a",
 };
 
   // Initialize Firebase
@@ -137,6 +137,7 @@ const firebaseConfig = {
         ">
           🌟 Each key can only be used once globally<br>
           Contact the admins if you need a key
+          Lifetime key is $15.(lifetime keys taken only at the moment
         </div>
       </div>
     `;
