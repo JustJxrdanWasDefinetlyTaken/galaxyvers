@@ -1,24 +1,40 @@
-// ===== KEY SYSTEM - MUST BE FIRST =====
+// ===== FIREBASE KEY SYSTEM - MUST BE FIRST =====
+// NOTE: You need to add Firebase SDK to your HTML file first!
+// Add these scripts to your index.html BEFORE scripts.js:
+/*
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+*/
+
 (function() {
-  // Valid keys - these can only be used once globally
-  const validKeys = {
-    'freekey': false,
-    'newkey123': false,
-    'davidishere': false,
-    'azthedev': false,
-    'msanchez': false
-  };
+  // Firebase configuration - REPLACE WITH YOUR OWN CONFIG
+const firebaseConfig = {
+  apiKey: "AIzaSyXXXXXXXXXXXXXXXXXXXXXXXX",
+  authDomain: "your-project.firebaseapp.com",
+  databaseURL: "https://your-project-default-rtdb.firebaseio.com",
+  projectId: "your-project",
+  storageBucket: "your-project.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "1:123456789:web:xxxxxxxxxxxxx"
+};
 
-  // Check if user has already activated a key
+  // Initialize Firebase
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+  const database = firebase.database();
+
+  // Valid keys list
+  const validKeys = [
+    'freekey',
+    'newkey123',
+    'davidishere',
+    'azthedev',
+    'msanchez'
+  ];
+
+  // Check if user has already activated a key locally
   const hasAccess = localStorage.getItem('galaxyverse_access');
-  const usedKeys = JSON.parse(localStorage.getItem('galaxyverse_used_keys') || '[]');
-
-  // Mark previously used keys as unavailable
-  usedKeys.forEach(key => {
-    if (validKeys.hasOwnProperty(key)) {
-      validKeys[key] = true;
-    }
-  });
 
   // If user doesn't have access, show key entry screen
   if (hasAccess !== 'granted') {
@@ -119,7 +135,7 @@
           color: #6b7280;
           font-size: 12px;
         ">
-          🌟 Each key can only be used once<br>
+          🌟 Each key can only be used once globally<br>
           Contact the admins if you need a key
         </div>
       </div>
@@ -128,7 +144,7 @@
     document.body.appendChild(keyOverlay);
     document.body.style.overflow = 'hidden';
 
-    // Focus on input
+    // Get elements
     const keyInput = document.getElementById('keyInput');
     const submitBtn = document.getElementById('submitKey');
     const keyError = document.getElementById('keyError');
@@ -155,7 +171,7 @@
       this.style.boxShadow = 'none';
     });
 
-    function verifyKey() {
+    async function verifyKey() {
       const enteredKey = keyInput.value.trim();
       
       if (!enteredKey) {
@@ -165,44 +181,71 @@
         return;
       }
 
-      // Check if key exists and hasn't been used
-      if (validKeys.hasOwnProperty(enteredKey) && !validKeys[enteredKey]) {
-        // Mark key as used globally
-        validKeys[enteredKey] = true;
-        usedKeys.push(enteredKey);
-        localStorage.setItem('galaxyverse_used_keys', JSON.stringify(usedKeys));
-        localStorage.setItem('galaxyverse_access', 'granted');
-        localStorage.setItem('galaxyverse_user_key', enteredKey);
-
-        // Success animation
-        keyError.style.color = '#4ade80';
-        keyError.textContent = '✅ Access granted! Welcome to GalaxyVerse';
-        keyError.style.display = 'block';
-        keyInput.style.borderColor = '#4ade80';
-        submitBtn.style.background = 'linear-gradient(135deg, #4ade80, #22c55e)';
-        submitBtn.textContent = 'Loading...';
-        submitBtn.disabled = true;
-
-        setTimeout(() => {
-          keyOverlay.style.opacity = '0';
-          keyOverlay.style.transition = 'opacity 0.5s ease';
-          setTimeout(() => {
-            keyOverlay.remove();
-            document.body.style.overflow = '';
-          }, 500);
-        }, 1500);
-      } else if (validKeys.hasOwnProperty(enteredKey) && validKeys[enteredKey]) {
-        // Key has already been used
-        keyError.textContent = '❌ This key has already been used. Please use a different key.';
-        keyError.style.display = 'block';
-        keyInput.style.borderColor = '#ff4444';
-        keyInput.value = '';
-      } else {
-        // Invalid key
+      // Check if key is in the valid keys list
+      if (!validKeys.includes(enteredKey)) {
         keyError.textContent = '❌ Invalid key. Please try again';
         keyError.style.display = 'block';
         keyInput.style.borderColor = '#ff4444';
         keyInput.value = '';
+        return;
+      }
+
+      // Disable button while checking
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Checking...';
+      submitBtn.style.cursor = 'wait';
+
+      try {
+        // Check Firebase if key has been used
+        const keyRef = database.ref('usedKeys/' + enteredKey);
+        const snapshot = await keyRef.once('value');
+        
+        if (snapshot.exists()) {
+          // Key has already been used
+          keyError.textContent = '❌ This key has already been used globally. Please use a different key.';
+          keyError.style.display = 'block';
+          keyInput.style.borderColor = '#ff4444';
+          keyInput.value = '';
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Verify Key';
+          submitBtn.style.cursor = 'pointer';
+        } else {
+          // Key is valid and unused - mark it as used in Firebase
+          await keyRef.set({
+            used: true,
+            timestamp: Date.now(),
+            date: new Date().toISOString()
+          });
+
+          // Grant access locally
+          localStorage.setItem('galaxyverse_access', 'granted');
+          localStorage.setItem('galaxyverse_user_key', enteredKey);
+
+          // Success animation
+          keyError.style.color = '#4ade80';
+          keyError.textContent = '✅ Access granted! Welcome to GalaxyVerse';
+          keyError.style.display = 'block';
+          keyInput.style.borderColor = '#4ade80';
+          submitBtn.style.background = 'linear-gradient(135deg, #4ade80, #22c55e)';
+          submitBtn.textContent = 'Success!';
+
+          setTimeout(() => {
+            keyOverlay.style.opacity = '0';
+            keyOverlay.style.transition = 'opacity 0.5s ease';
+            setTimeout(() => {
+              keyOverlay.remove();
+              document.body.style.overflow = '';
+            }, 500);
+          }, 1500);
+        }
+      } catch (error) {
+        console.error('Firebase error:', error);
+        keyError.textContent = '❌ Connection error. Please try again.';
+        keyError.style.display = 'block';
+        keyInput.style.borderColor = '#ff4444';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Verify Key';
+        submitBtn.style.cursor = 'pointer';
       }
     }
 
@@ -216,7 +259,7 @@
       }
     });
 
-    // Prevent access to the rest of the page
+    // Focus on input
     keyInput.focus();
     
     // Stop execution of rest of script until key is verified
