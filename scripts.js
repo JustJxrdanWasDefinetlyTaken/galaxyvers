@@ -136,8 +136,7 @@ const firebaseConfig = {
           font-size: 12px;
         ">
           🌟 Each key can only be used once globally<br>
-          Contact the admins if you need a key
-          Lifetime key is $15.(lifetime keys taken only at the moment
+          Contact the admins if you need a key. Lifetime key is $15.(lifetime keys taken only at the moment)
         </div>
       </div>
     `;
