@@ -4,8 +4,9 @@
 /*
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-<script src="others/assets/scripts/websitekeytracker.js"></script>
 */
+<script src="others/assets/scripts/websitekeytracker.js"></script>
+
 
 (function() {
   // Firebase configuration - REPLACE WITH YOUR OWN CONFIG
