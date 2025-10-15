@@ -19,3 +19,7 @@
 
 ### Discord Server
 https://discord.gg/FraNkZ4N
+### Additions
+No one should have access to this right now
+I am working very hard and skidding some stuff so that way stuff is hidden for my privacy and other people privacy
+If you find this tell az that you know its here and secret code word is doodoo butter and you will get a prize
