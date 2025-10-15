@@ -98,22 +98,24 @@
           return {
             key: key,
             used: false,
+            userId: null,
             websites: [],
-            timesUsed: 0
+            timesAccessed: 0
           };
         }
 
         const data = snapshot.val();
-        const metadata = data.metadata || {};
-        const sites = data.sites || {};
 
         return {
           key: key,
           used: true,
-          websites: metadata.websites || Object.keys(sites).map(s => s.replace(/_/g, '.')),
-          timesUsed: metadata.timesUsed || Object.keys(sites).length,
-          lastUsed: metadata.lastUsed || null,
-          siteDetails: sites
+          userId: data.userId || null,
+          websites: data.websites || [],
+          timesAccessed: data.timesAccessed || 0,
+          firstUsedOn: data.firstUsedOn || null,
+          firstUsedDate: data.firstUsedDate || null,
+          lastAccessed: data.lastAccessed || null,
+          lastAccessedSite: data.lastAccessedSite || null
         };
       } catch (error) {
         console.error('WebsiteKeyTracker: Error getting key stats:', error);
@@ -121,13 +123,12 @@
       }
     },
 
-    // Check if key is available for a specific website
-    isKeyAvailable: async function(key, website) {
+    // Check if key is available (not claimed by any user)
+    isKeyAvailable: async function(key) {
       if (!this.config.trackingEnabled) return true;
 
       try {
-        const sanitizedWebsite = website.replace(/\./g, '_');
-        const keyRef = this.database.ref(`usedKeys/${key}/sites/${sanitizedWebsite}`);
+        const keyRef = this.database.ref(`usedKeys/${key}`);
         const snapshot = await keyRef.once('value');
         
         return !snapshot.exists();
@@ -137,30 +138,52 @@
       }
     },
 
-    // Get all websites using a specific key
-    getWebsitesUsingKey: async function(key) {
+    // Check if key belongs to a specific user
+    doesKeyBelongToUser: async function(key, userId) {
+      if (!this.config.trackingEnabled) return false;
+
+      try {
+        const keyRef = this.database.ref(`usedKeys/${key}`);
+        const snapshot = await keyRef.once('value');
+        
+        if (!snapshot.exists()) return false;
+
+        const data = snapshot.val();
+        return data.userId === userId;
+      } catch (error) {
+        console.error('WebsiteKeyTracker: Error checking key ownership:', error);
+        return false;
+      }
+    },
+
+    // Get all websites a user has accessed with their key
+    getUserWebsites: async function(userId) {
       if (!this.config.trackingEnabled) return [];
 
       try {
-        const sitesRef = this.database.ref(`usedKeys/${key}/sites`);
-        const snapshot = await sitesRef.once('value');
+        const usedKeysRef = this.database.ref('usedKeys');
+        const snapshot = await usedKeysRef.once('value');
         
         if (!snapshot.exists()) return [];
 
-        const sites = [];
-        snapshot.forEach((childSnapshot) => {
-          const siteName = childSnapshot.key.replace(/_/g, '.');
-          const siteData = childSnapshot.val();
-          sites.push({
-            website: siteName,
-            date: siteData.date,
-            timestamp: siteData.timestamp
-          });
+        let userKey = null;
+        let websites = [];
+
+        snapshot.forEach((keySnapshot) => {
+          const keyData = keySnapshot.val();
+          if (keyData.userId === userId) {
+            userKey = keySnapshot.key;
+            websites = keyData.websites || [];
+          }
         });
 
-        return sites;
+        return {
+          userId: userId,
+          key: userKey,
+          websites: websites
+        };
       } catch (error) {
-        console.error('WebsiteKeyTracker: Error getting websites:', error);
+        console.error('WebsiteKeyTracker: Error getting user websites:', error);
         return [];
       }
     },
@@ -176,35 +199,37 @@
         if (!snapshot.exists()) {
           return {
             totalKeys: 0,
+            totalUsers: 0,
             totalWebsites: 0,
-            totalActivations: 0
+            totalAccesses: 0
           };
         }
 
-        let totalActivations = 0;
+        let totalAccesses = 0;
         const websiteSet = new Set();
+        const userSet = new Set();
         const keyCount = snapshot.numChildren();
 
         snapshot.forEach((keySnapshot) => {
           const keyData = keySnapshot.val();
-          if (keyData.metadata) {
-            totalActivations += keyData.metadata.timesUsed || 0;
-            if (keyData.metadata.websites) {
-              keyData.metadata.websites.forEach(site => websiteSet.add(site));
-            }
+          if (keyData.userId) {
+            userSet.add(keyData.userId);
           }
-          if (keyData.sites) {
-            Object.keys(keyData.sites).forEach(site => {
-              websiteSet.add(site.replace(/_/g, '.'));
-            });
+          if (keyData.timesAccessed) {
+            totalAccesses += keyData.timesAccessed;
+          }
+          if (keyData.websites) {
+            keyData.websites.forEach(site => websiteSet.add(site));
           }
         });
 
         return {
           totalKeys: keyCount,
+          totalUsers: userSet.size,
           totalWebsites: websiteSet.size,
-          totalActivations: totalActivations,
-          websites: Array.from(websiteSet)
+          totalAccesses: totalAccesses,
+          websites: Array.from(websiteSet),
+          activeUsers: userSet.size
         };
       } catch (error) {
         console.error('WebsiteKeyTracker: Error getting global stats:', error);
@@ -274,39 +299,189 @@
       if (!this.config.trackingEnabled) return null;
 
       try {
-        const sanitizedWebsite = website.replace(/\./g, '_');
         const usedKeysRef = this.database.ref('usedKeys');
         const snapshot = await usedKeysRef.once('value');
         
         if (!snapshot.exists()) {
           return {
             website: website,
-            keysUsed: 0,
+            uniqueUsers: 0,
+            totalAccesses: 0,
             keys: []
           };
         }
 
         const keys = [];
+        const userSet = new Set();
+
         snapshot.forEach((keySnapshot) => {
           const keyName = keySnapshot.key;
           const keyData = keySnapshot.val();
           
-          if (keyData.sites && keyData.sites[sanitizedWebsite]) {
+          if (keyData.websites && keyData.websites.includes(website)) {
             keys.push({
               key: keyName,
-              activatedAt: keyData.sites[sanitizedWebsite].date,
-              timestamp: keyData.sites[sanitizedWebsite].timestamp
+              userId: keyData.userId,
+              firstUsedOn: keyData.firstUsedOn,
+              firstUsedDate: keyData.firstUsedDate
             });
+            if (keyData.userId) {
+              userSet.add(keyData.userId);
+            }
           }
         });
 
         return {
           website: website,
-          keysUsed: keys.length,
+          uniqueUsers: userSet.size,
+          totalAccesses: keys.length,
           keys: keys
         };
       } catch (error) {
         console.error('WebsiteKeyTracker: Error getting website stats:', error);
+        return null;
+      }
+    },
+
+    // Get unauthorized access attempts (security monitoring)
+    getUnauthorizedAttempts: async function(limit = 50) {
+      if (!this.config.trackingEnabled) return [];
+
+      try {
+        const securityRef = this.database.ref('securityLogs/unauthorizedKeyAttempts');
+        const snapshot = await securityRef.orderByKey().limitToLast(limit).once('value');
+        
+        if (!snapshot.exists()) return [];
+
+        const attempts = [];
+        snapshot.forEach((childSnapshot) => {
+          attempts.push({
+            id: childSnapshot.key,
+            ...childSnapshot.val()
+          });
+        });
+
+        return attempts.reverse(); // Most recent first
+      } catch (error) {
+        console.error('WebsiteKeyTracker: Error getting unauthorized attempts:', error);
+        return [];
+      }
+    },
+
+    // Get attempts for a specific key
+    getKeyTheftAttempts: async function(key) {
+      if (!this.config.trackingEnabled) return [];
+
+      try {
+        const securityRef = this.database.ref('securityLogs/unauthorizedKeyAttempts');
+        const snapshot = await securityRef.once('value');
+        
+        if (!snapshot.exists()) return [];
+
+        const attempts = [];
+        snapshot.forEach((childSnapshot) => {
+          const data = childSnapshot.val();
+          if (data.attemptedKey === key) {
+            attempts.push({
+              id: childSnapshot.key,
+              ...data
+            });
+          }
+        });
+
+        return attempts;
+      } catch (error) {
+        console.error('WebsiteKeyTracker: Error getting key theft attempts:', error);
+        return [];
+      }
+    },
+
+    // Check if a user has suspicious activity
+    checkSuspiciousActivity: async function(userId) {
+      if (!this.config.trackingEnabled) return null;
+
+      try {
+        const securityRef = this.database.ref('securityLogs/unauthorizedKeyAttempts');
+        const snapshot = await securityRef.once('value');
+        
+        if (!snapshot.exists()) {
+          return {
+            userId: userId,
+            isSuspicious: false,
+            attemptCount: 0,
+            attempts: []
+          };
+        }
+
+        const attempts = [];
+        snapshot.forEach((childSnapshot) => {
+          const data = childSnapshot.val();
+          if (data.attemptedBy === userId) {
+            attempts.push({
+              id: childSnapshot.key,
+              ...data
+            });
+          }
+        });
+
+        return {
+          userId: userId,
+          isSuspicious: attempts.length > 0,
+          attemptCount: attempts.length,
+          attempts: attempts,
+          flagged: attempts.length >= 3 // Flag if 3+ attempts
+        };
+      } catch (error) {
+        console.error('WebsiteKeyTracker: Error checking suspicious activity:', error);
+        return null;
+      }
+    },
+
+    // Get security dashboard data
+    getSecurityDashboard: async function() {
+      if (!this.config.trackingEnabled) return null;
+
+      try {
+        const securityRef = this.database.ref('securityLogs/unauthorizedKeyAttempts');
+        const snapshot = await securityRef.once('value');
+        
+        if (!snapshot.exists()) {
+          return {
+            totalAttempts: 0,
+            uniqueAttackers: 0,
+            targetedKeys: 0,
+            recentAttempts: []
+          };
+        }
+
+        const attackers = new Set();
+        const targetedKeys = new Set();
+        const attempts = [];
+
+        snapshot.forEach((childSnapshot) => {
+          const data = childSnapshot.val();
+          attackers.add(data.attemptedBy);
+          targetedKeys.add(data.attemptedKey);
+          attempts.push({
+            id: childSnapshot.key,
+            ...data
+          });
+        });
+
+        // Get last 10 attempts
+        const recentAttempts = attempts
+          .sort((a, b) => b.timestamp - a.timestamp)
+          .slice(0, 10);
+
+        return {
+          totalAttempts: attempts.length,
+          uniqueAttackers: attackers.size,
+          targetedKeys: targetedKeys.size,
+          recentAttempts: recentAttempts,
+          allAttempts: attempts
+        };
+      } catch (error) {
+        console.error('WebsiteKeyTracker: Error getting security dashboard:', error);
         return null;
       }
     }
