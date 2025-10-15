@@ -39,8 +39,15 @@ const firebaseConfig = {
     'GalaxyVerse'
   ];
 
-  // Check if user has already activated a key locally
+  // Check if user has already activated a key locally (any key on any GalaxyVerse site)
   const hasAccess = localStorage.getItem('galaxyverse_access');
+  const userKeyId = localStorage.getItem('galaxyverse_user_id'); // Unique user identifier
+
+  // If user already has access with a valid key, allow them through
+  if (hasAccess === 'granted' && userKeyId) {
+    console.log('GalaxyVerse: Access granted via existing key');
+    return; // User already has access, no need to show key entry
+  }
 
   // If user doesn't have access, show key entry screen
   if (hasAccess !== 'granted') {
@@ -141,8 +148,9 @@ const firebaseConfig = {
           color: #6b7280;
           font-size: 12px;
         ">
-          🌟 Each key can only be used once per website<br>
-          Contact the admins if you need a key. Lifetime key is $15.(lifetime keys taken only at the moment)
+          🌟 Each key can only be claimed by one user<br>
+          Once claimed, it works across all GalaxyVerse websites<br>
+          Contact the admins if you need a key. Lifetime key is $15.
         </div>
       </div>
     `;
@@ -205,37 +213,107 @@ const firebaseConfig = {
         // Get the current website domain/identifier
         const currentSite = window.location.hostname || 'localhost';
         
-        // Check Firebase if key has been used on this specific website
-        const keyRef = database.ref('usedKeys/' + enteredKey + '/sites/' + currentSite.replace(/\./g, '_'));
+        // Get or generate user's unique ID
+        let currentUserId = localStorage.getItem('galaxyverse_user_id');
+        if (!currentUserId) {
+          currentUserId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+          localStorage.setItem('galaxyverse_user_id', currentUserId);
+        }
+        
+        // Check Firebase if key has been used by anyone
+        const keyRef = database.ref('usedKeys/' + enteredKey);
         const snapshot = await keyRef.once('value');
         
         if (snapshot.exists()) {
-          // Key has already been used on THIS website
-          keyError.textContent = '❌ This key has already been used on this website. Please use a different key.';
-          keyError.style.display = 'block';
-          keyInput.style.borderColor = '#ff4444';
-          keyInput.value = '';
-          submitBtn.disabled = false;
-          submitBtn.textContent = 'Verify Key';
-          submitBtn.style.cursor = 'pointer';
+          // Key has been used - check if it was used by THIS specific user
+          const keyData = snapshot.val();
+          const keyOwnerId = keyData.userId;
+          
+          if (currentUserId !== keyOwnerId) {
+            // SECURITY: Different user trying to use someone else's key
+            // Log this suspicious activity
+            const securityLogRef = database.ref('securityLogs/unauthorizedKeyAttempts/' + Date.now());
+            await securityLogRef.set({
+              attemptedKey: enteredKey,
+              keyOwner: keyOwnerId,
+              attemptedBy: currentUserId,
+              website: currentSite,
+              timestamp: Date.now(),
+              date: new Date().toISOString(),
+              userAgent: navigator.userAgent
+            });
+            
+            keyError.textContent = '❌ This key has already been claimed by another user. Each key can only be used by one person.';
+            keyError.style.display = 'block';
+            keyInput.style.borderColor = '#ff4444';
+            keyInput.value = '';
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Verify Key';
+            submitBtn.style.cursor = 'pointer';
+            return;
+          } else {
+            // Same user returning - update access tracking
+            const websites = keyData.websites || [];
+            const timesAccessed = keyData.timesAccessed || 0;
+            
+            // Update website list if this is a new site for this user
+            if (!websites.includes(currentSite)) {
+              await keyRef.update({
+                websites: [...websites, currentSite],
+                timesAccessed: timesAccessed + 1,
+                lastAccessed: new Date().toISOString(),
+                lastAccessedSite: currentSite
+              });
+            } else {
+              // Just update last access time
+              await keyRef.update({
+                timesAccessed: timesAccessed + 1,
+                lastAccessed: new Date().toISOString(),
+                lastAccessedSite: currentSite
+              });
+            }
+            
+            // Grant local access
+            localStorage.setItem('galaxyverse_access', 'granted');
+            localStorage.setItem('galaxyverse_user_key', enteredKey);
+            localStorage.setItem('galaxyverse_site', currentSite);
+            
+            // Track returning user
+            if (typeof window.WebsiteKeyTracker !== 'undefined') {
+              window.WebsiteKeyTracker.trackKeyUsage(enteredKey, currentSite, currentUserId);
+            }
+            
+            // Success - returning user
+            keyError.style.color = '#4ade80';
+            keyError.textContent = '✅ Welcome back! Access granted';
+            keyError.style.display = 'block';
+            keyInput.style.borderColor = '#4ade80';
+            submitBtn.style.background = 'linear-gradient(135deg, #4ade80, #22c55e)';
+            submitBtn.textContent = 'Success!';
+
+            setTimeout(() => {
+              keyOverlay.style.opacity = '0';
+              keyOverlay.style.transition = 'opacity 0.5s ease';
+              setTimeout(() => {
+                keyOverlay.remove();
+                document.body.style.overflow = '';
+              }, 500);
+            }, 1500);
+            return;
+          }
         } else {
-          // Key is valid and unused on this website - mark it as used
+          // Key is unused - claim it for this user
+          // Record key usage in Firebase
           await keyRef.set({
             used: true,
-            timestamp: Date.now(),
-            date: new Date().toISOString(),
-            site: currentSite
-          });
-
-          // Also update the main key record with metadata
-          const mainKeyRef = database.ref('usedKeys/' + enteredKey + '/metadata');
-          const mainSnapshot = await mainKeyRef.once('value');
-          const currentData = mainSnapshot.val() || { timesUsed: 0, websites: [] };
-          
-          await mainKeyRef.set({
-            timesUsed: (currentData.timesUsed || 0) + 1,
-            websites: [...(currentData.websites || []), currentSite],
-            lastUsed: new Date().toISOString()
+            userId: currentUserId,
+            firstUsedOn: currentSite,
+            firstUsedDate: new Date().toISOString(),
+            firstUsedTimestamp: Date.now(),
+            websites: [currentSite],
+            timesAccessed: 1,
+            lastAccessed: new Date().toISOString(),
+            lastAccessedSite: currentSite
           });
 
           // Grant access locally
@@ -245,10 +323,10 @@ const firebaseConfig = {
 
           // Track key usage via websitekeytracker.js if available
           if (typeof window.WebsiteKeyTracker !== 'undefined') {
-            window.WebsiteKeyTracker.trackKeyUsage(enteredKey, currentSite);
+            window.WebsiteKeyTracker.trackKeyUsage(enteredKey, currentSite, currentUserId);
           }
 
-          // Success animation
+          // Success animation - new user
           keyError.style.color = '#4ade80';
           keyError.textContent = '✅ Access granted! Welcome to GalaxyVerse';
           keyError.style.display = 'block';
