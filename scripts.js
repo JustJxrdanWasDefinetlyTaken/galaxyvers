@@ -31,7 +31,12 @@ const firebaseConfig = {
     'newkey123',
     'davidishere',
     'azthedev',
-    'msanchez'
+    'msanchez',
+    'azthedevschool',
+    'davidupdated',
+    'msanchezupdated',
+    'freekeyupdated',
+    'GalaxyVerse'
   ];
 
   // Check if user has already activated a key locally
