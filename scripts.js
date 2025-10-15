@@ -4,6 +4,7 @@
 /*
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="others/assets/scripts/websitekeytracker.js"></script>
 */
 
 (function() {
@@ -135,7 +136,7 @@ const firebaseConfig = {
           color: #6b7280;
           font-size: 12px;
         ">
-          🌟 Each key can only be used once globally<br>
+          🌟 Each key can only be used once per website<br>
           Contact the admins if you need a key. Lifetime key is $15.(lifetime keys taken only at the moment)
         </div>
       </div>
@@ -196,13 +197,16 @@ const firebaseConfig = {
       submitBtn.style.cursor = 'wait';
 
       try {
-        // Check Firebase if key has been used
-        const keyRef = database.ref('usedKeys/' + enteredKey);
+        // Get the current website domain/identifier
+        const currentSite = window.location.hostname || 'localhost';
+        
+        // Check Firebase if key has been used on this specific website
+        const keyRef = database.ref('usedKeys/' + enteredKey + '/sites/' + currentSite.replace(/\./g, '_'));
         const snapshot = await keyRef.once('value');
         
         if (snapshot.exists()) {
-          // Key has already been used
-          keyError.textContent = '❌ This key has already been used globally. Please use a different key.';
+          // Key has already been used on THIS website
+          keyError.textContent = '❌ This key has already been used on this website. Please use a different key.';
           keyError.style.display = 'block';
           keyInput.style.borderColor = '#ff4444';
           keyInput.value = '';
@@ -210,16 +214,34 @@ const firebaseConfig = {
           submitBtn.textContent = 'Verify Key';
           submitBtn.style.cursor = 'pointer';
         } else {
-          // Key is valid and unused - mark it as used in Firebase
+          // Key is valid and unused on this website - mark it as used
           await keyRef.set({
             used: true,
             timestamp: Date.now(),
-            date: new Date().toISOString()
+            date: new Date().toISOString(),
+            site: currentSite
+          });
+
+          // Also update the main key record with metadata
+          const mainKeyRef = database.ref('usedKeys/' + enteredKey + '/metadata');
+          const mainSnapshot = await mainKeyRef.once('value');
+          const currentData = mainSnapshot.val() || { timesUsed: 0, websites: [] };
+          
+          await mainKeyRef.set({
+            timesUsed: (currentData.timesUsed || 0) + 1,
+            websites: [...(currentData.websites || []), currentSite],
+            lastUsed: new Date().toISOString()
           });
 
           // Grant access locally
           localStorage.setItem('galaxyverse_access', 'granted');
           localStorage.setItem('galaxyverse_user_key', enteredKey);
+          localStorage.setItem('galaxyverse_site', currentSite);
+
+          // Track key usage via websitekeytracker.js if available
+          if (typeof window.WebsiteKeyTracker !== 'undefined') {
+            window.WebsiteKeyTracker.trackKeyUsage(enteredKey, currentSite);
+          }
 
           // Success animation
           keyError.style.color = '#4ade80';
