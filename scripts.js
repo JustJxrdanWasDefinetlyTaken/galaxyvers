@@ -37,7 +37,11 @@ const firebaseConfig = {
     'davidupdated',
     'msanchezupdated',
     'freekeyupdated',
-    'GalaxyVerse'
+    'GalaxyVerse',
+    'CxgMvuMFYdu9JwDePpddn2LOOgZPKn05',
+    '1AG4JsMjOvPiC9RzLt6KRZM2zAN8JhhM',
+    'qwtS730SkOAv4bhNpqC4qe2LXDaWV24i',
+    'LKPR0egJizvkY23HT5QJxjq8kp0SPsGe'
   ];
 
   // Check if user has already activated a key locally (any key on any GalaxyVerse site)
@@ -151,7 +155,7 @@ const firebaseConfig = {
         ">
           🌟 Each key can only be claimed by one user<br>
           Once claimed, it works across all GalaxyVerse websites<br>
-          Contact the admins if you need a key. Lifetime key is $15.
+          Contact the admins if you need a key. Lifetime key is $7.
         </div>
       </div>
     `;
@@ -346,7 +350,7 @@ const firebaseConfig = {
         }
       } catch (error) {
         console.error('Firebase error:', error);
-        keyError.textContent = '❌ Connection error. Please try again.';
+        keyError.textContent = '❌ Connection error. Please try again. Or firebase is cooked LOL';
         keyError.style.display = 'block';
         keyInput.style.borderColor = '#ff4444';
         submitBtn.disabled = false;
