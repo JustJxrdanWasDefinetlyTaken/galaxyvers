@@ -605,7 +605,7 @@ const apps = [
   { name: "YouTube", image: "others/assets/images/apps/youtube.png", url: "others/assets/apps/YouTube.html" },
   { name: "Spotify", image: "others/assets/images/apps/spotify.png", url: "others/assets/apps/Spotify.html" },
   { name: "Soundboard", image: "others/assets/images/apps/soundboard.png", url: "others/assets/apps/Soundboard.html" },
-  { name: "Vscode", image: "others/assets/images/apps/vscode.png", url: "others/assets/apps/Vscode.html" }
+  { name: "Vscode", image: "others/assets/images/apps/vscode.jpeg", url: "others/assets/apps/Vscode.html" }
 ];
 
 // ===== TAB CLOAKING PRESETS =====
