@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Select a YouTube Server - GalaxyVerse</title>
-  <link rel="icon" href="../assets/images/GalaxyVerse.png" />
   <style>
     * {
       margin: 0;
@@ -124,6 +123,7 @@
       font-weight: 600;
       transition: all 0.3s ease;
       margin-top: 15px;
+      cursor: pointer;
     }
 
     .back-btn:hover {
@@ -151,6 +151,7 @@
       cursor: pointer;
       position: relative;
       overflow: hidden;
+      display: block;
     }
 
     .server-card::before {
@@ -189,6 +190,7 @@
       box-shadow: 0 8px 25px rgba(255, 0, 0, 0.3);
       position: relative;
       z-index: 1;
+      transition: all 0.3s ease;
     }
 
     .server-card:hover .youtube-icon {
@@ -225,6 +227,14 @@
       z-index: 1;
     }
 
+    .alt-option {
+      grid-column: 1 / -1;
+    }
+
+    .alt-option .youtube-icon {
+      background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
+    }
+
     @media (max-width: 768px) {
       h1 {
         font-size: 2rem;
@@ -256,46 +266,46 @@
     <div class="header">
       <h1>🌌 Select a YouTube Server</h1>
       <p class="subtitle">Choose from our available proxy servers</p>
-      <a href="../../index.html" class="back-btn">← Back to Home</a>
+      <a href="../../../index.html" class="back-btn">← Back to Home</a>
     </div>
 
     <div class="server-grid">
-      <a class="server-card" href="../../active/index.html?autofill=https://yewtu.be&alert=true">
+      <a class="server-card" href="../../../active/index.html?autofill=https://yewtu.be&alert=true">
         <div class="youtube-icon">▶</div>
         <div class="server-name">YouTube Server 1</div>
         <div class="server-url">yewtu.be</div>
         <span class="server-status">● Active</span>
       </a>
 
-      <a class="server-card" href="../../active/index.html?autofill=https://youtube-clone-plum-sigma.vercel.app/&alert=true">
+      <a class="server-card" href="../../../active/index.html?autofill=https://youtube-clone-plum-sigma.vercel.app/&alert=true">
         <div class="youtube-icon">▶</div>
         <div class="server-name">YouTube Server 2</div>
         <div class="server-url">youtube-clone-plum-sigma</div>
         <span class="server-status">● Active</span>
       </a>
 
-      <a class="server-card" href="../../active/index.html?autofill=https://youtube-clone-gilt-ten.vercel.app&alert=true">
+      <a class="server-card" href="../../../active/index.html?autofill=https://youtube-clone-gilt-ten.vercel.app&alert=true">
         <div class="youtube-icon">▶</div>
         <div class="server-name">YouTube Server 3</div>
         <div class="server-url">youtube-clone-gilt-ten</div>
         <span class="server-status">● Active</span>
       </a>
 
-      <a class="server-card" href="../../active/index.html?autofill=https://youtube-clone-nine-nu.vercel.app/&alert=true">
+      <a class="server-card" href="../../../active/index.html?autofill=https://youtube-clone-nine-nu.vercel.app/&alert=true">
         <div class="youtube-icon">▶</div>
         <div class="server-name">YouTube Server 4</div>
         <div class="server-url">youtube-clone-nine-nu</div>
         <span class="server-status">● Active</span>
       </a>
 
-      <a class="server-card" href="../../active/index.html?autofill=https://samtube-youtube-clone.vercel.app/&alert=true">
+      <a class="server-card" href="../../../active/index.html?autofill=https://samtube-youtube-clone.vercel.app/&alert=true">
         <div class="youtube-icon">▶</div>
         <div class="server-name">YouTube Server 5</div>
         <div class="server-url">samtube-youtube-clone</div>
         <span class="server-status">● Active</span>
       </a>
 
-      <a class="server-card" href="../../active/index.html?autofill=https://youtube-clone-by-sathish.vercel.app&alert=true">
+      <a class="server-card" href="../../../active/index.html?autofill=https://youtube-clone-by-sathish.vercel.app&alert=true">
         <div class="youtube-icon">▶</div>
         <div class="server-name">YouTube Server 6</div>
         <div class="server-url">youtube-clone-by-sathish</div>
@@ -303,8 +313,8 @@
       </a>
 
       <!-- Alternative: Direct YouTube Search -->
-      <a class="server-card" href="../yt.html" style="grid-column: 1 / -1;">
-        <div class="youtube-icon" style="background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);">🔍</div>
+      <a class="server-card alt-option" href="../../yt.html">
+        <div class="youtube-icon">🔍</div>
         <div class="server-name">Direct YouTube Search</div>
         <div class="server-url">Search YouTube directly (uses API)</div>
         <span class="server-status">● Recommended</span>
