@@ -1,152 +1,166 @@
-<div id="loading">
-  <img src="others/assets/images/GalaxyVerse.png" width="200" />
-  <div class="bar-container">
-    <div class="bar" id="bar"></div>
-  </div>
-</div>
-<div id="content" align="center">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Select a Server</title>
   <style>
+    * {
+      font-family: 'Inter', sans-serif;
+    }
+
     body {
+      background-color: #000;
       color: white;
+      margin: 0;
+      padding: 0;
     }
 
-    a.link:hover {
-      font-family: 'Inter', sans-serif;
-      background-color: var(--btn);
-      background: var(--navbar);
-      transform: scale(1.04);
-      color: var(--txtcolor);
-      padding: 1px 1px;
+    #loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .bar-container {
+      width: 80%;
+      height: 10px;
+      background: #444;
+      margin-top: 20px;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    .bar {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, hsla(12, 55%, 67%, 1) 0%, hsla(85, 27%, 63%, 1) 100%);
+      transition: width 3s linear;
+    }
+
+    #content {
+      display: none;
+      padding: 20px;
       text-align: center;
-      text-decoration: none;
-      display: inline-block;
-      font-size: 16px;
-      cursor: pointer;
-      border-radius: 13px;
-      text-wrap: wrap;
     }
 
-    .box img {
-      border-radius: 13px;
-      width: 190px;
-      height: 190px;
-      margin: 15px;
-    }
-
-    img {
-      border-radius: 15px;
-    }
-
-    .button {
+    .link.button {
       margin: 10px;
-      font-family: 'Inter', sans-serif;
-      background-color: var(--btnhvr);
-      background: var(--navbar);
+      background-color: var(--btnhvr, #222);
+      background: var(--navbar, #222);
       border: none;
-      color: var(--txtcolor);
-      padding: 1px 1px;
-      text-align: center;
-      text-decoration: none;
+      color: var(--txtcolor, white);
+      padding: 1px;
       font-size: 16px;
       cursor: pointer;
       border-radius: 12px;
-      transition: 0.7s;
+      transition: 0.3s ease;
       display: inline-block;
+      text-decoration: none;
+    }
+
+    .link.button:hover {
+      transform: scale(1.04);
+      background-color: var(--btn, #333);
+      background: var(--navbar, #333);
+      color: var(--txtcolor, #fff);
+    }
+
+    .link.button img {
+      border-radius: 13px;
+      width: 175px;
+      height: 175px;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .link.button span {
+      padding: 3px;
+      margin: auto;
+      display: block;
+      width: 170px;
+      height: 45px;
+      line-height: 25px;
+      overflow: hidden;
+      text-align: center;
+      white-space: nowrap;
     }
   </style>
-  <h1>select a server</h1>
-  <a class='link button' href='/yt.html'><img height="175"
-      src="others/assets/images/apps/youtube.png" onerror="this.src='/assets/img/no-icon-found.png'" class="image" width="175"><span
-      style="padding:3px;margin:auto;display:block;width:170px;height:45px;line-height:25px;overflow:hidden;text-align:center;white-space:nowrap"
-      alt="Unblocked Browser (Icon by IconLauk)">**NEW** JRDNTube <br> (YT Alternative)</span></a>
-  <a class='link button' href='/active/index.html?autofill=https://yewtu.be&alert=true'><img height="175"
-      src="others/assets/images/apps/youtube.png" onerror="this.src='/assets/img/no-icon-found.png'" class="image" width="175"><span
-      style="padding:3px;margin:auto;display:block;width:170px;height:25px;line-height:25px;overflow:hidden;text-align:center;white-space:nowrap"
-      alt="Unblocked Browser (Icon by IconLauk)">Youtube (server 1)</span></a>
-  <a class='link button' href='/active/index.html?autofill=https://youtube-clone-plum-sigma.vercel.app/&alert=true'><img
-      height="175" src="others/assets/images/apps/youtube.png" onerror="this.src='/assets/img/no-icon-found.png'" class="image"
-      width="175"><span
-      style="padding:3px;margin:auto;display:block;width:170px;height:25px;line-height:25px;overflow:hidden;text-align:center;white-space:nowrap"
-      alt="Unblocked Browser (Icon by IconLauk)">Youtube (server 2)</span></a>
-  <a class='link button' href='/active/index.html?autofill=https://youtube-clone-gilt-ten.vercel.app&alert=true'><img height="175"
-      src="others/assets/images/apps/youtube.png" onerror="this.src='/assets/img/no-icon-found.png'" class="image" width="175"><span
-      style="padding:3px;margin:auto;display:block;width:170px;height:25px;line-height:25px;overflow:hidden;text-align:center;white-space:nowrap"
-      alt="Unblocked Browser (Icon by IconLauk)">Youtube (server 3)</span></a>
-  <a class='link button' href='/active/index.html?autofill=https://youtube-clone-nine-nu.vercel.app/&alert=true'><img height="175"
-      src="others/assets/images/apps/youtube.png" onerror="this.src='/assets/img/no-icon-found.png'" class="image" width="175"><span
-      style="padding:3px;margin:auto;display:block;width:170px;height:25px;line-height:25px;overflow:hidden;text-align:center;white-space:nowrap"
-      alt="Unblocked Browser (Icon by IconLauk)">Youtube (server 4)</span></a>
-  <a class='link button' href='/active/index.html?autofill=https://samtube-youtube-clone.vercel.app/&alert=true'><img height="175"
-      src="others/assets/images/apps/youtube.png" onerror="this.src='/assets/img/no-icon-found.png'" class="image" width="175"><span
-      style="padding:3px;margin:auto;display:block;width:170px;height:25px;line-height:25px;overflow:hidden;text-align:center;white-space:nowrap"
-      alt="Unblocked Browser (Icon by IconLauk)">Youtube (server 5)</span></a>
-  <a class='link button'
-    href='/active/index.html?autofill=https://youtube-complete-project-using-react-js.vercel.app/&alert=true'><img height="175"
-      src="others/assets/images/apps/youtube.png" onerror="this.src='/assets/img/no-icon-found.png'" class="image" width="175"><span
-      style="padding:3px;margin:auto;display:block;width:170px;height:25px;line-height:25px;overflow:hidden;text-align:center;white-space:nowrap"
-      alt="Unblocked Browser (Icon by IconLauk)">Youtube (server 6)</span></a>
-  <a class='link button' href='/active/index.html?autofill=https://youtube-clone-by-sathish.vercel.app&alert=true'><img
-      height="175" src="others/assets/images/apps/youtube.png" onerror="this.src='/assets/img/no-icon-found.png'" class="image"
-      width="175"><span
-      style="padding:3px;margin:auto;display:block;width:170px;height:25px;line-height:25px;overflow:hidden;text-align:center;white-space:nowrap"
-      alt="Unblocked Browser (Icon by IconLauk)">Youtube (server 7)</span></a>
-</div>
-<script>
-  const bar = document.getElementById('bar');
-  setTimeout(() => {
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('content').style.display = 'block';
-  }, 3000);
-  setTimeout(() => {
-    bar.style.width = '100%';
-  }, 50);
-</script>
-<style>
-  * {
-    font-family: 'Inter', sans-serif;
-  }
+</head>
+<body>
 
-  #loading {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: #000;
-    color: #fff;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-  }
+  <div id="loading">
+    <img src="others/assets/images/GalaxyVerse.png" width="200" alt="Loading..." />
+    <div class="bar-container">
+      <div class="bar" id="bar"></div>
+    </div>
+  </div>
 
-  .bar-container {
-    width: 80%;
-    height: 10px;
-    background: #444;
-    margin-top: 20px;
-    border-radius: 5px;
-    overflow: hidden;
-  }
+  <div id="content">
+    <h1>Select a server</h1>
 
-  .bar {
-    height: 100%;
-    width: 0;
-    background: hsla(12, 55%, 67%, 1);
+    <!-- Corrected JRDNTube link (.htmll fixed to .html) -->
+    <a class="link button" href="others/yt.html">
+      <img src="others/assets/images/apps/youtube.png" onerror="this.src='/assets/img/no-icon-found.png'" alt="JRDNTube">
+      <span>**NEW** JRDNTube <br> (YT Alternative)</span>
+    </a>
 
-    background: linear-gradient(90deg, hsla(12, 55%, 67%, 1) 0%, hsla(85, 27%, 63%, 1) 100%);
+    <!-- Servers 1–7 -->
+    <a class="link button" href="/active/index.html?autofill=https://yewtu.be&alert=true">
+      <img src="others/assets/images/apps/youtube.png" onerror="this.src='/assets/img/no-icon-found.png'" alt="YouTube 1">
+      <span>Youtube (server 1)</span>
+    </a>
 
-    background: -moz-linear-gradient(90deg, hsla(12, 55%, 67%, 1) 0%, hsla(85, 27%, 63%, 1) 100%);
+    <a class="link button" href="/active/index.html?autofill=https://youtube-clone-plum-sigma.vercel.app/&alert=true">
+      <img src="others/assets/images/apps/youtube.png" onerror="this.src='/assets/img/no-icon-found.png'" alt="YouTube 2">
+      <span>Youtube (server 2)</span>
+    </a>
 
-    background: -webkit-linear-gradient(90deg, hsla(12, 55%, 67%, 1) 0%, hsla(85, 27%, 63%, 1) 100%);
+    <a class="link button" href="/active/index.html?autofill=https://youtube-clone-gilt-ten.vercel.app&alert=true">
+      <img src="others/assets/images/apps/youtube.png" onerror="this.src='/assets/img/no-icon-found.png'" alt="YouTube 3">
+      <span>Youtube (server 3)</span>
+    </a>
 
-    filter: progid: DXImageTransform.Microsoft.gradient(startColorstr="#D98F7D", endColorstr="#A5BA87", GradientType=1);
-    transition: width 3s linear;
-  }
+    <a class="link button" href="/active/index.html?autofill=https://youtube-clone-nine-nu.vercel.app/&alert=true">
+      <img src="others/assets/images/apps/youtube.png" onerror="this.src='/assets/img/no-icon-found.png'" alt="YouTube 4">
+      <span>Youtube (server 4)</span>
+    </a>
 
-  #content {
-    display: none;
-    padding: 20px;
-  }
-</style>
+    <a class="link button" href="/active/index.html?autofill=https://samtube-youtube-clone.vercel.app/&alert=true">
+      <img src="others/assets/images/apps/youtube.png" onerror="this.src='/assets/img/no-icon-found.png'" alt="YouTube 5">
+      <span>Youtube (server 5)</span>
+    </a>
+
+
+    <a class="link button" href="/active/index.html?autofill=https://youtube-clone-by-sathish.vercel.app&alert=true">
+      <img src="others/assets/images/apps/youtube.png" onerror="this.src='/assets/img/no-icon-found.png'" alt="YouTube 7">
+      <span>Youtube (server 6)</span>
+    </a>
+
+  </div>
+
+  <script>
+    const bar = document.getElementById('bar');
+    
+    // Animate progress bar
+    setTimeout(() => {
+      bar.style.width = '100%';
+    }, 50);
+
+    // Show content after 3s
+    setTimeout(() => {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    }, 3000);
+  </script>
+
+</body>
+</html>
