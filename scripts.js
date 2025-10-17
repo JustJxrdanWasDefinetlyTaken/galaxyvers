@@ -61,20 +61,17 @@
 
     // Valid keys list
     const validKeys = [
-      'freekey',
-      'newkey123',
-      'davidishere',
+      'd4vid_ghost',
       'azthedev',
-      'msanchez',
-      'azthedevschool',
-      'davidupdated',
-      'msanchezupdated',
-      'freekeyupdated',
-      'GalaxyVerse',
+      'testingkeyfordevelopers',
+      'spartan_alloy3',
+      'aanzoski',
       'CxgMvuMFYdu9JwDePpddn2LOOgZPKn05',
       '1AG4JsMjOvPiC9RzLt6KRZM2zAN8JhhM',
       'qwtS730SkOAv4bhNpqC4qe2LXDaWV24i',
-      'LKPR0egJizvkY23HT5QJxjq8kp0SPsGe'
+      'LKPR0egJizvkY23HT5QJxjq8kp0SPsGe',
+      'neZN0a439QuKezFjQY1OyIGUOlDITSuA',
+      'fu5DZ4cpsbkLf4nXHRnvpARKomGqnleC'
     ];
 
     // Check if user has already activated a key locally
@@ -220,7 +217,8 @@
           ">
             🌟 Each key can only be claimed by one user<br>
             Once claimed, it works across all GalaxyVerse websites<br>
-            Contact the admins if you need a key. Lifetime key is $7.
+            Contact the admins if you need a key. Lifetime key is $7.<br>
+            Server: https://dsc.gg/galaxyproxi.
           </div>
         </div>
       `;
