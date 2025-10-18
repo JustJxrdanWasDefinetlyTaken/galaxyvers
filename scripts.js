@@ -59,71 +59,96 @@
         console.error('❌ Firebase database connection failed:', err);
       });
 
-    // Load valid keys from external file
-    let validKeys = [];
-    
-    async function loadValidKeys() {
-      try {
-        // Check if window.fs.readFile is available (for Claude artifacts)
-        if (typeof window.fs !== 'undefined' && window.fs.readFile) {
-          const fileContent = await window.fs.readFile('others/scrappedlistofyt.txt', { encoding: 'utf8' });
-          validKeys = fileContent.split('\n')
-            .map(key => key.trim())
-            .filter(key => key.length > 0 && !key.startsWith('#'));
-          console.log(`✅ Loaded ${validKeys.length} valid keys from file`);
-        } else {
-          // Fallback: fetch the file using standard fetch API
-          const response = await fetch('others/scrappedlistofyt.txt');
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          const fileContent = await response.text();
-          validKeys = fileContent.split('\n')
-            .map(key => key.trim())
-            .filter(key => key.length > 0 && !key.startsWith('#'));
-          console.log(`✅ Loaded ${validKeys.length} valid keys from file`);
-        }
-        return true;
-      } catch (error) {
-        console.error('❌ Failed to load keys from file:', error);
-        // Fallback to hardcoded keys if file loading fails
-        validKeys = [
-          'd4vid_ghost',
-          'azthedev',
-          'testingkeyfordevelopers',
-          'spartan_alloy3',
-          'aanzoski',
-          'CxgMvuMFYdu9JwDePpddn2LOOgZPKn05',
-          '1AG4JsMjOvPiC9RzLt6KRZM2zAN8JhhM',
-          'qwtS730SkOAv4bhNpqC4qe2LXDaWV24i',
-          'LKPR0egJizvkY23HT5QJxjq8kp0SPsGe',
-          'neZN0a439QuKezFjQY1OyIGUOlDITSuA',
-          'fu5DZ4cpsbkLf4nXHRnvpARKomGqnleC'
-        ];
-        console.log('⚠️ Using fallback hardcoded keys');
-        return false;
-      }
-    }
+    // Valid keys - hardcoded back into the file
+    const validKeys = [
+      'd4vid_ghost',
+      'azthedev',
+      'testingkeyfordevelopers',
+      'spartan_alloy3',
+      'aanzoski',
+      'CxgMvuMFYdu9JwDePpddn2LOOgZPKn05',
+      '1AG4JsMjOvPiC9RzLt6KRZM2zAN8JhhM',
+      'qwtS730SkOAv4bhNpqC4qe2LXDaWV24i',
+      'LKPR0egJizvkY23HT5QJxjq8kp0SPsGe',
+      'neZN0a439QuKezFjQY1OyIGUOlDITSuA',
+      'fu5DZ4cpsbkLf4nXHRnvpARKomGqnleC'
+    ];
+
+    // List of all GalaxyVerse websites
+    const galaxyVerseWebsites = [
+      'gverse.schoologydashboard.org.cdn.cloudflare.net',
+      'ahs.schoologydashboard.org.cdn.cloudflare.net',
+      'learn.schoologydashboard.org.cdn.cloudflare.net',
+      'galaxyverse-c1v.pages.dev',
+      'galaxyverse.org',
+      'localhost' // For development
+    ];
 
     // Initialize the key system
     async function initializeKeySystem() {
-      // Load keys from file first
-      await loadValidKeys();
-
-      // Check if user has already activated a key locally
-      const hasAccess = localStorage.getItem('galaxyverse_access');
-      const userKeyId = localStorage.getItem('galaxyverse_user_id');
-
-      // If user already has access with a valid key, allow them through
-      if (hasAccess === 'granted' && userKeyId) {
-        console.log('GalaxyVerse: Access granted via existing key');
-        return;
+      // Get or create a persistent user ID
+      let currentUserId = localStorage.getItem('galaxyverse_user_id');
+      if (!currentUserId) {
+        currentUserId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('galaxyverse_user_id', currentUserId);
       }
 
-      // If user doesn't have access, show key entry screen
-      if (hasAccess !== 'granted') {
-        showKeyEntryScreen();
+      // Check if user has a valid key stored locally
+      const storedKey = localStorage.getItem('galaxyverse_user_key');
+      
+      if (storedKey) {
+        // Verify the stored key is still valid and belongs to this user
+        try {
+          const keyRef = database.ref('usedKeys/' + storedKey);
+          const snapshot = await keyRef.once('value');
+          
+          if (snapshot.exists()) {
+            const keyData = snapshot.val();
+            
+            // Check if this key belongs to this user
+            if (keyData.userId === currentUserId) {
+              console.log('✅ Valid key found for user. Granting access across all sites.');
+              
+              // Update current website in the list if not already there
+              const currentSite = window.location.hostname || 'localhost';
+              const websites = keyData.websites || [];
+              
+              if (!websites.includes(currentSite)) {
+                await keyRef.update({
+                  websites: [...websites, currentSite],
+                  lastAccessed: new Date().toISOString(),
+                  lastAccessedSite: currentSite,
+                  timesAccessed: (keyData.timesAccessed || 0) + 1
+                });
+              }
+              
+              // Track usage with WebsiteKeyTracker
+              if (typeof window.WebsiteKeyTracker !== 'undefined') {
+                window.WebsiteKeyTracker.trackKeyUsage(storedKey, currentSite, currentUserId);
+              }
+              
+              // Grant access - no need to show key entry
+              localStorage.setItem('galaxyverse_access', 'granted');
+              return; // Exit early, don't show key entry screen
+            } else {
+              // Key exists but belongs to someone else - clear local storage
+              console.log('⚠️ Stored key belongs to another user. Clearing local data.');
+              localStorage.removeItem('galaxyverse_user_key');
+              localStorage.removeItem('galaxyverse_access');
+            }
+          } else {
+            // Key no longer exists in database - clear local storage
+            console.log('⚠️ Stored key not found in database. Clearing local data.');
+            localStorage.removeItem('galaxyverse_user_key');
+            localStorage.removeItem('galaxyverse_access');
+          }
+        } catch (error) {
+          console.error('❌ Error verifying stored key:', error);
+        }
       }
+
+      // If we reach here, show key entry screen
+      showKeyEntryScreen();
     }
 
     function showKeyEntryScreen() {
@@ -258,9 +283,10 @@
             font-size: 12px;
           ">
             🌟 Each key can only be claimed by one user<br>
-            Once claimed, it works across all GalaxyVerse websites<br>
+            ✨ Once claimed, it works across ALL GalaxyVerse websites<br>
+            💫 No need to re-enter your key on other sites<br><br>
             Contact the admins if you need a key. Lifetime key is $7.<br>
-            Server: https://dsc.gg/galaxyproxi.
+            Server: https://dsc.gg/galaxyproxi
           </div>
         </div>
       `;
@@ -417,6 +443,7 @@
             const keyOwnerId = keyData.userId;
             
             if (currentUserId !== keyOwnerId) {
+              // Log unauthorized attempt
               const securityLogRef = database.ref('securityLogs/unauthorizedKeyAttempts/' + Date.now());
               await securityLogRef.set({
                 attemptedKey: enteredKey,
@@ -438,6 +465,7 @@
               submitBtn.style.cursor = 'pointer';
               return;
             } else {
+              // Key belongs to this user - update website list
               const websites = keyData.websites || [];
               const timesAccessed = keyData.timesAccessed || 0;
               
@@ -458,14 +486,13 @@
               
               localStorage.setItem('galaxyverse_access', 'granted');
               localStorage.setItem('galaxyverse_user_key', enteredKey);
-              localStorage.setItem('galaxyverse_site', currentSite);
               
               if (typeof window.WebsiteKeyTracker !== 'undefined') {
                 window.WebsiteKeyTracker.trackKeyUsage(enteredKey, currentSite, currentUserId);
               }
               
               keyError.style.color = '#4ade80';
-              keyError.textContent = '✅ Welcome back! Access granted';
+              keyError.textContent = '✅ Welcome back! Access granted across all GalaxyVerse sites';
               keyError.style.display = 'block';
               keyInput.style.borderColor = '#4ade80';
               submitBtn.style.background = 'linear-gradient(135deg, #4ade80, #22c55e)';
@@ -486,6 +513,7 @@
               return;
             }
           } else {
+            // New key claim
             await keyRef.set({
               used: true,
               userId: currentUserId,
@@ -500,14 +528,13 @@
 
             localStorage.setItem('galaxyverse_access', 'granted');
             localStorage.setItem('galaxyverse_user_key', enteredKey);
-            localStorage.setItem('galaxyverse_site', currentSite);
 
             if (typeof window.WebsiteKeyTracker !== 'undefined') {
               window.WebsiteKeyTracker.trackKeyUsage(enteredKey, currentSite, currentUserId);
             }
 
             keyError.style.color = '#4ade80';
-            keyError.textContent = '✅ Access granted! Welcome to GalaxyVerse';
+            keyError.textContent = '✅ Key claimed! Welcome to GalaxyVerse - works on all sites';
             keyError.style.display = 'block';
             keyInput.style.borderColor = '#4ade80';
             submitBtn.style.background = 'linear-gradient(135deg, #4ade80, #22c55e)';
