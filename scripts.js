@@ -259,7 +259,7 @@
             🌟 Each key can only be claimed by one user<br>
             Once claimed, it works across all GalaxyVerse websites<br>
             Contact the admins if you need a key. Lifetime key is $7.<br>
-            Server: https://dsc.gg/galaxyproxi.
+            UPD test 1.
           </div>
         </div>
       `;
