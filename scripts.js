@@ -241,7 +241,8 @@
             color: #9ca3af;
             font-size: 16px;
             margin: 0 0 30px 0;
-          ">Enter your access key to continue</p>
+          ">Enter your access key to continue<br>
+          V1.1.7</p>
           
           <input type="text" id="keyInput" placeholder="Enter your key" style="
             width: 100%;
