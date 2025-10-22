@@ -1,13 +1,29 @@
-// ===== FIREBASE KEY SYSTEM - MUST BE FIRST =====
-// NOTE: You need to add Firebase SDK to your HTML file first!
-// Add these scripts to your index.html BEFORE scripts.js:
-/*
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-<script src="others/assets/scripts/websitekeytracker.js"></script>
-*/
-
+// ===== FIREBASE KEY SYSTEM - FIXED FOR SUBDOMAIN SUPPORT =====
 (function() {
+  // Normalize hostname to treat all schoologydashboard.org subdomains as one site
+  function normalizeHostname(hostname) {
+    // Remove port if present
+    hostname = hostname.split(':')[0];
+    
+    // Handle schoologydashboard.org and all its subdomains/CDN variants
+    if (hostname.includes('schoologydashboard.org')) {
+      return 'schoologydashboard.org';
+    }
+    
+    // Handle galaxyverse domains
+    if (hostname.includes('galaxyverse')) {
+      return 'galaxyverse.org';
+    }
+    
+    // Handle localhost variants
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return 'localhost';
+    }
+    
+    // For other domains, return as-is
+    return hostname;
+  }
+
   // Wait for Firebase to be ready
   function waitForFirebase(callback, maxAttempts = 50) {
     let attempts = 0;
@@ -74,8 +90,9 @@
       'fu5DZ4cpsbkLf4nXHRnvpARKomGqnleC'
     ];
 
-    // List of all GalaxyVerse websites
+    // List of all GalaxyVerse websites (for reference)
     const galaxyVerseWebsites = [
+      'schoologydashboard.org',
       'gverse.schoologydashboard.org.cdn.cloudflare.net',
       'ahs.schoologydashboard.org.cdn.cloudflare.net',
       'learn.schoologydashboard.org.cdn.cloudflare.net',
@@ -86,17 +103,25 @@
 
     // Initialize the key system
     async function initializeKeySystem() {
+      // Get current normalized site
+      const currentSite = normalizeHostname(window.location.hostname || 'localhost');
+      console.log('🌐 Current site (normalized):', currentSite);
+      
       // Get or create a persistent user ID
       let currentUserId = localStorage.getItem('galaxyverse_user_id');
       if (!currentUserId) {
         currentUserId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
         localStorage.setItem('galaxyverse_user_id', currentUserId);
+        console.log('🆔 Created new user ID:', currentUserId);
+      } else {
+        console.log('🆔 Existing user ID:', currentUserId);
       }
 
       // Check if user has a valid key stored locally
       const storedKey = localStorage.getItem('galaxyverse_user_key');
       
       if (storedKey) {
+        console.log('🔑 Found stored key, verifying...');
         // Verify the stored key is still valid and belongs to this user
         try {
           const keyRef = database.ref('usedKeys/' + storedKey);
@@ -110,25 +135,33 @@
               console.log('✅ Valid key found for user. Granting access across all sites.');
               
               // Update current website in the list if not already there
-              const currentSite = window.location.hostname || 'localhost';
               const websites = keyData.websites || [];
               
               if (!websites.includes(currentSite)) {
+                console.log('📝 Adding current site to websites list');
                 await keyRef.update({
                   websites: [...websites, currentSite],
                   lastAccessed: new Date().toISOString(),
                   lastAccessedSite: currentSite,
                   timesAccessed: (keyData.timesAccessed || 0) + 1
                 });
+              } else {
+                console.log('✓ Site already in websites list');
+                await keyRef.update({
+                  timesAccessed: (keyData.timesAccessed || 0) + 1,
+                  lastAccessed: new Date().toISOString(),
+                  lastAccessedSite: currentSite
+                });
               }
               
-              // Track usage with WebsiteKeyTracker
+              // Track usage with WebsiteKeyTracker if available
               if (typeof window.WebsiteKeyTracker !== 'undefined') {
                 window.WebsiteKeyTracker.trackKeyUsage(storedKey, currentSite, currentUserId);
               }
               
               // Grant access - no need to show key entry
               localStorage.setItem('galaxyverse_access', 'granted');
+              console.log('✅ Access granted automatically');
               return; // Exit early, don't show key entry screen
             } else {
               // Key exists but belongs to someone else - clear local storage
@@ -145,6 +178,8 @@
         } catch (error) {
           console.error('❌ Error verifying stored key:', error);
         }
+      } else {
+        console.log('ℹ️ No stored key found');
       }
 
       // If we reach here, show key entry screen
@@ -410,7 +445,8 @@
         submitBtn.style.cursor = 'wait';
 
         try {
-          const currentSite = window.location.hostname || 'localhost';
+          const currentSite = normalizeHostname(window.location.hostname || 'localhost');
+          console.log('🌐 Verifying for site:', currentSite);
           
           submitBtn.textContent = 'Connecting...';
           try {
@@ -470,6 +506,7 @@
               const timesAccessed = keyData.timesAccessed || 0;
               
               if (!websites.includes(currentSite)) {
+                console.log('📝 Adding site to user\'s website list');
                 await keyRef.update({
                   websites: [...websites, currentSite],
                   timesAccessed: timesAccessed + 1,
@@ -477,6 +514,7 @@
                   lastAccessedSite: currentSite
                 });
               } else {
+                console.log('✓ Site already in user\'s list, updating access time');
                 await keyRef.update({
                   timesAccessed: timesAccessed + 1,
                   lastAccessed: new Date().toISOString(),
@@ -514,6 +552,7 @@
             }
           } else {
             // New key claim
+            console.log('🆕 Claiming new key for user');
             await keyRef.set({
               used: true,
               userId: currentUserId,
