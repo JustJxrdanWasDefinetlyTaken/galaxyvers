@@ -1,26 +1,59 @@
-// ===== FIREBASE KEY SYSTEM - FIXED FOR SUBDOMAIN SUPPORT =====
+// ===== FIREBASE KEY SYSTEM - CROSS-WEBSITE UNIFIED ACCESS =====
 (function() {
-  // Normalize hostname to treat all schoologydashboard.org subdomains as one site
+  // Normalize hostname to treat ALL GalaxyVerse domains as ONE unified system
   function normalizeHostname(hostname) {
     // Remove port if present
     hostname = hostname.split(':')[0];
     
-    // Handle schoologydashboard.org and all its subdomains/CDN variants
+    // ALL GalaxyVerse domains return the same identifier
+    const galaxyverseDomains = [
+      'schoologydashboard.org',
+      'gverse.schoologydashboard.org',
+      'ahs.schoologydashboard.org',
+      'learn.schoologydashboard.org',
+      'galaxyverse-c1v.pages.dev',
+      'galaxyverse.org'
+    ];
+    
+    // Check if current hostname matches any GalaxyVerse domain
+    for (const domain of galaxyverseDomains) {
+      if (hostname.includes(domain.replace('.org', '').replace('.dev', '').replace('.net', ''))) {
+        return 'galaxyverse-network'; // Single identifier for all sites
+      }
+    }
+    
+    // Handle localhost for development
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return 'galaxyverse-network'; // Same identifier for testing
+    }
+    
+    // For other domains, return as-is
+    return hostname;
+  }
+
+  // Get actual website name for display purposes
+  function getActualWebsite(hostname) {
+    hostname = hostname.split(':')[0];
+    
     if (hostname.includes('schoologydashboard.org')) {
+      if (hostname.includes('gverse')) return 'gverse.schoologydashboard.org';
+      if (hostname.includes('ahs')) return 'ahs.schoologydashboard.org';
+      if (hostname.includes('learn')) return 'learn.schoologydashboard.org';
       return 'schoologydashboard.org';
     }
     
-    // Handle galaxyverse domains
-    if (hostname.includes('galaxyverse')) {
+    if (hostname.includes('galaxyverse-c1v.pages.dev')) {
+      return 'galaxyverse-c1v.pages.dev';
+    }
+    
+    if (hostname.includes('galaxyverse.org')) {
       return 'galaxyverse.org';
     }
     
-    // Handle localhost variants
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
       return 'localhost';
     }
     
-    // For other domains, return as-is
     return hostname;
   }
 
@@ -90,24 +123,26 @@
       'fu5DZ4cpsbkLf4nXHRnvpARKomGqnleC'
     ];
 
-    // List of all GalaxyVerse websites (for reference)
+    // List of all GalaxyVerse websites
     const galaxyVerseWebsites = [
       'schoologydashboard.org',
-      'gverse.schoologydashboard.org.cdn.cloudflare.net',
-      'ahs.schoologydashboard.org.cdn.cloudflare.net',
-      'learn.schoologydashboard.org.cdn.cloudflare.net',
+      'gverse.schoologydashboard.org',
+      'ahs.schoologydashboard.org',
+      'learn.schoologydashboard.org',
       'galaxyverse-c1v.pages.dev',
       'galaxyverse.org',
-      'localhost' // For development
+      'localhost'
     ];
 
     // Initialize the key system
     async function initializeKeySystem() {
-      // Get current normalized site
-      const currentSite = normalizeHostname(window.location.hostname || 'localhost');
-      console.log('🌐 Current site (normalized):', currentSite);
+      // Get current site (normalized for system, actual for tracking)
+      const normalizedSite = normalizeHostname(window.location.hostname || 'localhost');
+      const actualSite = getActualWebsite(window.location.hostname || 'localhost');
+      console.log('🌐 Current site (normalized):', normalizedSite);
+      console.log('🌐 Current site (actual):', actualSite);
       
-      // Get or create a persistent user ID
+      // Get or create a persistent user ID (same across ALL GalaxyVerse sites)
       let currentUserId = localStorage.getItem('galaxyverse_user_id');
       if (!currentUserId) {
         currentUserId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -122,7 +157,6 @@
       
       if (storedKey) {
         console.log('🔑 Found stored key, verifying...');
-        // Verify the stored key is still valid and belongs to this user
         try {
           const keyRef = database.ref('usedKeys/' + storedKey);
           const snapshot = await keyRef.once('value');
@@ -132,17 +166,17 @@
             
             // Check if this key belongs to this user
             if (keyData.userId === currentUserId) {
-              console.log('✅ Valid key found for user. Granting access across all sites.');
+              console.log('✅ Valid key found for user. Access granted across ALL GalaxyVerse sites.');
               
               // Update current website in the list if not already there
               const websites = keyData.websites || [];
               
-              if (!websites.includes(currentSite)) {
+              if (!websites.includes(actualSite)) {
                 console.log('📝 Adding current site to websites list');
                 await keyRef.update({
-                  websites: [...websites, currentSite],
+                  websites: [...websites, actualSite],
                   lastAccessed: new Date().toISOString(),
-                  lastAccessedSite: currentSite,
+                  lastAccessedSite: actualSite,
                   timesAccessed: (keyData.timesAccessed || 0) + 1
                 });
               } else {
@@ -150,13 +184,13 @@
                 await keyRef.update({
                   timesAccessed: (keyData.timesAccessed || 0) + 1,
                   lastAccessed: new Date().toISOString(),
-                  lastAccessedSite: currentSite
+                  lastAccessedSite: actualSite
                 });
               }
               
               // Track usage with WebsiteKeyTracker if available
               if (typeof window.WebsiteKeyTracker !== 'undefined') {
-                window.WebsiteKeyTracker.trackKeyUsage(storedKey, currentSite, currentUserId);
+                window.WebsiteKeyTracker.trackKeyUsage(storedKey, actualSite, currentUserId);
               }
               
               // Grant access - no need to show key entry
@@ -242,7 +276,7 @@
             font-size: 16px;
             margin: 0 0 30px 0;
           ">Enter your access key to continue<br>
-          V1.1.7</p>
+          V1.2.0 - Unified Network</p>
           
           <input type="text" id="keyInput" placeholder="Enter your key" style="
             width: 100%;
@@ -318,9 +352,10 @@
             color: #6b7280;
             font-size: 12px;
           ">
-            🌟 Each key can only be claimed by one user<br>
+            🌟 Each key can only be claimed by ONE user<br>
             ✨ Once claimed, it works across ALL GalaxyVerse websites<br>
-            💫 No need to re-enter your key on other sites<br><br>
+            💫 Automatically recognized on any GalaxyVerse domain<br>
+            🔒 No one else can use your key once you claim it<br><br>
             Contact the admins if you need a key. Lifetime key is $7.<br>
             Server: https://dsc.gg/galaxyproxi
           </div>
@@ -446,8 +481,10 @@
         submitBtn.style.cursor = 'wait';
 
         try {
-          const currentSite = normalizeHostname(window.location.hostname || 'localhost');
-          console.log('🌐 Verifying for site:', currentSite);
+          const normalizedSite = normalizeHostname(window.location.hostname || 'localhost');
+          const actualSite = getActualWebsite(window.location.hostname || 'localhost');
+          console.log('🌐 Verifying for site:', actualSite);
+          console.log('🌐 Normalized site:', normalizedSite);
           
           submitBtn.textContent = 'Connecting...';
           try {
@@ -479,6 +516,7 @@
             const keyData = snapshot.val();
             const keyOwnerId = keyData.userId;
             
+            // CRITICAL: Check if key is already claimed by ANOTHER user
             if (currentUserId !== keyOwnerId) {
               // Log unauthorized attempt
               const securityLogRef = database.ref('securityLogs/unauthorizedKeyAttempts/' + Date.now());
@@ -486,13 +524,14 @@
                 attemptedKey: enteredKey,
                 keyOwner: keyOwnerId,
                 attemptedBy: currentUserId,
-                website: currentSite,
+                website: actualSite,
+                normalizedSite: normalizedSite,
                 timestamp: Date.now(),
                 date: new Date().toISOString(),
                 userAgent: navigator.userAgent
               });
               
-              keyError.textContent = '❌ This key has already been claimed by another user. Each key can only be used by one person.';
+              keyError.textContent = '❌ This key has already been claimed by another user. Each key can only be used by ONE person across ALL GalaxyVerse sites.';
               keyError.style.color = '#ff4444';
               keyError.style.display = 'block';
               keyInput.style.borderColor = '#ff4444';
@@ -506,20 +545,22 @@
               const websites = keyData.websites || [];
               const timesAccessed = keyData.timesAccessed || 0;
               
-              if (!websites.includes(currentSite)) {
+              if (!websites.includes(actualSite)) {
                 console.log('📝 Adding site to user\'s website list');
                 await keyRef.update({
-                  websites: [...websites, currentSite],
+                  websites: [...websites, actualSite],
                   timesAccessed: timesAccessed + 1,
                   lastAccessed: new Date().toISOString(),
-                  lastAccessedSite: currentSite
+                  lastAccessedSite: actualSite,
+                  network: normalizedSite
                 });
               } else {
                 console.log('✓ Site already in user\'s list, updating access time');
                 await keyRef.update({
                   timesAccessed: timesAccessed + 1,
                   lastAccessed: new Date().toISOString(),
-                  lastAccessedSite: currentSite
+                  lastAccessedSite: actualSite,
+                  network: normalizedSite
                 });
               }
               
@@ -527,11 +568,11 @@
               localStorage.setItem('galaxyverse_user_key', enteredKey);
               
               if (typeof window.WebsiteKeyTracker !== 'undefined') {
-                window.WebsiteKeyTracker.trackKeyUsage(enteredKey, currentSite, currentUserId);
+                window.WebsiteKeyTracker.trackKeyUsage(enteredKey, actualSite, currentUserId);
               }
               
               keyError.style.color = '#4ade80';
-              keyError.textContent = '✅ Welcome back! Access granted across all GalaxyVerse sites';
+              keyError.textContent = '✅ Welcome back! Access granted across ALL GalaxyVerse sites';
               keyError.style.display = 'block';
               keyInput.style.borderColor = '#4ade80';
               submitBtn.style.background = 'linear-gradient(135deg, #4ade80, #22c55e)';
@@ -552,29 +593,31 @@
               return;
             }
           } else {
-            // New key claim
-            console.log('🆕 Claiming new key for user');
+            // NEW KEY CLAIM - First time this key is being used
+            console.log('🆕 Claiming new key for user across ALL GalaxyVerse sites');
             await keyRef.set({
               used: true,
               userId: currentUserId,
-              firstUsedOn: currentSite,
+              firstUsedOn: actualSite,
               firstUsedDate: new Date().toISOString(),
               firstUsedTimestamp: Date.now(),
-              websites: [currentSite],
+              websites: [actualSite],
               timesAccessed: 1,
               lastAccessed: new Date().toISOString(),
-              lastAccessedSite: currentSite
+              lastAccessedSite: actualSite,
+              network: normalizedSite,
+              claimedAcrossNetwork: true
             });
 
             localStorage.setItem('galaxyverse_access', 'granted');
             localStorage.setItem('galaxyverse_user_key', enteredKey);
 
             if (typeof window.WebsiteKeyTracker !== 'undefined') {
-              window.WebsiteKeyTracker.trackKeyUsage(enteredKey, currentSite, currentUserId);
+              window.WebsiteKeyTracker.trackKeyUsage(enteredKey, actualSite, currentUserId);
             }
 
             keyError.style.color = '#4ade80';
-            keyError.textContent = '✅ Key claimed! Welcome to GalaxyVerse - works on all sites';
+            keyError.textContent = '✅ Key claimed! Welcome to GalaxyVerse - works on ALL sites in the network';
             keyError.style.display = 'block';
             keyInput.style.borderColor = '#4ade80';
             submitBtn.style.background = 'linear-gradient(135deg, #4ade80, #22c55e)';
@@ -1040,7 +1083,6 @@ window.onload = () => {
   loadSettings();
   showHome();
 
-  // Theme selector
   const themeSelect = document.getElementById('themeSelect');
   if (themeSelect) {
     const savedTheme = localStorage.getItem('selectedTheme') || 'original';
@@ -1052,7 +1094,6 @@ window.onload = () => {
     });
   }
 
-  // Credits and Update Log buttons
   const creditsBtn = document.getElementById('creditsBtn');
   const updateLogBtn = document.getElementById('updateLogBtn');
   const creditsModal = document.getElementById('creditsModal');
@@ -1070,7 +1111,6 @@ window.onload = () => {
     });
   }
 
-  // Close buttons for info modals
   document.querySelectorAll('.info-close').forEach(closeBtn => {
     closeBtn.addEventListener('click', function() {
       const modalId = this.getAttribute('data-modal');
@@ -1079,14 +1119,12 @@ window.onload = () => {
     });
   });
 
-  // Close info modals when clicking outside
   window.onclick = (e) => {
     if (e.target.classList.contains('info-modal')) {
       e.target.style.display = 'none';
     }
   };
 
-  // Apply tab cloaking button
   const applyBtn = document.getElementById('applyBtn');
   if (applyBtn) {
     applyBtn.addEventListener('click', () => {
@@ -1097,7 +1135,6 @@ window.onload = () => {
     });
   }
 
-  // Reset tab cloaking button
   const resetBtn = document.getElementById('resetBtn');
   if (resetBtn) {
     resetBtn.addEventListener('click', () => {
@@ -1116,7 +1153,6 @@ window.onload = () => {
     });
   }
 
-  // Preset select dropdown
   const presetSelect = document.getElementById('presetSelect');
   if (presetSelect) {
     presetSelect.addEventListener('change', (e) => {
@@ -1131,7 +1167,6 @@ window.onload = () => {
     });
   }
 
-  // Snow effect toggle
   const snowToggle = document.getElementById('snowToggle');
   if (snowToggle) {
     snowToggle.addEventListener('change', (e) => {
@@ -1145,7 +1180,6 @@ window.onload = () => {
     });
   }
 
-  // Panic hotkey input
   const hotkeyInput = document.getElementById('hotkey-input');
   if (hotkeyInput) {
     hotkeyInput.addEventListener('keydown', (e) => {
@@ -1156,7 +1190,6 @@ window.onload = () => {
     });
   }
 
-  // Change panic hotkey button
   const changeHotkeyBtn = document.getElementById('change-hotkey-btn');
   if (changeHotkeyBtn) {
     changeHotkeyBtn.addEventListener('click', () => {
@@ -1170,7 +1203,6 @@ window.onload = () => {
     });
   }
 
-  // Change redirect URL button
   const changeURLBtn = document.getElementById('change-URL-btn');
   if (changeURLBtn) {
     changeURLBtn.addEventListener('click', () => {
@@ -1187,7 +1219,6 @@ window.onload = () => {
     });
   }
 
-  // Panic button key listener
   window.addEventListener('keydown', (e) => {
     const savedHotkey = localStorage.getItem('hotkey') || '`';
     const redirectURL = localStorage.getItem('redirectURL') || 'https://google.com';
@@ -1196,7 +1227,6 @@ window.onload = () => {
     }
   });
 
-  // About:blank toggle
   const aboutBlankToggle = document.getElementById('aboutBlankToggle');
   if (aboutBlankToggle) {
     aboutBlankToggle.addEventListener('change', (e) => {
@@ -1211,7 +1241,6 @@ window.onload = () => {
     });
   }
 
-  // Navigation links
   const navHome = document.getElementById('homeLink');
   const navGames = document.getElementById('gameLink');
   const navApps = document.getElementById('appsLink');
@@ -1224,7 +1253,6 @@ window.onload = () => {
   if (navAbout) navAbout.addEventListener('click', e => { e.preventDefault(); showAbout(); });
   if (navSettings) navSettings.addEventListener('click', e => { e.preventDefault(); showSettings(); });
 
-  // Game search
   const searchBtn = document.getElementById('searchBtn');
   const searchInput = document.getElementById('searchInput');
   if (searchBtn) searchBtn.addEventListener('click', searchGames);
@@ -1235,17 +1263,14 @@ window.onload = () => {
     });
   }
 
-  // Back buttons
   const backToHomeApps = document.getElementById('backToHomeApps');
   if (backToHomeApps) backToHomeApps.addEventListener('click', showHome);
   const backToHomeGame = document.getElementById('backToHomeGame');
   if (backToHomeGame) backToHomeGame.addEventListener('click', showHome);
 
-  // Fullscreen toggle
   const fullscreenBtn = document.getElementById('fullscreenBtn');
   if (fullscreenBtn) fullscreenBtn.addEventListener('click', toggleFullscreen);
 
-  // Homepage search
   const homepageSearchBtn = document.getElementById('homepageSearchBtn');
   const homepageSearchInput = document.getElementById('homepageSearchInput');
   if (homepageSearchBtn) homepageSearchBtn.addEventListener('click', homepageSearch);
