@@ -36,7 +36,7 @@ const games = [
   { name: "Rooftop Snipers 2", image: "others/assets/images/games/rooftop-snipers-2.avif", url: "others/assets/games/Rooftop Snipers 2.html" },
   { name: "Slope", image: "others/assets/images/games/slope.png", url: "others/assets/games/Slope.html" },
   { name: "Solar Smash", image: "others/assets/images/games/Solar_smash.webp", url: "others/assets/games/Solar Smash.html" },
-  { name: "Steal a Brainrot", image: "others/assets/images/games/stealabrainrot (1).webp", url: "others/assets/games/Steal Brainrot Online.html" },
+  { name: "Steal a Brainrot", image: "others/assets/images/games/stealabrain.webp", url: "others/assets/games/Steal Brainrot Online.html" },
   { name: "Subway Surfers San Francisco", image: "others/assets/images/games/subwaysanfran.jpeg", url: "others/assets/games/Subway Surfers_ San Francisco.html" },
   { name: "Subway Surfers Winter Holiday", image: "others/assets/images/games/subway-surfers.jpg", url: "others/assets/games/Subway Surfers_ Winter Holiday.html" }
 ];
