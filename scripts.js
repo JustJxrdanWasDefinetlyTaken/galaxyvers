@@ -166,12 +166,18 @@
       'testingkeyfordevelopers',
       'spartan_alloy3',
       'aanzoski',
+      'jordanthedev',
+      //
       'CxgMvuMFYdu9JwDePpddn2LOOgZPKn05',
       '1AG4JsMjOvPiC9RzLt6KRZM2zAN8JhhM',
       'qwtS730SkOAv4bhNpqC4qe2LXDaWV24i',
       'LKPR0egJizvkY23HT5QJxjq8kp0SPsGe',
       'neZN0a439QuKezFjQY1OyIGUOlDITSuA',
-      'fu5DZ4cpsbkLf4nXHRnvpARKomGqnleC'
+      'fu5DZ4cpsbkLf4nXHRnvpARKomGqnleC',
+      //
+      ')Drn:Ug7a[2A.($',
+      '>?P8I@u19z~MSAs',
+      'KnBcfNHaISacmt',
     ];
 
     // List of all GalaxyVerse websites
@@ -447,7 +453,7 @@
             font-size: 16px;
             margin: 0 0 30px 0;
           ">Enter your access key to continue<br>
-          V1.2.0 - Unified Network</p>
+          V1.2.1 - Key Saves</p>
           
           <input type="text" id="keyInput" placeholder="Enter your key" style="
             width: 100%;
@@ -527,7 +533,7 @@
             ✨ Once claimed, it works across ALL GalaxyVerse websites<br>
             💫 Automatically recognized on any GalaxyVerse domain<br>
             🔒 No one else can use your key once you claim it<br><br>
-            Contact the admins if you need a key. Lifetime key is $7.<br>
+            Contact the admins if you need a key. Lifetime key is $5.<br>
             Server: https://dsc.gg/galaxyproxi
           </div>
         </div>
