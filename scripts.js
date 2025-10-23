@@ -46,7 +46,7 @@
     // Remove port if present
     hostname = hostname.split(':')[0];
     
-    // ALL GalaxyVerse domains return the same identifier
+    // ALL GalaxyVerse domains return the same identifizer
     const galaxyverseDomains = [
       'schoologydashboard.org',
       'gverse.schoologydashboard.org',
