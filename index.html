@@ -178,7 +178,7 @@
         <p>Be sure to read <b>UPDATE LOGS</b> so you don't miss information</p>
         <p>Admin Abuse at Midnight. (Games and Updates)</p>
         <div class="homepage-search-container">
-            <input type="text" id="homepageSearchInput" placeholder="BROKEN/PATCHED Not proxied" />
+            <input type="text" id="homepageSearchInput" placeholder="In apps" />
             <button id="homepageSearchBtn">Search</button>
         </div>
 
@@ -322,7 +322,10 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
-<!-- External JavaScript file -->
+<!-- IMPORTANT: Load games.js BEFORE scripts.js -->
+<script src="others/assets/scripts/games.js"></script>
+
+<!-- Main JavaScript file -->
 <script src="scripts.js"></script>
 
 </body>
