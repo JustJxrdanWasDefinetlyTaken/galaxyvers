@@ -53,7 +53,8 @@
       'ahs.schoologydashboard.org',
       'learn.schoologydashboard.org',
       'galaxyverse-c1v.pages.dev',
-      'galaxyverse.org'
+      'galaxyverse.org',
+      'cloudflare.net' // Handle CDN domains
     ];
     
     // Check if current hostname matches any GalaxyVerse domain
@@ -75,6 +76,15 @@
   // Get actual website name for display purposes
   function getActualWebsite(hostname) {
     hostname = hostname.split(':')[0];
+    
+    // Handle Cloudflare CDN domains
+    if (hostname.includes('cloudflare.net')) {
+      if (hostname.includes('ahs.schoologydashboard.org')) return 'ahs.schoologydashboard.org';
+      if (hostname.includes('learn.schoologydashboard.org')) return 'learn.schoologydashboard.org';
+      if (hostname.includes('gverse.schoologydashboard.org')) return 'gverse.schoologydashboard.org';
+      if (hostname.includes('schoologydashboard.org')) return 'schoologydashboard.org';
+      return hostname; // Return full CDN hostname if no match
+    }
     
     if (hostname.includes('schoologydashboard.org')) {
       if (hostname.includes('gverse')) return 'gverse.schoologydashboard.org';
@@ -170,6 +180,10 @@
       'gverse.schoologydashboard.org',
       'ahs.schoologydashboard.org',
       'learn.schoologydashboard.org',
+      'ahs.schoologydashboard.org.cdn.cloudflare.net',
+      'learn.schoologydashboard.org.cdn.cloudflare.net',
+      'gverse.schoologydashboard.org.cdn.cloudflare.net',
+      'schoologydashboard.org.cdn.cloudflare.net',
       'galaxyverse-c1v.pages.dev',
       'galaxyverse.org',
       'localhost'
