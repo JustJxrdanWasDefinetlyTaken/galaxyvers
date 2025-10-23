@@ -156,6 +156,8 @@
       'testingkeyfordevelopers',
       'spartan_alloy3',
       'aanzoski',
+      'freekey4test',
+      //
       'CxgMvuMFYdu9JwDePpddn2LOOgZPKn05',
       '1AG4JsMjOvPiC9RzLt6KRZM2zAN8JhhM',
       'qwtS730SkOAv4bhNpqC4qe2LXDaWV24i',
@@ -342,7 +344,7 @@
             font-size: 16px;
             margin: 0 0 30px 0;
           ">Enter your access key to continue<br>
-          V1.2.0 - Unified Network</p>
+          V1.2.1 - Publish Key UPD</p>
           
           <input type="text" id="keyInput" placeholder="Enter your key" style="
             width: 100%;
