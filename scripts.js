@@ -156,8 +156,6 @@
       'testingkeyfordevelopers',
       'spartan_alloy3',
       'aanzoski',
-      'freekey4test',
-      //
       'CxgMvuMFYdu9JwDePpddn2LOOgZPKn05',
       '1AG4JsMjOvPiC9RzLt6KRZM2zAN8JhhM',
       'qwtS730SkOAv4bhNpqC4qe2LXDaWV24i',
@@ -177,6 +175,36 @@
       'localhost'
     ];
 
+    // Generate a browser fingerprint for cross-domain user identification
+    function generateBrowserFingerprint() {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      ctx.textBaseline = 'top';
+      ctx.font = '14px Arial';
+      ctx.fillText('Browser Fingerprint', 2, 2);
+      const canvasData = canvas.toDataURL();
+      
+      const fingerprint = {
+        userAgent: navigator.userAgent,
+        language: navigator.language,
+        platform: navigator.platform,
+        screenResolution: `${screen.width}x${screen.height}`,
+        colorDepth: screen.colorDepth,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        canvasHash: canvasData.substring(0, 50),
+        hardwareConcurrency: navigator.hardwareConcurrency || 0
+      };
+      
+      const fingerprintString = JSON.stringify(fingerprint);
+      let hash = 0;
+      for (let i = 0; i < fingerprintString.length; i++) {
+        const char = fingerprintString.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+      }
+      return 'fp_' + Math.abs(hash).toString(36);
+    }
+
     // Initialize the key system
     async function initializeKeySystem() {
       // Get current site (normalized for system, actual for tracking)
@@ -185,22 +213,61 @@
       console.log('🌐 Current site (normalized):', normalizedSite);
       console.log('🌐 Current site (actual):', actualSite);
       
+      // Generate browser fingerprint for cross-domain identification
+      const browserFingerprint = generateBrowserFingerprint();
+      console.log('🔒 Browser fingerprint:', browserFingerprint);
+      
       // Get or create a persistent user ID (same across ALL GalaxyVerse sites)
       let currentUserId = localStorage.getItem('galaxyverse_user_id');
       
-      // If no local ID, check if user has a key stored and retrieve their ID from Firebase
+      // Step 1: Check localStorage first
+      if (currentUserId) {
+        console.log('🆔 Found user ID in localStorage:', currentUserId);
+      }
+      
+      // Step 2: If no local ID, check Firebase for this fingerprint
+      if (!currentUserId) {
+        try {
+          console.log('🔍 No local user ID, checking Firebase for fingerprint...');
+          const fingerprintRef = database.ref('fingerprints/' + browserFingerprint);
+          const fingerprintSnapshot = await fingerprintRef.once('value');
+          
+          if (fingerprintSnapshot.exists()) {
+            const fingerprintData = fingerprintSnapshot.val();
+            currentUserId = fingerprintData.userId;
+            localStorage.setItem('galaxyverse_user_id', currentUserId);
+            console.log('🆔 Retrieved user ID from fingerprint:', currentUserId);
+          }
+        } catch (error) {
+          console.error('Error retrieving fingerprint from Firebase:', error);
+        }
+      }
+      
+      // Step 3: If still no ID, check if user has a key stored and retrieve their ID from Firebase
       if (!currentUserId) {
         const storedKey = localStorage.getItem('galaxyverse_user_key');
         if (storedKey) {
           try {
-            console.log('🔍 No local user ID, but key found. Retrieving user ID from Firebase...');
+            console.log('🔍 No user ID found, but key exists. Retrieving from key data...');
             const keyRef = database.ref('usedKeys/' + storedKey);
             const snapshot = await keyRef.once('value');
             if (snapshot.exists()) {
               const keyData = snapshot.val();
               currentUserId = keyData.userId;
               localStorage.setItem('galaxyverse_user_id', currentUserId);
-              console.log('🆔 Retrieved user ID from Firebase:', currentUserId);
+              console.log('🆔 Retrieved user ID from key data:', currentUserId);
+              
+              // Store fingerprint mapping in Firebase
+              try {
+                await database.ref('fingerprints/' + browserFingerprint).set({
+                  userId: currentUserId,
+                  createdAt: new Date().toISOString(),
+                  lastSeen: new Date().toISOString()
+                });
+                console.log('✅ Fingerprint stored in Firebase');
+              } catch (error) {
+                console.error('Error storing fingerprint:', error);
+              }
             }
           } catch (error) {
             console.error('Error retrieving user ID from Firebase:', error);
@@ -208,13 +275,35 @@
         }
       }
       
-      // If still no ID, create a new one
+      // Step 4: If still no ID, create a new one
       if (!currentUserId) {
         currentUserId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
         localStorage.setItem('galaxyverse_user_id', currentUserId);
         console.log('🆔 Created new user ID:', currentUserId);
+        
+        // Store fingerprint mapping in Firebase for future visits
+        try {
+          await database.ref('fingerprints/' + browserFingerprint).set({
+            userId: currentUserId,
+            createdAt: new Date().toISOString(),
+            lastSeen: new Date().toISOString()
+          });
+          console.log('✅ New fingerprint stored in Firebase');
+        } catch (error) {
+          console.error('Error storing new fingerprint:', error);
+        }
       } else {
-        console.log('🆔 Existing user ID:', currentUserId);
+        console.log('🆔 Using user ID:', currentUserId);
+        
+        // Update fingerprint last seen
+        try {
+          await database.ref('fingerprints/' + browserFingerprint).update({
+            userId: currentUserId,
+            lastSeen: new Date().toISOString()
+          });
+        } catch (error) {
+          console.error('Error updating fingerprint:', error);
+        }
       }
 
       // Check if user has a valid key stored locally
@@ -344,7 +433,7 @@
             font-size: 16px;
             margin: 0 0 30px 0;
           ">Enter your access key to continue<br>
-          V1.2.1 - Publish Key UPD</p>
+          V1.2.0 - Unified Network</p>
           
           <input type="text" id="keyInput" placeholder="Enter your key" style="
             width: 100%;
