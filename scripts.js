@@ -1,3 +1,44 @@
+// ===== WEBSITEKEYTRACKER.JS =====
+(function() {
+  window.WebsiteKeyTracker = {
+    initialized: false,
+    
+    init: function() {
+      if (this.initialized) return;
+      this.initialized = true;
+      console.log('🔍 WebsiteKeyTracker initialized (v2.0 - Unified Network)');
+    },
+    
+    trackKeyUsage: async function(key, website, userId) {
+      try {
+        if (typeof firebase === 'undefined' || !firebase.database) {
+          console.error('❌ Firebase not available for tracking');
+          return;
+        }
+        
+        const database = firebase.database();
+        const trackingRef = database.ref('keyTracking/' + key + '/' + Date.now());
+        
+        await trackingRef.set({
+          website: website,
+          userId: userId,
+          timestamp: Date.now(),
+          date: new Date().toISOString(),
+          userAgent: navigator.userAgent,
+          action: 'access'
+        });
+        
+        console.log('✅ Key usage tracked:', key, 'on', website);
+      } catch (error) {
+        console.error('❌ Error tracking key usage:', error);
+      }
+    }
+  };
+  
+  // Auto-initialize
+  window.WebsiteKeyTracker.init();
+})();
+
 // ===== FIREBASE KEY SYSTEM - CROSS-WEBSITE UNIFIED ACCESS =====
 (function() {
   // Normalize hostname to treat ALL GalaxyVerse domains as ONE unified system
@@ -144,6 +185,28 @@
       
       // Get or create a persistent user ID (same across ALL GalaxyVerse sites)
       let currentUserId = localStorage.getItem('galaxyverse_user_id');
+      
+      // If no local ID, check if user has a key stored and retrieve their ID from Firebase
+      if (!currentUserId) {
+        const storedKey = localStorage.getItem('galaxyverse_user_key');
+        if (storedKey) {
+          try {
+            console.log('🔍 No local user ID, but key found. Retrieving user ID from Firebase...');
+            const keyRef = database.ref('usedKeys/' + storedKey);
+            const snapshot = await keyRef.once('value');
+            if (snapshot.exists()) {
+              const keyData = snapshot.val();
+              currentUserId = keyData.userId;
+              localStorage.setItem('galaxyverse_user_id', currentUserId);
+              console.log('🆔 Retrieved user ID from Firebase:', currentUserId);
+            }
+          } catch (error) {
+            console.error('Error retrieving user ID from Firebase:', error);
+          }
+        }
+      }
+      
+      // If still no ID, create a new one
       if (!currentUserId) {
         currentUserId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
         localStorage.setItem('galaxyverse_user_id', currentUserId);
@@ -167,6 +230,9 @@
             // Check if this key belongs to this user
             if (keyData.userId === currentUserId) {
               console.log('✅ Valid key found for user. Access granted across ALL GalaxyVerse sites.');
+              
+              // Sync user ID to localStorage in case it was missing
+              localStorage.setItem('galaxyverse_user_id', currentUserId);
               
               // Update current website in the list if not already there
               const websites = keyData.websites || [];
@@ -544,6 +610,9 @@
               // Key belongs to this user - update website list
               const websites = keyData.websites || [];
               const timesAccessed = keyData.timesAccessed || 0;
+              
+              // Ensure user ID is synced to localStorage
+              localStorage.setItem('galaxyverse_user_id', currentUserId);
               
               if (!websites.includes(actualSite)) {
                 console.log('📝 Adding site to user\'s website list');
