@@ -1,2 +1,2 @@
 # Treat .bf files as Brainfuck
-*.bf linguist-language=c++
+*.bf linguist-language=Brainfuck
