@@ -1,1 +1,2 @@
 *.bf linguist-language=Brainfuck
+*.txt linguist-language=Text
