@@ -9,7 +9,7 @@
       console.log('🔍 WebsiteKeyTracker initialized (v2.0 - Unified Network)');
     },
     
-    trackKeyUsage: async function(key, website, userId) {
+    trackKeyUsage: async function(key, website, fingerprint) {
       try {
         if (typeof firebase === 'undefined' || !firebase.database) {
           console.error('❌ Firebase not available for tracking');
@@ -21,7 +21,7 @@
         
         await trackingRef.set({
           website: website,
-          userId: userId,
+          fingerprint: fingerprint,
           timestamp: Date.now(),
           date: new Date().toISOString(),
           userAgent: navigator.userAgent,
@@ -218,100 +218,21 @@
       console.log('🌐 Current site (normalized):', normalizedSite);
       console.log('🌐 Current site (actual):', actualSite);
       
-      // Generate browser fingerprint for cross-domain identification
+      // Generate browser fingerprint for identification
       const browserFingerprint = generateBrowserFingerprint();
       console.log('🔒 Browser fingerprint:', browserFingerprint);
       
-      // Get or create a persistent user ID (same across ALL GalaxyVerse sites)
-      let currentUserId = localStorage.getItem('galaxyverse_user_id');
-      
-      // Step 1: Check localStorage first
-      if (currentUserId) {
-        console.log('🆔 Found user ID in localStorage:', currentUserId);
-      }
-      
-      // Step 2: If no local ID, check Firebase for this fingerprint
-      if (!currentUserId) {
-        try {
-          console.log('🔍 No local user ID, checking Firebase for fingerprint...');
-          const fingerprintRef = database.ref('fingerprints/' + browserFingerprint);
-          const fingerprintSnapshot = await fingerprintRef.once('value');
-          
-          if (fingerprintSnapshot.exists()) {
-            const fingerprintData = fingerprintSnapshot.val();
-            currentUserId = fingerprintData.userId;
-            localStorage.setItem('galaxyverse_user_id', currentUserId);
-            console.log('🆔 Retrieved user ID from fingerprint:', currentUserId);
-          }
-        } catch (error) {
-          console.error('Error retrieving fingerprint from Firebase:', error);
-        }
-      }
-      
-      // Step 3: If still no ID, check if user has a key stored and retrieve their ID from Firebase
-      if (!currentUserId) {
-        const storedKey = localStorage.getItem('galaxyverse_user_key');
-        if (storedKey) {
-          try {
-            console.log('🔍 No user ID found, but key exists. Retrieving from key data...');
-            const keyRef = database.ref('usedKeys/' + storedKey);
-            const snapshot = await keyRef.once('value');
-            if (snapshot.exists()) {
-              const keyData = snapshot.val();
-              currentUserId = keyData.userId;
-              localStorage.setItem('galaxyverse_user_id', currentUserId);
-              console.log('🆔 Retrieved user ID from key data:', currentUserId);
-              
-              // Store fingerprint mapping in Firebase
-              try {
-                await database.ref('fingerprints/' + browserFingerprint).set({
-                  userId: currentUserId,
-                  createdAt: new Date().toISOString(),
-                  lastSeen: new Date().toISOString()
-                });
-                console.log('✅ Fingerprint stored in Firebase');
-              } catch (error) {
-                console.error('Error storing fingerprint:', error);
-              }
-            }
-          } catch (error) {
-            console.error('Error retrieving user ID from Firebase:', error);
-          }
-        }
-      }
-      
-      // Step 4: If still no ID, create a new one
-      if (!currentUserId) {
-        currentUserId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        localStorage.setItem('galaxyverse_user_id', currentUserId);
-        console.log('🆔 Created new user ID:', currentUserId);
-        
-        // Store fingerprint mapping in Firebase for future visits
-        try {
-          await database.ref('fingerprints/' + browserFingerprint).set({
-            userId: currentUserId,
-            createdAt: new Date().toISOString(),
-            lastSeen: new Date().toISOString()
-          });
-          console.log('✅ New fingerprint stored in Firebase');
-        } catch (error) {
-          console.error('Error storing new fingerprint:', error);
-        }
-      } else {
-        console.log('🆔 Using user ID:', currentUserId);
-        
-        // Update fingerprint last seen
-        try {
-          await database.ref('fingerprints/' + browserFingerprint).update({
-            userId: currentUserId,
-            lastSeen: new Date().toISOString()
-          });
-        } catch (error) {
-          console.error('Error updating fingerprint:', error);
-        }
+      // Update fingerprint last seen timestamp
+      try {
+        await database.ref('fingerprints/' + browserFingerprint).update({
+          lastSeen: new Date().toISOString(),
+          lastSeenSite: actualSite
+        });
+      } catch (error) {
+        console.log('ℹ️ Fingerprint not yet registered');
       }
 
-      // Check if user has a valid key stored locally
+      // Check if this fingerprint has a valid key stored locally
       const storedKey = localStorage.getItem('galaxyverse_user_key');
       
       if (storedKey) {
@@ -323,12 +244,9 @@
           if (snapshot.exists()) {
             const keyData = snapshot.val();
             
-            // Check if this key belongs to this user
-            if (keyData.userId === currentUserId) {
-              console.log('✅ Valid key found for user. Access granted across ALL GalaxyVerse sites.');
-              
-              // Sync user ID to localStorage in case it was missing
-              localStorage.setItem('galaxyverse_user_id', currentUserId);
+            // Check if this key belongs to this fingerprint
+            if (keyData.fingerprint === browserFingerprint) {
+              console.log('✅ Valid key found for fingerprint. Access granted across ALL GalaxyVerse sites.');
               
               // Update current website in the list if not already there
               const websites = keyData.websites || [];
@@ -352,7 +270,7 @@
               
               // Track usage with WebsiteKeyTracker if available
               if (typeof window.WebsiteKeyTracker !== 'undefined') {
-                window.WebsiteKeyTracker.trackKeyUsage(storedKey, actualSite, currentUserId);
+                window.WebsiteKeyTracker.trackKeyUsage(storedKey, actualSite, browserFingerprint);
               }
               
               // Grant access - no need to show key entry
@@ -360,8 +278,8 @@
               console.log('✅ Access granted automatically');
               return; // Exit early, don't show key entry screen
             } else {
-              // Key exists but belongs to someone else - clear local storage
-              console.log('⚠️ Stored key belongs to another user. Clearing local data.');
+              // Key exists but belongs to another fingerprint - clear local storage
+              console.log('⚠️ Stored key belongs to another browser. Clearing local data.');
               localStorage.removeItem('galaxyverse_user_key');
               localStorage.removeItem('galaxyverse_access');
             }
@@ -438,7 +356,7 @@
             font-size: 16px;
             margin: 0 0 30px 0;
           ">Enter your access key to continue<br>
-          V1.2.1 - Key Saves</p>
+          V1.2.2 - Fingerprint Auth/Updated Keys</p>
           
           <input type="text" id="keyInput" placeholder="Enter your key" style="
             width: 100%;
@@ -514,12 +432,11 @@
             color: #6b7280;
             font-size: 12px;
           ">
-            🌟 Each key can only be claimed by ONE user<br>
+            🌟 Each key is linked to your browser fingerprint<br>
             ✨ Once claimed, it works across ALL GalaxyVerse websites<br>
             💫 Automatically recognized on any GalaxyVerse domain<br>
-            🔒 No one else can use your key once you claim it<br><br>
-            Contact the admins if you need a key. Lifetime key is $5.<br>
-            Server: https://dsc.gg/galaxyproxi
+            If you purchased a key and it logs you out use it again<br><br>
+            Contact the admins if you need a key. Lifetime key is $5.
           </div>
         </div>
       `;
@@ -645,8 +562,11 @@
         try {
           const normalizedSite = normalizeHostname(window.location.hostname || 'localhost');
           const actualSite = getActualWebsite(window.location.hostname || 'localhost');
+          const browserFingerprint = generateBrowserFingerprint();
+          
           console.log('🌐 Verifying for site:', actualSite);
           console.log('🌐 Normalized site:', normalizedSite);
+          console.log('🔒 Browser fingerprint:', browserFingerprint);
           
           submitBtn.textContent = 'Connecting...';
           try {
@@ -665,27 +585,21 @@
           
           submitBtn.textContent = 'Verifying...';
           
-          let currentUserId = localStorage.getItem('galaxyverse_user_id');
-          if (!currentUserId) {
-            currentUserId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-            localStorage.setItem('galaxyverse_user_id', currentUserId);
-          }
-          
           const keyRef = database.ref('usedKeys/' + enteredKey);
           const snapshot = await keyRef.once('value');
           
           if (snapshot.exists()) {
             const keyData = snapshot.val();
-            const keyOwnerId = keyData.userId;
+            const keyOwnerFingerprint = keyData.fingerprint;
             
-            // CRITICAL: Check if key is already claimed by ANOTHER user
-            if (currentUserId !== keyOwnerId) {
+            // CRITICAL: Check if key is already claimed by ANOTHER fingerprint
+            if (browserFingerprint !== keyOwnerFingerprint) {
               // Log unauthorized attempt
               const securityLogRef = database.ref('securityLogs/unauthorizedKeyAttempts/' + Date.now());
               await securityLogRef.set({
                 attemptedKey: enteredKey,
-                keyOwner: keyOwnerId,
-                attemptedBy: currentUserId,
+                keyOwnerFingerprint: keyOwnerFingerprint,
+                attemptedByFingerprint: browserFingerprint,
                 website: actualSite,
                 normalizedSite: normalizedSite,
                 timestamp: Date.now(),
@@ -693,7 +607,7 @@
                 userAgent: navigator.userAgent
               });
               
-              keyError.textContent = '❌ This key has already been claimed by another user. Each key can only be used by ONE person across ALL GalaxyVerse sites.';
+              keyError.textContent = '❌ This key has already been claimed by another browser. Each key can only be used on ONE browser across ALL GalaxyVerse sites.';
               keyError.style.color = '#ff4444';
               keyError.style.display = 'block';
               keyInput.style.borderColor = '#ff4444';
@@ -703,15 +617,12 @@
               submitBtn.style.cursor = 'pointer';
               return;
             } else {
-              // Key belongs to this user - update website list
+              // Key belongs to this fingerprint - update website list
               const websites = keyData.websites || [];
               const timesAccessed = keyData.timesAccessed || 0;
               
-              // Ensure user ID is synced to localStorage
-              localStorage.setItem('galaxyverse_user_id', currentUserId);
-              
               if (!websites.includes(actualSite)) {
-                console.log('📝 Adding site to user\'s website list');
+                console.log('📝 Adding site to website list');
                 await keyRef.update({
                   websites: [...websites, actualSite],
                   timesAccessed: timesAccessed + 1,
@@ -720,7 +631,7 @@
                   network: normalizedSite
                 });
               } else {
-                console.log('✓ Site already in user\'s list, updating access time');
+                console.log('✓ Site already in list, updating access time');
                 await keyRef.update({
                   timesAccessed: timesAccessed + 1,
                   lastAccessed: new Date().toISOString(),
@@ -729,11 +640,18 @@
                 });
               }
               
+              // Update fingerprint record
+              await database.ref('fingerprints/' + browserFingerprint).set({
+                key: enteredKey,
+                lastSeen: new Date().toISOString(),
+                lastSeenSite: actualSite
+              });
+              
               localStorage.setItem('galaxyverse_access', 'granted');
               localStorage.setItem('galaxyverse_user_key', enteredKey);
               
               if (typeof window.WebsiteKeyTracker !== 'undefined') {
-                window.WebsiteKeyTracker.trackKeyUsage(enteredKey, actualSite, currentUserId);
+                window.WebsiteKeyTracker.trackKeyUsage(enteredKey, actualSite, browserFingerprint);
               }
               
               keyError.style.color = '#4ade80';
@@ -759,10 +677,10 @@
             }
           } else {
             // NEW KEY CLAIM - First time this key is being used
-            console.log('🆕 Claiming new key for user across ALL GalaxyVerse sites');
+            console.log('🆕 Claiming new key for fingerprint across ALL GalaxyVerse sites');
             await keyRef.set({
               used: true,
-              userId: currentUserId,
+              fingerprint: browserFingerprint,
               firstUsedOn: actualSite,
               firstUsedDate: new Date().toISOString(),
               firstUsedTimestamp: Date.now(),
@@ -774,11 +692,19 @@
               claimedAcrossNetwork: true
             });
 
+            // Store fingerprint record
+            await database.ref('fingerprints/' + browserFingerprint).set({
+              key: enteredKey,
+              createdAt: new Date().toISOString(),
+              lastSeen: new Date().toISOString(),
+              lastSeenSite: actualSite
+            });
+
             localStorage.setItem('galaxyverse_access', 'granted');
             localStorage.setItem('galaxyverse_user_key', enteredKey);
 
             if (typeof window.WebsiteKeyTracker !== 'undefined') {
-              window.WebsiteKeyTracker.trackKeyUsage(enteredKey, actualSite, currentUserId);
+              window.WebsiteKeyTracker.trackKeyUsage(enteredKey, actualSite, browserFingerprint);
             }
 
             keyError.style.color = '#4ade80';
