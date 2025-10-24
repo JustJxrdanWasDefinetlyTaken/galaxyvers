@@ -908,7 +908,7 @@ function showGames() {
 
 function showApps() {
   hideAll();
-  const appsContent = document.getElementById('content-apps');
+  const appsContent = document.getElementById('content-aps');
   if (appsContent) appsContent.style.display = 'block';
   const appsLink = document.getElementById('appsLink');
   if (appsLink) appsLink.classList.add('active');
