@@ -1,2 +1,5 @@
+# Braindead
 *.bf linguist-language=Brainfuck
+
+# Text
 *.txt linguist-language=Text
