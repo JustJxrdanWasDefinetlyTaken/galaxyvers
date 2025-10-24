@@ -1,5 +1,5 @@
-# Braindead
+# Treat .bf files as Brainfuck
 *.bf linguist-language=Brainfuck
 
 # Text
-*.txt linguist-language=Text
+*.txt linguist-language=Text linguist-documentation=false
