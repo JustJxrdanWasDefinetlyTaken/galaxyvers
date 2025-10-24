@@ -893,7 +893,7 @@ function showHome() {
 
 function showGames() {
   hideAll();
-  const gamesContent = document.getElementById('content-games');
+  const gamesContent = document.getElementById('content-gms');
   if (gamesContent) gamesContent.style.display = 'block';
   const gameLink = document.getElementById('gameLink');
   if (gameLink) gameLink.classList.add('active');
