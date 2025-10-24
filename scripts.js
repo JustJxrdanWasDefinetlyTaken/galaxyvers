@@ -166,16 +166,27 @@
       'testingkeyfordevelopers',
       'spartan_alloy3',
       'aanzoski',
-      'jordanthedev',
       'CxgMvuMFYdu9JwDePpddn2LOOgZPKn05',
       '1AG4JsMjOvPiC9RzLt6KRZM2zAN8JhhM',
       'qwtS730SkOAv4bhNpqC4qe2LXDaWV24i',
       'LKPR0egJizvkY23HT5QJxjq8kp0SPsGe',
       'neZN0a439QuKezFjQY1OyIGUOlDITSuA',
-      'fu5DZ4cpsbkLf4nXHRnvpARKomGqnleC',
-      ')Drn:Ug7a[2A.($',
-      '>?P8I@u19z~MSAs',
-      'KnBcfNHaISacmt',
+      'fu5DZ4cpsbkLf4nXHRnvpARKomGqnleC'
+    ];
+
+    // List of all GalaxyVerse websites
+    const galaxyVerseWebsites = [
+      'schoologydashboard.org',
+      'gverse.schoologydashboard.org',
+      'ahs.schoologydashboard.org',
+      'learn.schoologydashboard.org',
+      'ahs.schoologydashboard.org.cdn.cloudflare.net',
+      'learn.schoologydashboard.org.cdn.cloudflare.net',
+      'gverse.schoologydashboard.org.cdn.cloudflare.net',
+      'schoologydashboard.org.cdn.cloudflare.net',
+      'galaxyverse-c1v.pages.dev',
+      'galaxyverse.org',
+      'localhost'
     ];
 
     // Generate a browser fingerprint for cross-domain user identification
@@ -270,6 +281,7 @@
                 console.log('✅ Fingerprint stored in Firebase');
               } catch (fpError) {
                 console.warn('⚠️ Could not store fingerprint (non-critical):', fpError.message);
+                // Non-critical error, user ID is already retrieved
               }
             }
           } catch (error) {
@@ -292,8 +304,8 @@
             lastSeen: new Date().toISOString()
           });
           console.log('✅ New fingerprint stored in Firebase');
-        } catch (fpError) {
-          console.warn('⚠️ Could not store fingerprint (non-critical):', fpError.message);
+        } catch (error) {
+          console.error('Error storing new fingerprint:', error);
         }
       } else {
         console.log('🆔 Using user ID:', currentUserId);
@@ -315,6 +327,7 @@
             console.log('✅ Fingerprint created/updated');
           } catch (setError) {
             console.warn('⚠️ Could not update fingerprint (non-critical):', setError.message);
+            // Non-critical error, continue execution
           }
         }
       }
@@ -359,6 +372,387 @@
               }
               
               // Track usage with WebsiteKeyTracker if available
+              if (typeof window.WebsiteKeyTracker !== 'undefined') {
+                window.WebsiteKeyTracker.trackKeyUsage(storedKey, actualSite, currentUserId);
+              }
+              
+              // Grant access - no need to show key entry
+              localStorage.setItem('galaxyverse_access', 'granted');
+              console.log('✅ Access granted automatically');
+              return; // Exit early, don't show key entry screen
+            } else {
+              // Key exists but belongs to someone else - clear local storage
+              console.log('⚠️ Stored key belongs to another user. Clearing local data.');
+              localStorage.removeItem('galaxyverse_user_key');
+              localStorage.removeItem('galaxyverse_access');
+            }
+          } else {
+            // Key no longer exists in database - clear local storage
+            console.log('⚠️ Stored key not found in database. Clearing local data.');
+            localStorage.removeItem('galaxyverse_user_key');
+            localStorage.removeItem('galaxyverse_access');
+          }
+        } catch (error) {
+          console.error('❌ Error verifying stored key:', error);
+        }
+      } else {
+        console.log('ℹ️ No stored key found');
+      }
+
+      // If we reach here, show key entry screen
+      showKeyEntryScreen();
+    }
+
+    function showKeyEntryScreen() {
+      // Create key entry overlay
+      const keyOverlay = document.createElement('div');
+      keyOverlay.id = 'galaxyverse-key-overlay';
+      keyOverlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 999999;
+        font-family: 'Roboto', sans-serif;
+      `;
+
+      keyOverlay.innerHTML = `
+        <div style="
+          background: rgba(30, 36, 51, 0.95);
+          border: 2px solid #4f90ff;
+          border-radius: 20px;
+          padding: 40px;
+          box-shadow: 0 15px 50px rgba(79, 144, 255, 0.3);
+          text-align: center;
+          max-width: 450px;
+          width: 90%;
+        ">
+          <div style="
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #4f90ff, #9d4edd);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            box-shadow: 0 8px 20px rgba(79, 144, 255, 0.4);
+          ">
+            🔐
+          </div>
+          
+          <h1 style="
+            color: #e0e6f1;
+            font-size: 32px;
+            margin: 0 0 10px 0;
+            font-weight: 700;
+          ">GalaxyVerse</h1>
+          
+          <p style="
+            color: #9ca3af;
+            font-size: 16px;
+            margin: 0 0 30px 0;
+          ">Enter your access key to continue<br>
+          V1.2.0 - Unified Network</p>
+          
+          <input type="text" id="keyInput" placeholder="Enter your key" style="
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            border: 2px solid #38415d;
+            border-radius: 10px;
+            background: #121826;
+            color: #e0e6f1;
+            outline: none;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+          " />
+          
+          <button id="submitKey" style="
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #4f90ff, #9d4edd);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(79, 144, 255, 0.3);
+          ">Verify Key</button>
+          
+          <button id="testConnectionBtn" style="
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            background: transparent;
+            color: #4f90ff;
+            border: 1px solid #4f90ff;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+          ">Test Connection</button>
+          
+          <div id="keyError" style="
+            color: #ff4444;
+            margin-top: 15px;
+            font-size: 14px;
+            display: none;
+          "></div>
+          
+          <div id="connectionStatus" style="
+            margin-top: 15px;
+            font-size: 12px;
+            color: #9ca3af;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+          ">
+            <span id="statusDot" style="
+              width: 8px;
+              height: 8px;
+              border-radius: 50%;
+              background: #4ade80;
+              display: inline-block;
+            "></span>
+            <span id="statusText">Connected</span>
+          </div>
+          
+          <div style="
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #38415d;
+            color: #6b7280;
+            font-size: 12px;
+          ">
+            🌟 Each key can only be claimed by ONE user<br>
+            ✨ Once claimed, it works across ALL GalaxyVerse websites<br>
+            💫 Automatically recognized on any GalaxyVerse domain<br>
+            🔒 No one else can use your key once you claim it<br><br>
+            Contact the admins if you need a key. Lifetime key is $7.<br>
+            Server: https://dsc.gg/galaxyproxi
+          </div>
+        </div>
+      `;
+
+      document.body.appendChild(keyOverlay);
+      
+      // Hide main content but don't block it
+      const mainContent = document.getElementById('app') || document.body;
+      if (mainContent && mainContent !== document.body) {
+        mainContent.style.filter = 'blur(10px)';
+        mainContent.style.pointerEvents = 'none';
+      }
+
+      // Get elements
+      const keyInput = document.getElementById('keyInput');
+      const submitBtn = document.getElementById('submitKey');
+      const testConnectionBtn = document.getElementById('testConnectionBtn');
+      const keyError = document.getElementById('keyError');
+      const statusDot = document.getElementById('statusDot');
+      const statusText = document.getElementById('statusText');
+
+      // Monitor Firebase connection
+      database.ref('.info/connected').on('value', (snapshot) => {
+        if (snapshot.val() === true) {
+          statusDot.style.background = '#4ade80';
+          statusText.textContent = 'Connected';
+        } else {
+          statusDot.style.background = '#ff4444';
+          statusText.textContent = 'Disconnected';
+        }
+      });
+
+      // Test connection button
+      testConnectionBtn.addEventListener('click', async function() {
+        testConnectionBtn.disabled = true;
+        testConnectionBtn.textContent = 'Testing...';
+        keyError.style.display = 'none';
+        
+        try {
+          console.log('Test 1: Checking connection...');
+          await database.ref('.info/connected').once('value');
+          console.log('✅ Connection test passed');
+          
+          console.log('Test 2: Testing read access...');
+          const testRead = await database.ref('usedKeys').limitToFirst(1).once('value');
+          console.log('✅ Read test passed');
+          
+          console.log('Test 3: Testing write access...');
+          const testRef = database.ref('connectionTest/' + Date.now());
+          await testRef.set({ test: true, timestamp: Date.now() });
+          console.log('✅ Write test passed');
+          
+          await testRef.remove();
+          
+          keyError.style.color = '#4ade80';
+          keyError.textContent = '✅ All tests passed! Connection is working.';
+          keyError.style.display = 'block';
+          
+          testConnectionBtn.textContent = 'Test Connection';
+          testConnectionBtn.disabled = false;
+        } catch (error) {
+          console.error('❌ Connection test failed:', error);
+          keyError.style.color = '#ff4444';
+          
+          if (error.code === 'PERMISSION_DENIED') {
+            keyError.textContent = '❌ Permission Denied: Firebase rules need to be updated. Contact admin.';
+          } else {
+            keyError.textContent = `❌ Connection test failed: ${error.message}`;
+          }
+          
+          keyError.style.display = 'block';
+          testConnectionBtn.textContent = 'Test Connection';
+          testConnectionBtn.disabled = false;
+        }
+      });
+
+      // Add hover effect to button
+      submitBtn.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-2px)';
+        this.style.boxShadow = '0 6px 20px rgba(79, 144, 255, 0.5)';
+      });
+
+      submitBtn.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+        this.style.boxShadow = '0 4px 15px rgba(79, 144, 255, 0.3)';
+      });
+
+      // Add focus effect to input
+      keyInput.addEventListener('focus', function() {
+        this.style.borderColor = '#4f90ff';
+        this.style.boxShadow = '0 0 0 3px rgba(79, 144, 255, 0.1)';
+      });
+
+      keyInput.addEventListener('blur', function() {
+        this.style.borderColor = '#38415d';
+        this.style.boxShadow = 'none';
+      });
+
+      async function verifyKey() {
+        const enteredKey = keyInput.value.trim();
+        
+        if (!enteredKey) {
+          keyError.textContent = '❌ Please enter a key';
+          keyError.style.color = '#ff4444';
+          keyError.style.display = 'block';
+          keyInput.style.borderColor = '#ff4444';
+          return;
+        }
+
+        if (!validKeys.includes(enteredKey)) {
+          keyError.textContent = '❌ Invalid key. Please try again';
+          keyError.style.color = '#ff4444';
+          keyError.style.display = 'block';
+          keyInput.style.borderColor = '#ff4444';
+          keyInput.value = '';
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Checking...';
+        submitBtn.style.cursor = 'wait';
+
+        try {
+          const normalizedSite = normalizeHostname(window.location.hostname || 'localhost');
+          const actualSite = getActualWebsite(window.location.hostname || 'localhost');
+          console.log('🌐 Verifying for site:', actualSite);
+          console.log('🌐 Normalized site:', normalizedSite);
+          
+          submitBtn.textContent = 'Connecting...';
+          try {
+            await database.ref('.info/connected').once('value');
+          } catch (connectionError) {
+            console.error('Firebase connection test failed:', connectionError);
+            keyError.textContent = '❌ Cannot connect to server. Check your internet connection and try again.';
+            keyError.style.color = '#ff4444';
+            keyError.style.display = 'block';
+            keyInput.style.borderColor = '#ff4444';
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Verify Key';
+            submitBtn.style.cursor = 'pointer';
+            return;
+          }
+          
+          submitBtn.textContent = 'Verifying...';
+          
+          let currentUserId = localStorage.getItem('galaxyverse_user_id');
+          if (!currentUserId) {
+            currentUserId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('galaxyverse_user_id', currentUserId);
+          }
+          
+          const keyRef = database.ref('usedKeys/' + enteredKey);
+          const snapshot = await keyRef.once('value');
+          
+          if (snapshot.exists()) {
+            const keyData = snapshot.val();
+            const keyOwnerId = keyData.userId;
+            
+            // CRITICAL: Check if key is already claimed by ANOTHER user
+            if (currentUserId !== keyOwnerId) {
+              // Log unauthorized attempt
+              const securityLogRef = database.ref('securityLogs/unauthorizedKeyAttempts/' + Date.now());
+              await securityLogRef.set({
+                attemptedKey: enteredKey,
+                keyOwner: keyOwnerId,
+                attemptedBy: currentUserId,
+                website: actualSite,
+                normalizedSite: normalizedSite,
+                timestamp: Date.now(),
+                date: new Date().toISOString(),
+                userAgent: navigator.userAgent
+              });
+              
+              keyError.textContent = '❌ This key has already been claimed by another user. Each key can only be used by ONE person across ALL GalaxyVerse sites.';
+              keyError.style.color = '#ff4444';
+              keyError.style.display = 'block';
+              keyInput.style.borderColor = '#ff4444';
+              keyInput.value = '';
+              submitBtn.disabled = false;
+              submitBtn.textContent = 'Verify Key';
+              submitBtn.style.cursor = 'pointer';
+              return;
+            } else {
+              // Key belongs to this user - update website list
+              const websites = keyData.websites || [];
+              const timesAccessed = keyData.timesAccessed || 0;
+              
+              // Ensure user ID is synced to localStorage
+              localStorage.setItem('galaxyverse_user_id', currentUserId);
+              
+              if (!websites.includes(actualSite)) {
+                console.log('📝 Adding site to user\'s website list');
+                await keyRef.update({
+                  websites: [...websites, actualSite],
+                  timesAccessed: timesAccessed + 1,
+                  lastAccessed: new Date().toISOString(),
+                  lastAccessedSite: actualSite,
+                  network: normalizedSite
+                });
+              } else {
+                console.log('✓ Site already in user\'s list, updating access time');
+                await keyRef.update({
+                  timesAccessed: timesAccessed + 1,
+                  lastAccessed: new Date().toISOString(),
+                  lastAccessedSite: actualSite,
+                  network: normalizedSite
+                });
+              }
+              
+              localStorage.setItem('galaxyverse_access', 'granted');
+              localStorage.setItem('galaxyverse_user_key', enteredKey);
+              
               if (typeof window.WebsiteKeyTracker !== 'undefined') {
                 window.WebsiteKeyTracker.trackKeyUsage(enteredKey, actualSite, currentUserId);
               }
@@ -498,6 +892,47 @@
   }
 })();
 
+// ===== GAME DATA =====
+const games = [
+  { name: "Feedback", image: "https://iili.io/3OM27wv.th.jpg", url: "https://forms.gle/GhMEg7s8H9aRSy4d9" },
+  { name: "1v1 Oldest", image: "others/assets/images/games/1v1lololdest.jpeg", url: "others/assets/games/1v1.lol_oldest.html" },
+  { name: "8 Ball Pool", image: "others/assets/images/games/8-ball-pool-2021-08-05.webp", url: "others/assets/games/8 Ball Pool.html" },
+  { name: "A Small World Cup", image: "others/assets/images/games/asmallworldcup.png", url: "others/assets/games/A Small World Cup.html" },
+  { name: "Bacon May Die", image: "others/assets/images/games/bacon-may-die.png", url: "others/assets/games/Bacon May Die.html" },
+  { name: "Bad Time Simulator", image: "others/assets/images/games/badtimesim.png", url: "others/assets/games/Bad Time Simulator.html" },
+  { name: "Baldi's Basics Plus", image: "others/assets/images/games/baldis.png", url: "others/assets/games/Baldi's Basics Plus.html" },
+  { name: "Basketbros.IO", image: "others/assets/images/games/basketbros-io.jpg", url: "others/assets/games/Basket Bros.html" },
+  { name: "BitLife", image: "others/assets/images/games/bitlife.jpeg", url: "others/assets/games/BitLife.html" },
+  { name: "Bloxorz", image: "others/assets/images/games/blockorz.jpeg", url: "others/assets/games/Bloxorz.html" },
+  { name: "Cookie Clicker", image: "others/assets/images/games/cookie-clicker.png", url: "others/assets/games/Cookie Clicker.html" },
+  { name: "Crazy Cattle 3D", image: "others/assets/images/games/crazy-cattle-3d-icon.jpg", url: "others/assets/games/Crazy Cattle 3D.html" },
+  { name: "Crossy Road", image: "others/assets/images/games/crossyroad.png", url: "others/assets/games/Crossy Road.html" },
+  { name: "Drift Boss", image: "others/assets/images/games/driftboss.png", url: "others/assets/games/Drift Boss.html" },
+  { name: "Drift Hunters ", image: "others/assets/images/games/drift-hunters.png", url: "others/assets/games/Drift Hunters.html" },
+  { name: "Friday Night Funkin': Darkness Takeover", image: "others/assets/images/games/takeover.jpg", url: "others/assets/games/Friday Night Funkin'_ Darkness Takeover.html" },
+  { name: "Geometry Dash Lite", image: "others/assets/images/games/dashlite.png", url: "others/assets/games/Geometry Dash Lite.html" },
+  { name: "Google Baseball", image: "others/assets/images/games/baseball.png", url: "others/assets/games/Google Baseball.html" },
+  { name: "Infinite Craft", image: "others/assets/images/games/infcraft.jpg", url: "others/assets/games/Infinite Craft" },
+  { name: "Jetpack Joyride", image: "others/assets/images/games/jetpack.png", url: "others/assets/games/Jetpack Joyride.html" },
+  { name: "Monkey Mart", image: "others/assets/images/games/monkey-mart.png", url: "others/assets/games/Monkey Mart.html" },
+  { name: "Paper.IO", image: "others/assets/images/games/paperio2.png", url: "others/assets/games/Paper.io 2.html" },
+  { name: "Retro Bowl", image: "others/assets/images/games/retro-bowl.jpeg", url: "others/assets/games/Retro Bowl.html" },
+  { name: "Rooftop Snipers", image: "others/assets/images/games/rooftopsnipers.jpg", url: "others/assets/games/Rooftop Snipers.html" },
+  { name: "Rooftop Snipers 2", image: "others/assets/images/games/rooftop-snipers-2.avif", url: "others/assets/games/Rooftop Snipers 2.html" },
+  { name: "Slope", image: "others/assets/images/games/slope.png", url: "others/assets/games/Slope.html" },
+  { name: "Solar Smash", image: "others/assets/images/games/Solar_smash.webp", url: "others/assets/games/Solar Smash.html" },
+  { name: "Subway Surfers San Francisco", image: "others/assets/images/games/subwaysanfran.jpeg", url: "others/assets/games/Subway Surfers_ San Francisco.html" },
+  { name: "Subway Surfers Winter Holiday", image: "others/assets/images/games/subway-surfers.jpg", url: "others/assets/games/Subway Surfers_ Winter Holiday.html" }
+];
+
+// ===== APP DATA =====
+const apps = [
+  { name: "YouTube", image: "others/assets/images/apps/youtube.png", url: "others/assets/apps/YouTube.html" },
+  { name: "Spotify", image: "others/assets/images/apps/spotify.png", url: "others/assets/apps/Spotify.html" },
+  { name: "Soundboard", image: "others/assets/images/apps/soundboard.png", url: "others/assets/apps/Soundboard.html" },
+  { name: "Vscode", image: "others/assets/images/apps/vscode.jpeg", url: "others/assets/apps/Vscode.html" }
+];
+
 // ===== TAB CLOAKING PRESETS =====
 const presets = {
   google: { title: "Google", favicon: "https://www.google.com/favicon.ico" },
@@ -527,17 +962,24 @@ const themes = {
   retro: { bgColor: '#2b1b17', navColor: '#3d2b27', accentColor: '#ff9966', textColor: '#ffeaa7', borderColor: '#5d4b47', hoverBg: '#4d3b37', btnBg: '#6d5b57', btnHoverBg: '#ff9966' }
 };
 
-// ===== GAME OF THE DAY (uses games from games.js) =====
+// ===== GAME OF THE DAY =====
+function getGameOfTheDay() {
+  const now = new Date();
+  const cdtOffset = -5;
+  const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+  const cdtTime = new Date(utc + (3600000 * cdtOffset));
+  const startOfYear = new Date(cdtTime.getFullYear(), 0, 0);
+  startOfYear.setHours(0, 0, 0, 0);
+  const diff = cdtTime - startOfYear;
+  const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const playableGames = games.filter(game => game.name !== "Feedback");
+  const index = dayOfYear % playableGames.length;
+  return playableGames[index];
+}
+
 function displayGameOfTheDay() {
   const gotdContainer = document.getElementById('game-of-the-day-container');
   if (!gotdContainer) return;
-  
-  // Check if getGameOfTheDay function exists from games.js
-  if (typeof getGameOfTheDay !== 'function') {
-    console.error('getGameOfTheDay function not found. Make sure games.js is loaded.');
-    return;
-  }
-  
   const game = getGameOfTheDay();
   gotdContainer.innerHTML = `
     <div class="gotd-card">
@@ -598,13 +1040,7 @@ function showGames() {
   if (gamesContent) gamesContent.style.display = 'block';
   const gameLink = document.getElementById('gameLink');
   if (gameLink) gameLink.classList.add('active');
-  
-  // Check if games array exists from games.js
-  if (typeof games !== 'undefined') {
-    renderGames(games);
-  } else {
-    console.error('games array not found. Make sure games.js is loaded.');
-  }
+  renderGames(games);
 }
 
 function showApps() {
@@ -613,13 +1049,7 @@ function showApps() {
   if (appsContent) appsContent.style.display = 'block';
   const appsLink = document.getElementById('appsLink');
   if (appsLink) appsLink.classList.add('active');
-  
-  // Check if apps array exists from games.js
-  if (typeof apps !== 'undefined') {
-    renderApps(apps);
-  } else {
-    console.error('apps array not found. Make sure games.js is loaded.');
-  }
+  renderApps(apps);
 }
 
 function showAbout() {
@@ -697,13 +1127,6 @@ function searchGames() {
   const searchInput = document.getElementById('searchInput');
   if (!searchInput) return;
   const query = searchInput.value.toLowerCase().trim();
-  
-  // Check if games array exists from games.js
-  if (typeof games === 'undefined') {
-    console.error('games array not found. Make sure games.js is loaded.');
-    return;
-  }
-  
   if (!query) {
     renderGames(games);
     return;
@@ -1042,385 +1465,4 @@ window.onload = () => {
       if (e.key === 'Enter') homepageSearch();
     });
   }
-};(storedKey, actualSite, currentUserId);
-              }
-              
-              // Grant access - no need to show key entry
-              localStorage.setItem('galaxyverse_access', 'granted');
-              console.log('✅ Access granted automatically');
-              return; // Exit early, don't show key entry screen
-            } else {
-              // Key exists but belongs to someone else - clear local storage
-              console.log('⚠️ Stored key belongs to another user. Clearing local data.');
-              localStorage.removeItem('galaxyverse_user_key');
-              localStorage.removeItem('galaxyverse_access');
-            }
-          } else {
-            // Key no longer exists in database - clear local storage
-            console.log('⚠️ Stored key not found in database. Clearing local data.');
-            localStorage.removeItem('galaxyverse_user_key');
-            localStorage.removeItem('galaxyverse_access');
-          }
-        } catch (error) {
-          console.error('❌ Error verifying stored key:', error);
-        }
-      } else {
-        console.log('ℹ️ No stored key found');
-      }
-
-      // If we reach here, show key entry screen
-      showKeyEntryScreen();
-    }
-
-    function showKeyEntryScreen() {
-      // Create key entry overlay
-      const keyOverlay = document.createElement('div');
-      keyOverlay.id = 'galaxyverse-key-overlay';
-      keyOverlay.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 999999;
-        font-family: 'Roboto', sans-serif;
-      `;
-
-      keyOverlay.innerHTML = `
-        <div style="
-          background: rgba(30, 36, 51, 0.95);
-          border: 2px solid #4f90ff;
-          border-radius: 20px;
-          padding: 40px;
-          box-shadow: 0 15px 50px rgba(79, 144, 255, 0.3);
-          text-align: center;
-          max-width: 450px;
-          width: 90%;
-        ">
-          <div style="
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 20px;
-            background: linear-gradient(135deg, #4f90ff, #9d4edd);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            box-shadow: 0 8px 20px rgba(79, 144, 255, 0.4);
-          ">
-            🔐
-          </div>
-          
-          <h1 style="
-            color: #e0e6f1;
-            font-size: 32px;
-            margin: 0 0 10px 0;
-            font-weight: 700;
-          ">GalaxyVerse</h1>
-          
-          <p style="
-            color: #9ca3af;
-            font-size: 16px;
-            margin: 0 0 30px 0;
-          ">Enter your access key to continue<br>
-          V1.2.1 - Key Saves</p>
-          
-          <input type="text" id="keyInput" placeholder="Enter your key" style="
-            width: 100%;
-            padding: 15px;
-            font-size: 16px;
-            border: 2px solid #38415d;
-            border-radius: 10px;
-            background: #121826;
-            color: #e0e6f1;
-            outline: none;
-            box-sizing: border-box;
-            transition: all 0.3s ease;
-            margin-bottom: 20px;
-          " />
-          
-          <button id="submitKey" style="
-            width: 100%;
-            padding: 15px;
-            font-size: 16px;
-            font-weight: bold;
-            background: linear-gradient(135deg, #4f90ff, #9d4edd);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(79, 144, 255, 0.3);
-          ">Verify Key</button>
-          
-          <button id="testConnectionBtn" style="
-            width: 100%;
-            padding: 10px;
-            font-size: 14px;
-            background: transparent;
-            color: #4f90ff;
-            border: 1px solid #4f90ff;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: all 0.3s ease;
-          ">Test Connection</button>
-          
-          <div id="keyError" style="
-            color: #ff4444;
-            margin-top: 15px;
-            font-size: 14px;
-            display: none;
-          "></div>
-          
-          <div id="connectionStatus" style="
-            margin-top: 15px;
-            font-size: 12px;
-            color: #9ca3af;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-          ">
-            <span id="statusDot" style="
-              width: 8px;
-              height: 8px;
-              border-radius: 50%;
-              background: #4ade80;
-              display: inline-block;
-            "></span>
-            <span id="statusText">Connected</span>
-          </div>
-          
-          <div style="
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #38415d;
-            color: #6b7280;
-            font-size: 12px;
-          ">
-            🌟 Each key can only be claimed by ONE user<br>
-            ✨ Once claimed, it works across ALL GalaxyVerse websites<br>
-            💫 Automatically recognized on any GalaxyVerse domain<br>
-            🔒 No one else can use your key once you claim it<br><br>
-            Contact the admins if you need a key. Lifetime key is $5.<br>
-            Server: https://dsc.gg/galaxyproxi
-          </div>
-        </div>
-      `;
-
-      document.body.appendChild(keyOverlay);
-      
-      // Hide main content but don't block it
-      const mainContent = document.getElementById('app') || document.body;
-      if (mainContent && mainContent !== document.body) {
-        mainContent.style.filter = 'blur(10px)';
-        mainContent.style.pointerEvents = 'none';
-      }
-
-      // Get elements
-      const keyInput = document.getElementById('keyInput');
-      const submitBtn = document.getElementById('submitKey');
-      const testConnectionBtn = document.getElementById('testConnectionBtn');
-      const keyError = document.getElementById('keyError');
-      const statusDot = document.getElementById('statusDot');
-      const statusText = document.getElementById('statusText');
-
-      // Monitor Firebase connection
-      database.ref('.info/connected').on('value', (snapshot) => {
-        if (snapshot.val() === true) {
-          statusDot.style.background = '#4ade80';
-          statusText.textContent = 'Connected';
-        } else {
-          statusDot.style.background = '#ff4444';
-          statusText.textContent = 'Disconnected';
-        }
-      });
-
-      // Test connection button
-      testConnectionBtn.addEventListener('click', async function() {
-        testConnectionBtn.disabled = true;
-        testConnectionBtn.textContent = 'Testing...';
-        keyError.style.display = 'none';
-        
-        try {
-          console.log('Test 1: Checking connection...');
-          await database.ref('.info/connected').once('value');
-          console.log('✅ Connection test passed');
-          
-          console.log('Test 2: Testing read access...');
-          const testRead = await database.ref('usedKeys').limitToFirst(1).once('value');
-          console.log('✅ Read test passed');
-          
-          console.log('Test 3: Testing write access...');
-          const testRef = database.ref('connectionTest/' + Date.now());
-          await testRef.set({ test: true, timestamp: Date.now() });
-          console.log('✅ Write test passed');
-          
-          await testRef.remove();
-          
-          keyError.style.color = '#4ade80';
-          keyError.textContent = '✅ All tests passed! Connection is working.';
-          keyError.style.display = 'block';
-          
-          testConnectionBtn.textContent = 'Test Connection';
-          testConnectionBtn.disabled = false;
-        } catch (error) {
-          console.error('❌ Connection test failed:', error);
-          keyError.style.color = '#ff4444';
-          
-          if (error.code === 'PERMISSION_DENIED') {
-            keyError.textContent = '❌ Permission Denied: Firebase rules need to be updated. Contact admin.';
-          } else {
-            keyError.textContent = `❌ Connection test failed: ${error.message}`;
-          }
-          
-          keyError.style.display = 'block';
-          testConnectionBtn.textContent = 'Test Connection';
-          testConnectionBtn.disabled = false;
-        }
-      });
-
-      // Add hover effect to button
-      submitBtn.addEventListener('mouseenter', function() {
-        this.style.transform = 'translateY(-2px)';
-        this.style.boxShadow = '0 6px 20px rgba(79, 144, 255, 0.5)';
-      });
-
-      submitBtn.addEventListener('mouseleave', function() {
-        this.style.transform = 'translateY(0)';
-        this.style.boxShadow = '0 4px 15px rgba(79, 144, 255, 0.3)';
-      });
-
-      // Add focus effect to input
-      keyInput.addEventListener('focus', function() {
-        this.style.borderColor = '#4f90ff';
-        this.style.boxShadow = '0 0 0 3px rgba(79, 144, 255, 0.1)';
-      });
-
-      keyInput.addEventListener('blur', function() {
-        this.style.borderColor = '#38415d';
-        this.style.boxShadow = 'none';
-      });
-
-      async function verifyKey() {
-        const enteredKey = keyInput.value.trim();
-        
-        if (!enteredKey) {
-          keyError.textContent = '❌ Please enter a key';
-          keyError.style.color = '#ff4444';
-          keyError.style.display = 'block';
-          keyInput.style.borderColor = '#ff4444';
-          return;
-        }
-
-        if (!validKeys.includes(enteredKey)) {
-          keyError.textContent = '❌ Invalid key. Please try again';
-          keyError.style.color = '#ff4444';
-          keyError.style.display = 'block';
-          keyInput.style.borderColor = '#ff4444';
-          keyInput.value = '';
-          return;
-        }
-
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Checking...';
-        submitBtn.style.cursor = 'wait';
-
-        try {
-          const normalizedSite = normalizeHostname(window.location.hostname || 'localhost');
-          const actualSite = getActualWebsite(window.location.hostname || 'localhost');
-          console.log('🌐 Verifying for site:', actualSite);
-          console.log('🌐 Normalized site:', normalizedSite);
-          
-          submitBtn.textContent = 'Connecting...';
-          try {
-            await database.ref('.info/connected').once('value');
-          } catch (connectionError) {
-            console.error('Firebase connection test failed:', connectionError);
-            keyError.textContent = '❌ Cannot connect to server. Check your internet connection and try again.';
-            keyError.style.color = '#ff4444';
-            keyError.style.display = 'block';
-            keyInput.style.borderColor = '#ff4444';
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Verify Key';
-            submitBtn.style.cursor = 'pointer';
-            return;
-          }
-          
-          submitBtn.textContent = 'Verifying...';
-          
-          let currentUserId = localStorage.getItem('galaxyverse_user_id');
-          if (!currentUserId) {
-            currentUserId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-            localStorage.setItem('galaxyverse_user_id', currentUserId);
-          }
-          
-          const keyRef = database.ref('usedKeys/' + enteredKey);
-          const snapshot = await keyRef.once('value');
-          
-          if (snapshot.exists()) {
-            const keyData = snapshot.val();
-            const keyOwnerId = keyData.userId;
-            
-            // CRITICAL: Check if key is already claimed by ANOTHER user
-            if (currentUserId !== keyOwnerId) {
-              // Log unauthorized attempt
-              const securityLogRef = database.ref('securityLogs/unauthorizedKeyAttempts/' + Date.now());
-              await securityLogRef.set({
-                attemptedKey: enteredKey,
-                keyOwner: keyOwnerId,
-                attemptedBy: currentUserId,
-                website: actualSite,
-                normalizedSite: normalizedSite,
-                timestamp: Date.now(),
-                date: new Date().toISOString(),
-                userAgent: navigator.userAgent
-              });
-              
-              keyError.textContent = '❌ This key has already been claimed by another user. Each key can only be used by ONE person across ALL GalaxyVerse sites.';
-              keyError.style.color = '#ff4444';
-              keyError.style.display = 'block';
-              keyInput.style.borderColor = '#ff4444';
-              keyInput.value = '';
-              submitBtn.disabled = false;
-              submitBtn.textContent = 'Verify Key';
-              submitBtn.style.cursor = 'pointer';
-              return;
-            } else {
-              // Key belongs to this user - update website list
-              const websites = keyData.websites || [];
-              const timesAccessed = keyData.timesAccessed || 0;
-              
-              // Ensure user ID is synced to localStorage
-              localStorage.setItem('galaxyverse_user_id', currentUserId);
-              
-              if (!websites.includes(actualSite)) {
-                console.log('📝 Adding site to user\'s website list');
-                await keyRef.update({
-                  websites: [...websites, actualSite],
-                  timesAccessed: timesAccessed + 1,
-                  lastAccessed: new Date().toISOString(),
-                  lastAccessedSite: actualSite,
-                  network: normalizedSite
-                });
-              } else {
-                console.log('✓ Site already in user\'s list, updating access time');
-                await keyRef.update({
-                  timesAccessed: timesAccessed + 1,
-                  lastAccessed: new Date().toISOString(),
-                  lastAccessedSite: actualSite,
-                  network: normalizedSite
-                });
-              }
-              
-              localStorage.setItem('galaxyverse_access', 'granted');
-              localStorage.setItem('galaxyverse_user_key', enteredKey);
-              
-              if (typeof window.WebsiteKeyTracker !== 'undefined') {
-                window.WebsiteKeyTracker.trackKeyUsage
+};
