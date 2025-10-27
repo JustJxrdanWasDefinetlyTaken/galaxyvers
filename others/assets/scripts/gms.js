@@ -35,18 +35,18 @@ const games = [
   { name: "Monkey Mart", image: "others/assets/images/games/monkey-mart.png", url: "others/assets/games/Monkey Mart.html" },
   { name: "Paper.IO", image: "others/assets/images/games/paperio2.png", url: "others/assets/games/Paper.io 2.html" },
   { name: "Retro Bowl", image: "others/assets/images/games/retro-bowl.jpeg", url: "others/assets/games/Retro Bowl.html" },
-  { name: "Retro Bowl College", image: "others/assets/images/games/retrobowlcollege.jpg", url: "others/assets/games/Retro Bowl College.html" },
+  { name: "Retro Bowl College", image: "others/assets/images/games/retrobrowlcollege.jpg", url: "others/assets/games/Retro Bowl College.html" },
   { name: "Rooftop Snipers", image: "others/assets/images/games/rooftopsnipers.jpg", url: "others/assets/games/Rooftop Snipers.html" },
   { name: "Rooftop Snipers 2", image: "others/assets/images/games/rooftop-snipers-2.avif", url: "others/assets/games/Rooftop Snipers 2.html" },
   { name: "Slope", image: "others/assets/images/games/slope.png", url: "others/assets/games/Slope.html" },
   { name: "Solar Smash", image: "others/assets/images/games/Solar_smash.webp", url: "others/assets/games/Solar Smash.html" },
   { name: "Space Waves", image: "others/assets/images/games/spacewaves.png", url: "others/assets/games/Space Waves.html" },
   { name: "Steal a Brainrot", image: "others/assets/images/games/stealabrain.webp", url: "others/assets/games/Steal Brainrot Online.html" },
-  { name: "Stickman Hook", image: "others/assets/images/games/Solar_smash.webp", url: "others/assets/games/Stickman Hook.html" },
+  { name: "Stickman Hook", image: "others/assets/images/games/stickman Hook.jpg", url: "others/assets/games/Stickman Hook.html" },
   { name: "Subway Surfers San Francisco", image: "others/assets/images/games/subwaysanfran.jpeg", url: "others/assets/games/Subway Surfers_ San Francisco.html" },
   { name: "Subway Surfers Winter Holiday", image: "others/assets/images/games/subway-surfers.jpg", url: "others/assets/games/Subway Surfers_ Winter Holiday.html" },
-  { name: "Temple Run 2", image: "others/assets/images/games/Solar_smash.webp", url: "others/assets/games/Temple Run 2.html" },
-  { name: "Tomb Of The Mask", image: "others/assets/images/games/Solar_smash.webp", url: "others/assets/games/Tomb Of The Mask.html" }
+  { name: "Temple Run 2", image: "others/assets/images/games/temple run 2.png", url: "others/assets/games/Temple Run 2.html" },
+  { name: "Tomb Of The Mask", image: "others/assets/images/games/tomb of the mask.png", url: "others/assets/games/Tomb Of The Mask.html" }
 ];
 
 // ===== APP DATA =====
