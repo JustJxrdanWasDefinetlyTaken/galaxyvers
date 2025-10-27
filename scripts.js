@@ -175,9 +175,12 @@
       'neZN0a439QuKezFjQY1OyIGUOlDITSuA',
       'fu5DZ4cpsbkLf4nXHRnvpARKomGqnleC',
       //
-      ')Drn:Ug7a[2A.($',
-      '>?P8I@u19z~MSAs',
-      'KnBcfNHaISacmt',
+      'D5F11',
+      '1471D',
+      '21B1E',
+      'B98EE',
+      'B27A9',
+      'd3vinthefirstdev'
     ];
 
     // Generate a browser fingerprint for cross-domain user identification
@@ -356,7 +359,7 @@
             font-size: 16px;
             margin: 0 0 30px 0;
           ">Enter your access key to continue<br>
-          V1.2.2 - Fingerprint Auth/Updated Keys</p>
+          V1.2.3 - Added keys + Games</p>
           
           <input type="text" id="keyInput" placeholder="Enter your key" style="
             width: 100%;
