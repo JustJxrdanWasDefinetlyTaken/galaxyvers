@@ -21,6 +21,9 @@ const games = [
   { name: "Crossy Road", image: "others/assets/images/games/crossyroad.png", url: "others/assets/games/Crossy Road.html" },
   { name: "Drift Boss", image: "others/assets/images/games/driftboss.png", url: "others/assets/games/Drift Boss.html" },
   { name: "Drift Hunters ", image: "others/assets/images/games/drift-hunters.png", url: "others/assets/games/Drift Hunters.html" },
+  { name: "Escape Road", image: "others/assets/images/games/escaperoad.png", url: "others/assets/games/Escape Road.html" }, /*ok*/
+  { name: "Flappy Bird", image: "others/assets/images/games/flappybird.png", url: "others/assets/games/Flappy Bird.html" },
+  { name: "Football Bros", image: "others/assets/images/games/football-bros.webp", url: "others/assets/games/Football Bros.html" },
   { name: "Friday Night Funkin': Darkness Takeover", image: "others/assets/images/games/takeover.jpg", url: "others/assets/games/Friday Night Funkin'_ Darkness Takeover.html" },
   { name: "Fruit Ninja", image: "others/assets/images/games/fruitninja.jpeg", url: "others/assets/games/Fruit Ninja.html" },
   { name: "Google Feud", image: "others/assets/images/games/googlefeud.jpg", url: "others/assets/games/Google Feud.html" },
@@ -32,13 +35,18 @@ const games = [
   { name: "Monkey Mart", image: "others/assets/images/games/monkey-mart.png", url: "others/assets/games/Monkey Mart.html" },
   { name: "Paper.IO", image: "others/assets/images/games/paperio2.png", url: "others/assets/games/Paper.io 2.html" },
   { name: "Retro Bowl", image: "others/assets/images/games/retro-bowl.jpeg", url: "others/assets/games/Retro Bowl.html" },
+  { name: "Retro Bowl College", image: "others/assets/images/games/retrobowlcollege.jpg", url: "others/assets/games/Retro Bowl College.html" },
   { name: "Rooftop Snipers", image: "others/assets/images/games/rooftopsnipers.jpg", url: "others/assets/games/Rooftop Snipers.html" },
   { name: "Rooftop Snipers 2", image: "others/assets/images/games/rooftop-snipers-2.avif", url: "others/assets/games/Rooftop Snipers 2.html" },
   { name: "Slope", image: "others/assets/images/games/slope.png", url: "others/assets/games/Slope.html" },
   { name: "Solar Smash", image: "others/assets/images/games/Solar_smash.webp", url: "others/assets/games/Solar Smash.html" },
+  { name: "Space Waves", image: "others/assets/images/games/spacewaves.png", url: "others/assets/games/Space Waves.html" },
   { name: "Steal a Brainrot", image: "others/assets/images/games/stealabrain.webp", url: "others/assets/games/Steal Brainrot Online.html" },
+  { name: "Stickman Hook", image: "others/assets/images/games/Solar_smash.webp", url: "others/assets/games/Stickman Hook.html" },
   { name: "Subway Surfers San Francisco", image: "others/assets/images/games/subwaysanfran.jpeg", url: "others/assets/games/Subway Surfers_ San Francisco.html" },
-  { name: "Subway Surfers Winter Holiday", image: "others/assets/images/games/subway-surfers.jpg", url: "others/assets/games/Subway Surfers_ Winter Holiday.html" }
+  { name: "Subway Surfers Winter Holiday", image: "others/assets/images/games/subway-surfers.jpg", url: "others/assets/games/Subway Surfers_ Winter Holiday.html" },
+  { name: "Temple Run 2", image: "others/assets/images/games/Solar_smash.webp", url: "others/assets/games/Temple Run 2.html" },
+  { name: "Tomb Of The Mask", image: "others/assets/images/games/Solar_smash.webp", url: "others/assets/games/Tomb Of The Mask.html" }
 ];
 
 // ===== APP DATA =====
