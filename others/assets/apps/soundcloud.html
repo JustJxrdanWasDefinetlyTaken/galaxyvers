@@ -12,6 +12,8 @@
         setTimeout(() => {
           document.getElementById('loading').style.display = 'none';
           document.getElementById('content').style.display = 'block';
+          // Option 3: Redirect to SoundCloud after loading
+          window.location.href = 'https://soundcloud.com';
         }, 3000);
         setTimeout(() => {
           bar.style.width = '100%';
