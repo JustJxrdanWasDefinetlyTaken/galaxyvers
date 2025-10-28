@@ -3,6 +3,42 @@
 // <script src="others/assets/scripts/gms.js"></script>
 // <script src="scripts.js"></script>
 
+// ===== SEASONAL THEME SYSTEM (BUILT-IN) =====
+function getSeasonalTheme() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth(); // 0-11
+  const day = now.getDate();
+  
+  // Halloween: Oct 27-30, 2025
+  if (year === 2025 && month === 9 && day >= 27 && day <= 30) {
+    console.log('🎃 Halloween theme active!');
+    return 'halloween';
+  }
+  
+  // Christmas: Nov 1, 2025 - Dec 31, 2025
+  if (year === 2025 && ((month === 10 && day >= 1) || month === 11)) {
+    console.log('🎄 Christmas theme active!');
+    return 'christmas';
+  }
+  
+  // Original theme: Jan 1, 2026 onwards
+  if (year >= 2026) {
+    console.log('✨ Original theme active');
+    return 'original';
+  }
+  
+  return 'original';
+}
+
+function shouldUseSeasonalTheme() {
+  const seasonalOverride = localStorage.getItem('disableSeasonalThemes');
+  if (seasonalOverride === 'true') {
+    return false;
+  }
+  return true;
+}
+
 // ===== WEBSITEKEYTRACKER.JS =====
 (function() {
   window.WebsiteKeyTracker = {
@@ -106,14 +142,12 @@
       } else if (attempts >= maxAttempts) {
         clearInterval(checkFirebase);
         console.error('Firebase failed to load - continuing anyway');
-        // CRITICAL FIX: Don't block the site if Firebase fails
-        callback(); // Continue initialization even without Firebase
+        callback();
       }
     }, 100);
   }
 
   waitForFirebase(function() {
-    // CRITICAL FIX: Don't block if Firebase is unavailable
     if (typeof firebase === 'undefined') {
       console.warn('⚠️ Firebase not available, running in offline mode');
       return;
@@ -136,7 +170,7 @@
       console.log('✅ Firebase initialized successfully');
     } catch (initError) {
       console.error('❌ Firebase initialization error:', initError);
-      return; // Exit early but don't block the site
+      return;
     }
 
     const database = firebase.database();
@@ -422,7 +456,6 @@
 
       document.body.appendChild(keyOverlay);
       
-      // CRITICAL FIX: Don't prevent interaction with main content
       const mainContent = document.getElementById('app') || document.body;
       if (mainContent && mainContent !== document.body) {
         mainContent.style.filter = 'blur(10px)';
@@ -778,6 +811,8 @@ const presets = {
 // ===== THEME CONFIGURATIONS =====
 const themes = {
   original: { bgColor: '#121826', navColor: '#1e2433', accentColor: '#4f90ff', textColor: '#e0e6f1', borderColor: '#38415d', hoverBg: '#2a2f48', btnBg: '#3b466f', btnHoverBg: '#4f90ff' },
+  halloween: { bgColor: '#0a0a0a', navColor: '#1a0f0a', accentColor: '#ff6600', textColor: '#ffa500', borderColor: '#331a00', hoverBg: '#2a1a0f', btnBg: '#4a2a1a', btnHoverBg: '#ff6600' },
+  christmas: { bgColor: '#0a1a0a', navColor: '#1a2e1a', accentColor: '#c41e3a', textColor: '#f0f8ff', borderColor: '#2d5016', hoverBg: '#1f3d1f', btnBg: '#2d5016', btnHoverBg: '#c41e3a' },
   dark: { bgColor: '#0a0a0a', navColor: '#1a1a1a', accentColor: '#00ff00', textColor: '#ffffff', borderColor: '#333333', hoverBg: '#2a2a2a', btnBg: '#262626', btnHoverBg: '#00ff00' },
   light: { bgColor: '#f5f5f5', navColor: '#ffffff', accentColor: '#2563eb', textColor: '#1f2937', borderColor: '#e5e7eb', hoverBg: '#e5e7eb', btnBg: '#d1d5db', btnHoverBg: '#2563eb' },
   midnight: { bgColor: '#0f0f23', navColor: '#1a1a2e', accentColor: '#9d4edd', textColor: '#e0e0e0', borderColor: '#3c3c5a', hoverBg: '#2a2a4e', btnBg: '#3c3c6f', btnHoverBg: '#9d4edd' },
@@ -801,7 +836,6 @@ function displayGameOfTheDay() {
     return;
   }
   
-  // CRITICAL FIX: Check if function exists, provide fallback
   if (typeof getGameOfTheDay !== 'function') {
     console.error('getGameOfTheDay function not found. Make sure gms.js is loaded BEFORE scripts.js');
     gotdContainer.innerHTML = `
@@ -886,7 +920,6 @@ function showGames() {
   const gameLink = document.getElementById('gameLink');
   if (gameLink) gameLink.classList.add('active');
   
-  // CRITICAL FIX: Check if games array exists, provide fallback
   if (typeof games !== 'undefined' && Array.isArray(games)) {
     renderGames(games);
   } else {
@@ -905,7 +938,6 @@ function showApps() {
   const appsLink = document.getElementById('appsLink');
   if (appsLink) appsLink.classList.add('active');
   
-  // CRITICAL FIX: Check if apps array exists, provide fallback
   if (typeof apps !== 'undefined' && Array.isArray(apps)) {
     renderApps(apps);
   } else {
@@ -949,7 +981,6 @@ function renderGames(gamesToRender) {
   }
   
   gamesToRender.forEach(game => {
-    // CRITICAL FIX: Validate game object
     if (!game || !game.name || !game.url) {
       console.warn('Invalid game object:', game);
       return;
@@ -983,7 +1014,6 @@ function renderApps(appsToRender) {
   }
   
   appsToRender.forEach(app => {
-    // CRITICAL FIX: Validate app object
     if (!app || !app.name || !app.url) {
       console.warn('Invalid app object:', app);
       return;
@@ -1002,7 +1032,6 @@ function renderApps(appsToRender) {
   });
 }
 
-// CRITICAL FIX: Enhanced error handling in loadGame
 function loadGame(url) {
   if (!url) {
     console.error('No URL provided to loadGame');
@@ -1021,14 +1050,10 @@ function loadGame(url) {
       return;
     }
     
-    // Clear previous iframe source first
     gameIframe.src = '';
-    
-    // Set new source
     gameIframe.src = url;
     gameDisplay.style.display = 'block';
     
-    // CRITICAL FIX: Add iframe error handling
     gameIframe.onerror = function() {
       console.error('Failed to load game:', url);
       alert('Error loading game. The game file may be missing or inaccessible.');
@@ -1050,7 +1075,6 @@ function searchGames() {
   
   const query = searchInput.value.toLowerCase().trim();
   
-  // CRITICAL FIX: Check if games array exists
   if (typeof games === 'undefined' || !Array.isArray(games)) {
     console.error('games array not found. Make sure gms.js is loaded BEFORE scripts.js');
     return;
@@ -1161,13 +1185,24 @@ function applyTabCloaking(title, favicon) {
 
 // ===== LOAD SETTINGS =====
 function loadSettings() {
+  // Determine which theme to use
+  let themeToUse = 'original';
+  
+  // Check if seasonal themes should be applied
+  if (shouldUseSeasonalTheme()) {
+    themeToUse = getSeasonalTheme();
+    console.log('🎨 Using seasonal theme:', themeToUse);
+  } else {
+    // Use saved theme or default to original
+    themeToUse = localStorage.getItem('selectedTheme') || 'original';
+  }
+
   const savedTitle = localStorage.getItem('TabCloak_Title');
   const savedFavicon = localStorage.getItem('TabCloak_Favicon');
   const savedSnow = localStorage.getItem('snowEffect');
   const savedHotkey = localStorage.getItem('hotkey') || '`';
   const savedRedirect = localStorage.getItem('redirectURL') || 'https://google.com';
   const savedAboutBlank = localStorage.getItem('aboutBlank');
-  const savedTheme = localStorage.getItem('selectedTheme') || 'original';
 
   if (savedTitle) {
     document.title = savedTitle;
@@ -1206,11 +1241,10 @@ function loadSettings() {
     aboutBlankToggle.checked = savedAboutBlank === 'enabled';
   }
 
-  applyTheme(savedTheme);
+  applyTheme(themeToUse);
 }
 
 // ===== INITIALIZATION =====
-// CRITICAL FIX: Use DOMContentLoaded instead of window.onload for faster initialization
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initializeApp);
 } else {
@@ -1225,12 +1259,31 @@ function initializeApp() {
 
   const themeSelect = document.getElementById('themeSelect');
   if (themeSelect) {
-    const savedTheme = localStorage.getItem('selectedTheme') || 'original';
-    themeSelect.value = savedTheme;
+    // Determine current theme (seasonal or saved)
+    let currentTheme = 'original';
+    if (shouldUseSeasonalTheme()) {
+      currentTheme = getSeasonalTheme();
+    } else {
+      currentTheme = localStorage.getItem('selectedTheme') || 'original';
+    }
+    
+    themeSelect.value = currentTheme;
+    
     themeSelect.addEventListener('change', (e) => {
       const theme = e.target.value;
       applyTheme(theme);
       localStorage.setItem('selectedTheme', theme);
+      
+      // If user manually selects a theme, disable automatic seasonal themes
+      const seasonalTheme = getSeasonalTheme();
+      if (theme !== seasonalTheme) {
+        localStorage.setItem('disableSeasonalThemes', 'true');
+        console.log('🎨 Seasonal themes disabled - user preference saved');
+      } else {
+        // User selected the current seasonal theme, re-enable auto-switching
+        localStorage.removeItem('disableSeasonalThemes');
+        console.log('🎨 Seasonal themes re-enabled');
+      }
     });
   }
 
