@@ -1,7 +1,6 @@
-// ===== SEASONAL THEMES FOR GALAXYVERSE =====
-// Halloween Theme (Oct 27 - Oct 30, 2025)
-// Christmas Theme (Nov 1, 2025 - Dec 31, 2025)
-// Original Theme (Jan 1, 2026+)
+// ===== THEMES.JS - Complete Theme Configuration =====
+// All available themes for GalaxyVerse
+// Includes seasonal themes: Halloween and Christmas
 
 const seasonalThemes = {
   halloween: {
@@ -13,7 +12,7 @@ const seasonalThemes = {
     hoverBg: '#2a1a0f',
     btnBg: '#4a2a1a',
     btnHoverBg: '#ff6600',
-    name: 'Halloween'
+    name: '🎃 Halloween'
   },
   christmas: {
     bgColor: '#0a1a0a',
@@ -25,11 +24,11 @@ const seasonalThemes = {
     btnBg: '#2d5016',
     btnHoverBg: '#c41e3a',
     secondaryAccent: '#228b22',
-    name: 'Christmas'
+    name: '🎄 Christmas'
   }
 };
 
-// Original theme definitions (keep existing themes)
+// All theme definitions
 const allThemes = {
   original: { 
     bgColor: '#121826', 
@@ -198,19 +197,19 @@ function getSeasonalTheme() {
   
   // Halloween: Oct 27-30, 2025
   if (year === 2025 && month === 9 && day >= 27 && day <= 30) {
-    console.log('🎃 Halloween theme active!');
+    console.log('🎃 Halloween season detected!');
     return 'halloween';
   }
   
   // Christmas: Nov 1, 2025 - Dec 31, 2025
   if (year === 2025 && ((month === 10 && day >= 1) || month === 11)) {
-    console.log('🎄 Christmas theme active!');
+    console.log('🎄 Christmas season detected!');
     return 'christmas';
   }
   
   // Original theme: Jan 1, 2026 onwards
   if (year >= 2026) {
-    console.log('✨ Original theme active');
+    console.log('✨ Default season');
     return 'original';
   }
   
@@ -218,29 +217,11 @@ function getSeasonalTheme() {
   return 'original';
 }
 
-// Function to check if user has manually overridden the theme
-function shouldUseSeasonalTheme() {
-  const savedTheme = localStorage.getItem('selectedTheme');
-  const seasonalOverride = localStorage.getItem('disableSeasonalThemes');
-  
-  // If user has disabled seasonal themes, don't use them
-  if (seasonalOverride === 'true') {
-    return false;
-  }
-  
-  // If user has never selected a theme, use seasonal
-  if (!savedTheme) {
-    return true;
-  }
-  
-  // If user selected a theme during a seasonal period, check if we're still in that period
-  const currentSeasonal = getSeasonalTheme();
-  if (savedTheme === currentSeasonal) {
-    return true;
-  }
-  
-  // User has manually selected a different theme
-  return false;
+// Function to check if we should auto-apply seasonal themes
+function shouldAutoApplySeasonalTheme() {
+  const autoApply = localStorage.getItem('autoApplySeasonalThemes');
+  // Default to true if not set, false if user has disabled it
+  return autoApply !== 'false';
 }
 
 // Export for use in scripts.js
@@ -248,7 +229,7 @@ if (typeof window !== 'undefined') {
   window.seasonalThemes = seasonalThemes;
   window.allThemes = allThemes;
   window.getSeasonalTheme = getSeasonalTheme;
-  window.shouldUseSeasonalTheme = shouldUseSeasonalTheme;
+  window.shouldAutoApplySeasonalTheme = shouldAutoApplySeasonalTheme;
 }
 
-console.log('✅ Seasonal themes loaded successfully');
+console.log('✅ Themes.js loaded - All themes available including 🎃 Halloween and 🎄 Christmas');
