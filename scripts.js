@@ -12,31 +12,30 @@ function getSeasonalTheme() {
   
   // Halloween: Oct 27-30, 2025
   if (year === 2025 && month === 9 && day >= 27 && day <= 30) {
-    console.log('🎃 Halloween theme active!');
+    console.log('🎃 Halloween season detected!');
     return 'halloween';
   }
   
   // Christmas: Nov 1, 2025 - Dec 31, 2025
   if (year === 2025 && ((month === 10 && day >= 1) || month === 11)) {
-    console.log('🎄 Christmas theme active!');
+    console.log('🎄 Christmas season detected!');
     return 'christmas';
   }
   
   // Original theme: Jan 1, 2026 onwards
   if (year >= 2026) {
-    console.log('✨ Original theme active');
+    console.log('✨ Default season');
     return 'original';
   }
   
   return 'original';
 }
 
-function shouldUseSeasonalTheme() {
-  const seasonalOverride = localStorage.getItem('disableSeasonalThemes');
-  if (seasonalOverride === 'true') {
-    return false;
-  }
-  return true;
+function shouldAutoApplySeasonalTheme() {
+  // Check if user has disabled auto-apply of seasonal themes
+  const autoApply = localStorage.getItem('autoApplySeasonalThemes');
+  // Default to true if not set
+  return autoApply !== 'false';
 }
 
 // ===== WEBSITEKEYTRACKER.JS =====
@@ -1188,13 +1187,20 @@ function loadSettings() {
   // Determine which theme to use
   let themeToUse = 'original';
   
-  // Check if seasonal themes should be applied
-  if (shouldUseSeasonalTheme()) {
+  // Check if we should auto-apply seasonal themes
+  const savedTheme = localStorage.getItem('selectedTheme');
+  
+  if (!savedTheme && shouldAutoApplySeasonalTheme()) {
+    // No saved theme and auto-apply is enabled - use seasonal
     themeToUse = getSeasonalTheme();
-    console.log('🎨 Using seasonal theme:', themeToUse);
+    console.log('🎨 Auto-applying seasonal theme:', themeToUse);
+  } else if (savedTheme) {
+    // User has selected a theme
+    themeToUse = savedTheme;
+    console.log('🎨 Using saved theme:', themeToUse);
   } else {
-    // Use saved theme or default to original
-    themeToUse = localStorage.getItem('selectedTheme') || 'original';
+    // Use original as fallback
+    themeToUse = 'original';
   }
 
   const savedTitle = localStorage.getItem('TabCloak_Title');
@@ -1259,31 +1265,21 @@ function initializeApp() {
 
   const themeSelect = document.getElementById('themeSelect');
   if (themeSelect) {
-    // Determine current theme (seasonal or saved)
-    let currentTheme = 'original';
-    if (shouldUseSeasonalTheme()) {
-      currentTheme = getSeasonalTheme();
+    // Set current theme value
+    const savedTheme = localStorage.getItem('selectedTheme');
+    if (savedTheme) {
+      themeSelect.value = savedTheme;
+    } else if (shouldAutoApplySeasonalTheme()) {
+      themeSelect.value = getSeasonalTheme();
     } else {
-      currentTheme = localStorage.getItem('selectedTheme') || 'original';
+      themeSelect.value = 'original';
     }
-    
-    themeSelect.value = currentTheme;
     
     themeSelect.addEventListener('change', (e) => {
       const theme = e.target.value;
       applyTheme(theme);
       localStorage.setItem('selectedTheme', theme);
-      
-      // If user manually selects a theme, disable automatic seasonal themes
-      const seasonalTheme = getSeasonalTheme();
-      if (theme !== seasonalTheme) {
-        localStorage.setItem('disableSeasonalThemes', 'true');
-        console.log('🎨 Seasonal themes disabled - user preference saved');
-      } else {
-        // User selected the current seasonal theme, re-enable auto-switching
-        localStorage.removeItem('disableSeasonalThemes');
-        console.log('🎨 Seasonal themes re-enabled');
-      }
+      console.log('🎨 Theme manually selected:', theme);
     });
   }
 
