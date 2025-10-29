@@ -111,6 +111,104 @@ body {
   box-shadow: 0 0 8px var(--btn-hover-bg);
 }
 
+/* ===== GAME FILTERS ===== */
+.game-filters {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  background: var(--btn-bg);
+  color: var(--text-color);
+  border: 2px solid var(--border-color);
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Roboto', sans-serif;
+}
+
+.filter-btn:hover {
+  background: var(--hover-bg);
+  border-color: var(--accent-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(79, 144, 255, 0.3);
+}
+
+.filter-btn.active {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+  color: white;
+  box-shadow: 0 4px 15px rgba(79, 144, 255, 0.4);
+}
+
+/* ===== FAVORITE BUTTON ===== */
+.favorite-btn {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(30, 36, 51, 0.9);
+  border: 2px solid var(--border-color);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.3s ease;
+  padding: 0;
+  backdrop-filter: blur(10px);
+}
+
+.favorite-btn:hover {
+  background: rgba(79, 144, 255, 0.2);
+  border-color: var(--accent-color);
+  transform: scale(1.1);
+}
+
+.favorite-btn svg {
+  color: #ffd700;
+  transition: all 0.3s ease;
+}
+
+.favorite-btn.favorited {
+  background: rgba(79, 144, 255, 0.3);
+  border-color: #ffd700;
+}
+
+.favorite-btn.favorited svg {
+  color: #ffd700;
+  filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.5));
+}
+
+.favorite-btn:active {
+  transform: scale(0.95);
+}
+
+/* Animation for favoriting */
+@keyframes favoritePopup {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.favorite-btn.favorited {
+  animation: favoritePopup 0.3s ease;
+}
+
 /* Settings page container */
 .settings-page-container {
   max-width: 800px;
@@ -647,5 +745,26 @@ body {
   .settings-page-container {
     width: 95%;
     padding: 10px;
+  }
+
+  .game-filters {
+    gap: 8px;
+  }
+  
+  .filter-btn {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+  
+  .favorite-btn {
+    width: 36px;
+    height: 36px;
+    top: 8px;
+    left: 8px;
+  }
+  
+  .favorite-btn svg {
+    width: 20px;
+    height: 20px;
   }
 }
