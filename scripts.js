@@ -1,6 +1,7 @@
 // ===== CRITICAL FIX: Load games.js data first or provide fallback =====
 // Make sure gms.js is loaded BEFORE this script in your HTML:
 // <script src="others/assets/scripts/gms.js"></script>
+// <script src="others/assets/scripts/stats.js"></script>
 // <script src="scripts.js"></script>
 
 // ===== SEASONAL THEME SYSTEM (BUILT-IN) =====
@@ -919,8 +920,24 @@ function showGames() {
   const gameLink = document.getElementById('gameLink');
   if (gameLink) gameLink.classList.add('active');
   
+  // Add filter buttons if they don't exist
+  if (!document.querySelector('.game-filters') && window.GameStats) {
+    const searchContainer = document.querySelector('.search-container');
+    if (searchContainer) {
+      const filtersHTML = window.GameStats.createFilterButtons();
+      searchContainer.insertAdjacentHTML('afterend', filtersHTML);
+    }
+  }
+  
   if (typeof games !== 'undefined' && Array.isArray(games)) {
-    renderGames(games);
+    // Check if there's an active filter
+    const activeFilter = document.querySelector('.filter-btn.active');
+    if (activeFilter) {
+      const filter = activeFilter.dataset.filter;
+      window.filterGames(filter);
+    } else {
+      renderGames(games);
+    }
   } else {
     console.error('games array not found. Make sure gms.js is loaded BEFORE scripts.js');
     const gameList = document.getElementById('game-list');
@@ -985,10 +1002,13 @@ function renderGames(gamesToRender) {
       return;
     }
     
+    const isFavorited = window.GameStats ? window.GameStats.isFavorite(game.url) : false;
+    
     const card = document.createElement('div');
     card.className = 'game-card';
     card.tabIndex = 0;
     card.innerHTML = `
+      ${window.GameStats ? window.GameStats.createFavoriteButton(game.url, isFavorited) : ''}
       <img src="${game.image || 'https://via.placeholder.com/250x250?text=Game'}" alt="${game.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/250x250?text=${encodeURIComponent(game.name)}'" />
       <h3>${game.name}</h3>
     `;
@@ -1049,9 +1069,21 @@ function loadGame(url) {
       return;
     }
     
+    // Stop tracking previous game
+    if (window.GameStats) {
+      window.GameStats.stopTracking();
+    }
+    
     gameIframe.src = '';
     gameIframe.src = url;
     gameDisplay.style.display = 'block';
+    
+    // Start tracking new game after iframe loads
+    gameIframe.onload = function() {
+      if (window.GameStats) {
+        window.GameStats.startTracking(url);
+      }
+    };
     
     gameIframe.onerror = function() {
       console.error('Failed to load game:', url);
@@ -1378,99 +1410,3 @@ function initializeApp() {
       if (e.key.length === 1 || e.key === 'Escape' || /^F\d{1,2}$/.test(e.key)) {
         hotkeyInput.value = e.key;
       }
-    });
-  }
-
-  const changeHotkeyBtn = document.getElementById('change-hotkey-btn');
-  if (changeHotkeyBtn) {
-    changeHotkeyBtn.addEventListener('click', () => {
-      const newHotkey = hotkeyInput ? hotkeyInput.value.trim() : '';
-      if (newHotkey) {
-        localStorage.setItem('hotkey', newHotkey);
-        alert(`Panic hotkey changed to: ${newHotkey}`);
-      } else {
-        alert('Please enter a valid hotkey.');
-      }
-    });
-  }
-
-  const changeURLBtn = document.getElementById('change-URL-btn');
-  if (changeURLBtn) {
-    changeURLBtn.addEventListener('click', () => {
-      const redirectInput = document.getElementById('redirect-url-input');
-      let newURL = redirectInput ? redirectInput.value.trim() : '';
-      if (newURL && !/^https?:\/\//i.test(newURL)) {
-        newURL = 'https://' + newURL;
-      }
-      if (newURL) {
-        localStorage.setItem('redirectURL', newURL);
-        alert(`Redirect URL changed to: ${newURL}`);
-      } else {
-        alert('Please enter a valid URL.');
-      }
-    });
-  }
-
-  window.addEventListener('keydown', (e) => {
-    const savedHotkey = localStorage.getItem('hotkey') || '`';
-    const redirectURL = localStorage.getItem('redirectURL') || 'https://google.com';
-    if (e.key === savedHotkey) {
-      location.replace(redirectURL);
-    }
-  });
-
-  const aboutBlankToggle = document.getElementById('aboutBlankToggle');
-  if (aboutBlankToggle) {
-    aboutBlankToggle.addEventListener('change', (e) => {
-      const value = e.target.checked ? 'enabled' : 'disabled';
-      localStorage.setItem('aboutBlank', value);
-      if (e.target.checked) {
-        alert('About:blank cloaking enabled. The page will reload in about:blank mode to hide from history.');
-        setTimeout(() => { window.location.reload(); }, 1000);
-      } else {
-        alert('About:blank cloaking disabled. Note: You may need to manually close this tab and reopen the site normally.');
-      }
-    });
-  }
-
-  const navHome = document.getElementById('homeLink');
-  const navGames = document.getElementById('gameLink');
-  const navApps = document.getElementById('appsLink');
-  const navAbout = document.getElementById('aboutLink');
-  const navSettings = document.getElementById('settingsLink');
-
-  if (navHome) navHome.addEventListener('click', e => { e.preventDefault(); showHome(); });
-  if (navGames) navGames.addEventListener('click', e => { e.preventDefault(); showGames(); });
-  if (navApps) navApps.addEventListener('click', e => { e.preventDefault(); showApps(); });
-  if (navAbout) navAbout.addEventListener('click', e => { e.preventDefault(); showAbout(); });
-  if (navSettings) navSettings.addEventListener('click', e => { e.preventDefault(); showSettings(); });
-
-  const searchBtn = document.getElementById('searchBtn');
-  const searchInput = document.getElementById('searchInput');
-  if (searchBtn) searchBtn.addEventListener('click', searchGames);
-  if (searchInput) {
-    searchInput.addEventListener('input', debounce(searchGames));
-    searchInput.addEventListener('keypress', e => {
-      if (e.key === 'Enter') searchGames();
-    });
-  }
-
-  const backToHomeApps = document.getElementById('backToHomeApps');
-  if (backToHomeApps) backToHomeApps.addEventListener('click', showHome);
-  const backToHomeGame = document.getElementById('backToHomeGame');
-  if (backToHomeGame) backToHomeGame.addEventListener('click', showHome);
-
-  const fullscreenBtn = document.getElementById('fullscreenBtn');
-  if (fullscreenBtn) fullscreenBtn.addEventListener('click', toggleFullscreen);
-
-  const homepageSearchBtn = document.getElementById('homepageSearchBtn');
-  const homepageSearchInput = document.getElementById('homepageSearchInput');
-  if (homepageSearchBtn) homepageSearchBtn.addEventListener('click', homepageSearch);
-  if (homepageSearchInput) {
-    homepageSearchInput.addEventListener('keypress', e => {
-      if (e.key === 'Enter') homepageSearch();
-    });
-  }
-  
-  console.log('✅ GalaxyVerse initialized successfully');
-}
