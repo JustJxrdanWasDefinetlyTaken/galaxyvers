@@ -78,6 +78,8 @@
       this.currentGameURL = gameURL;
       this.currentGameStartTime = Date.now();
       
+      console.log('🎮 Started tracking playtime for:', gameURL);
+      
       // Update every 10 seconds
       this.updateInterval = setInterval(() => {
         this.saveCurrentPlaytime();
@@ -91,6 +93,7 @@
         if (elapsed > 0) {
           this.addPlaytime(this.currentGameURL, elapsed);
           this.currentGameStartTime = Date.now(); // Reset start time
+          console.log('💾 Saved', elapsed, 'seconds of playtime');
         }
       }
     },
@@ -102,6 +105,7 @@
         clearInterval(this.updateInterval);
         this.updateInterval = null;
       }
+      console.log('⏸️ Paused playtime tracking');
     },
 
     // Resume tracking
@@ -111,6 +115,7 @@
         this.updateInterval = setInterval(() => {
           this.saveCurrentPlaytime();
         }, 10000);
+        console.log('▶️ Resumed playtime tracking');
       }
     },
 
@@ -123,6 +128,7 @@
       }
       this.currentGameURL = null;
       this.currentGameStartTime = null;
+      console.log('⏹️ Stopped playtime tracking');
     },
 
     // Get all games sorted by playtime
@@ -145,10 +151,11 @@
 
     // Create favorite button HTML
     createFavoriteButton: function(gameURL, isFavorited) {
+      const escapedURL = gameURL.replace(/'/g, "\\'");
       return `
         <button class="favorite-btn ${isFavorited ? 'favorited' : ''}" 
                 data-game-url="${gameURL}" 
-                onclick="window.GameStats.handleFavoriteClick(event, '${gameURL}')"
+                onclick="event.stopPropagation(); window.GameStats.handleFavoriteClick(event, '${escapedURL}')"
                 title="${isFavorited ? 'Remove from favorites' : 'Add to favorites'}">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="${isFavorited ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
@@ -168,10 +175,12 @@
         button.classList.add('favorited');
         button.title = 'Remove from favorites';
         button.querySelector('svg').setAttribute('fill', 'currentColor');
+        console.log('⭐ Added to favorites:', gameURL);
       } else {
         button.classList.remove('favorited');
         button.title = 'Add to favorites';
         button.querySelector('svg').setAttribute('fill', 'none');
+        console.log('☆ Removed from favorites:', gameURL);
       }
       
       // Update the game list if we're on a filtered view
@@ -225,6 +234,13 @@
     switch(filter) {
       case 'favorites':
         gamesToRender = GameStats.getFavoriteGames(games);
+        if (gamesToRender.length === 0) {
+          const gameList = document.getElementById('game-list');
+          if (gameList) {
+            gameList.innerHTML = '<p style="padding: 40px; text-align: center; color: var(--text-color);">No favorite games yet. Click the star on any game to add it to your favorites!</p>';
+          }
+          return;
+        }
         break;
       case 'most-played':
         gamesToRender = GameStats.getMostPlayedGames(games);
