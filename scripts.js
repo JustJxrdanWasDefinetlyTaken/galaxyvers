@@ -369,7 +369,7 @@ function shouldAutoApplySeasonalTheme() {
             font-size: 16px;
             margin: 0 0 30px 0;
           ">Enter your access key to continue<br>
-          V1.2.3 - Added keys + Games</p>
+          V1.2.4 - I dunno ask Will</p>
           
           <input type="text" id="keyInput" placeholder="Enter your key" style="
             width: 100%;
