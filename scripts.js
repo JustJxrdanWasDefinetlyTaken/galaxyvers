@@ -1282,6 +1282,52 @@ function loadSettings() {
   applyTheme(themeToUse);
 }
 
+// ===== PANIC BUTTON =====
+function setupPanicButton() {
+  const savedHotkey = localStorage.getItem('hotkey') || '`';
+  const savedRedirect = localStorage.getItem('redirectURL') || 'https://google.com';
+  
+  document.addEventListener('keydown', (e) => {
+    if (e.key === savedHotkey) {
+      window.location.href = savedRedirect;
+    }
+  });
+  
+  const changeHotkeyBtn = document.getElementById('change-hotkey-btn');
+  const hotkeyInput = document.getElementById('hotkey-input');
+  
+  if (changeHotkeyBtn && hotkeyInput) {
+    changeHotkeyBtn.addEventListener('click', () => {
+      hotkeyInput.focus();
+      hotkeyInput.placeholder = 'Press a key...';
+    });
+  }
+  
+  if (hotkeyInput) {
+    hotkeyInput.addEventListener('keydown', (e) => {
+      e.preventDefault();
+      if (e.key.length === 1 || e.key === 'Escape' || /^F\d{1,2}$/.test(e.key)) {
+        hotkeyInput.value = e.key;
+        localStorage.setItem('hotkey', e.key);
+        hotkeyInput.blur();
+      }
+    });
+  }
+  
+  const changeURLBtn = document.getElementById('change-URL-btn');
+  const redirectInput = document.getElementById('redirect-url-input');
+  
+  if (changeURLBtn && redirectInput) {
+    changeURLBtn.addEventListener('click', () => {
+      const url = redirectInput.value.trim();
+      if (url) {
+        localStorage.setItem('redirectURL', url);
+        alert('Redirect URL updated!');
+      }
+    });
+  }
+}
+
 // ===== INITIALIZATION =====
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initializeApp);
@@ -1294,6 +1340,7 @@ function initializeApp() {
   
   loadSettings();
   showHome();
+  setupPanicButton();
 
   const themeSelect = document.getElementById('themeSelect');
   if (themeSelect) {
@@ -1403,10 +1450,81 @@ function initializeApp() {
     });
   }
 
-  const hotkeyInput = document.getElementById('hotkey-input');
-  if (hotkeyInput) {
-    hotkeyInput.addEventListener('keydown', (e) => {
-      e.preventDefault();
-      if (e.key.length === 1 || e.key === 'Escape' || /^F\d{1,2}$/.test(e.key)) {
-        hotkeyInput.value = e.key;
+  const aboutBlankToggle = document.getElementById('aboutBlankToggle');
+  if (aboutBlankToggle) {
+    aboutBlankToggle.addEventListener('change', (e) => {
+      if (e.target.checked) {
+        localStorage.setItem('aboutBlank', 'enabled');
+      } else {
+        localStorage.removeItem('aboutBlank');
       }
+    });
+  }
+
+  // Navigation event listeners
+  const homeLink = document.getElementById('homeLink');
+  const gameLink = document.getElementById('gameLink');
+  const appsLink = document.getElementById('appsLink');
+  const settingsLink = document.getElementById('settingsLink');
+  const aboutLink = document.getElementById('aboutLink');
+
+  if (homeLink) homeLink.addEventListener('click', (e) => { e.preventDefault(); showHome(); });
+  if (gameLink) gameLink.addEventListener('click', (e) => { e.preventDefault(); showGames(); });
+  if (appsLink) appsLink.addEventListener('click', (e) => { e.preventDefault(); showApps(); });
+  if (settingsLink) settingsLink.addEventListener('click', (e) => { e.preventDefault(); showSettings(); });
+  if (aboutLink) aboutLink.addEventListener('click', (e) => { e.preventDefault(); showAbout(); });
+
+  // Back to home buttons
+  const backToHomeGame = document.getElementById('backToHomeGame');
+  const backToHomeApps = document.getElementById('backToHomeApps');
+  
+  if (backToHomeGame) {
+    backToHomeGame.addEventListener('click', () => {
+      if (window.GameStats) {
+        window.GameStats.stopTracking();
+      }
+      showHome();
+    });
+  }
+  
+  if (backToHomeApps) {
+    backToHomeApps.addEventListener('click', () => showHome());
+  }
+
+  // Search functionality
+  const searchBtn = document.getElementById('searchBtn');
+  const searchInput = document.getElementById('searchInput');
+  
+  if (searchBtn) {
+    searchBtn.addEventListener('click', searchGames);
+  }
+  
+  if (searchInput) {
+    searchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') searchGames();
+    });
+    searchInput.addEventListener('input', debounce(searchGames, 300));
+  }
+
+  // Homepage search
+  const homepageSearchBtn = document.getElementById('homepageSearchBtn');
+  const homepageSearchInput = document.getElementById('homepageSearchInput');
+  
+  if (homepageSearchBtn) {
+    homepageSearchBtn.addEventListener('click', homepageSearch);
+  }
+  
+  if (homepageSearchInput) {
+    homepageSearchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') homepageSearch();
+    });
+  }
+
+  // Fullscreen button
+  const fullscreenBtn = document.getElementById('fullscreenBtn');
+  if (fullscreenBtn) {
+    fullscreenBtn.addEventListener('click', toggleFullscreen);
+  }
+
+  console.log('✅ GalaxyVerse initialized successfully');
+}
