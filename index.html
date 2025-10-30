@@ -6,8 +6,8 @@
   <title>GalaxyVerse</title>
   <link rel="icon" href="others/assets/images/GalaxyVerse.png" />
 
-  <!-- Link to external CSS -->
-  <link rel="stylesheet" href="styles.css" />
+  <!-- Link to external CSS - FIXED PATH -->
+  <link rel="stylesheet" href="./styles.css" />
 
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100..900&display=swap" rel="stylesheet" />
@@ -335,13 +335,10 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
-<!-- IMPORTANT: Load gᾷmes.js BEFORE scripts.js -->
-<script src="others/assets/scripts/gms.js"></script>
-
-<!-- Main JavaScript file -->
-<script src="others/assets/scripts/gms.js"></script>
-<script src="others/assets/scripts/stats.js"></script>
-<script src="scripts.js"></script>
+<!-- FIXED: Load scripts in correct order, no duplicates -->
+<script src="./others/assets/scripts/gms.js"></script>
+<script src="./others/assets/scripts/stats.js"></script>
+<script src="./scripts.js"></script>
 
 </body>
 </html>
