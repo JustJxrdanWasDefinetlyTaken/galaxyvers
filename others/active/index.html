@@ -5,8 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Anzo da skid</title>
-  <link rel="icon" href="/assets/images/GalaxyVerse.png" />
-  <link rel="shortcut icon" href="/assets/images/GalaxyVerse.png" />
+  <link rel="icon" href="../assets/images/GalaxyVerse.png" />
+  <link rel="shortcut icon" href="../assets/images/GalaxyVerse.png" />
   <script>
     let count = parseInt(localStorage.getItem('alertCount')) || 0;
 
@@ -17,8 +17,8 @@
       localStorage.setItem('alertCount', count + 1);
     }
   </script>
-  <script async defer src="./js/tabs.js" type="module"></script>
-  <link href="/assets/css/tabs.css" rel="stylesheet" />
+  <script async defer src="../js/tabs.js" type="module"></script>
+  <link href="../assets/css/tabs.css" rel="stylesheet" />
   <script type="module" async defer>
 
     import {
@@ -30,7 +30,7 @@
       addressInput,
       currentTab,
       Tab
-    } from "/cat.mjs"
+    } from "../../cat.mjs"
 
     // --- INIT ---
     const form = document.getElementById("form")
@@ -243,7 +243,7 @@
     }
   </script>
 </body>
-<script src="/assets/scripts/index.js"></script>
+<script src="../assets/scripts/index.js"></script>
 <script>
   function reload() {
     var iframe = document.querySelector("iframe");
@@ -432,7 +432,7 @@
     if (!menu.contains(e.target) && e.target !== moreIcon) menu.classList.remove('open');
   });
 </script>
-<script src="/assets/scripts/index.js"></script>
+<script src="../assets/scripts/index.js"></script>
 <script>
   let isLeavePopupEnabled = JSON.parse(localStorage.getItem('leavePopupEnabled'));
   if (isLeavePopupEnabled === null) isLeavePopupEnabled = false;
