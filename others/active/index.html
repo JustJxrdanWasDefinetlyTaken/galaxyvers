@@ -5,8 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Anzo da skid</title>
-  <link rel="icon" href="../assets/images/GalaxyVerse.png" />
-  <link rel="shortcut icon" href="../assets/images/GalaxyVerse.png" />
+  <link rel="icon" href="/others/assets/images/GalaxyVerse.png" />
+  <link rel="shortcut icon" href="/others/assets/images/GalaxyVerse.png" />
   <script>
     let count = parseInt(localStorage.getItem('alertCount')) || 0;
 
@@ -17,8 +17,8 @@
       localStorage.setItem('alertCount', count + 1);
     }
   </script>
-  <script async defer src="../js/tabs.js" type="module"></script>
-  <link href="../assets/css/tabs.css" rel="stylesheet" />
+  <script async defer src="/others/active/js/tabs.js" type="module"></script>
+  <link href="/others/assets/css/tabs.css" rel="stylesheet" />
   <script type="module" async defer>
 
     import {
@@ -30,7 +30,7 @@
       addressInput,
       currentTab,
       Tab
-    } from "../../cat.mjs"
+    } from "/others/cat.mjs"
 
     // --- INIT ---
     const form = document.getElementById("form")
@@ -121,11 +121,11 @@
             repeat the first method.</li>
           <p>IF THAT DOESN'T WORK:</p>
           <li>Method 2 (no bare clients & uh oh & cannot get error screen): press CTRL+SHIFT+R [Cache Refresh] or go
-            over <a href="/active/index.html?goback=true" target="_blank">Here</a> and do it.</li>
+            over <a href="/others/active/index.html?goback=true" target="_blank">Here</a> and do it.</li>
           <p>IF THAT DOESN'T WORK:</p>
           <li>Method 3 (no bare clients & uh oh & cannot get error screen): Go over <a
-              href="/active/index.html?autofill=doyouseethisifyoudoitworks" target="blank" style="color:white;">Here
-              (click here)</a>, if it doesn't work go <a href="/active/index.html?autofill=doyouseethisifyoudoitworks"
+              href="/others/active/index.html?autofill=doyouseethisifyoudoitworks" target="blank" style="color:white;">Here
+              (click here)</a>, if it doesn't work go <a href="/others/active/index.html?autofill=doyouseethisifyoudoitworks"
               target="blank" style="color:white;">Here (click here)</a> again and search something random.</li>
         </ul>
         <h4>Join <a style="color:white;" href="//dsc.gg/gnetwork">https://galaxyverse-c1v.pages.dev/</a>Live updates</h4>
@@ -243,7 +243,7 @@
     }
   </script>
 </body>
-<script src="../assets/scripts/index.js"></script>
+<script src="/others/assets/scripts/index.js"></script>
 <script>
   function reload() {
     var iframe = document.querySelector("iframe");
@@ -432,7 +432,7 @@
     if (!menu.contains(e.target) && e.target !== moreIcon) menu.classList.remove('open');
   });
 </script>
-<script src="../assets/scripts/index.js"></script>
+<script src="/others/assets/scripts/index.js"></script>
 <script>
   let isLeavePopupEnabled = JSON.parse(localStorage.getItem('leavePopupEnabled'));
   if (isLeavePopupEnabled === null) isLeavePopupEnabled = false;
@@ -508,7 +508,7 @@ function renderHistory(filter = '') {
     li.appendChild(text);
     li.onclick = () => {
       input.value = item.term;
-      window.location.href = `/active/index.html?autofill=${encodeURIComponent(item.term)}`;
+      window.location.href = `/others/active/index.html?autofill=${encodeURIComponent(item.term)}`;
       historyContainer.style.display = 'none';
     };
 
