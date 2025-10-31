@@ -180,24 +180,32 @@ function shouldAutoApplySeasonalTheme() {
       .catch(err => console.error('❌ Firebase database connection failed:', err));
 
     const validKeys = [
+      // DEVS KEYS
       'd4vid_ghost',
       'azthedev',
       'testingkeyfordevelopers',
       'spartan_alloy3',
       'aanzoski',
       'jordanthedev',
+      'd3vinthefirstdev',
+      // PAYED KEYS
       'CxgMvuMFYdu9JwDePpddn2LOOgZPKn05',
       '1AG4JsMjOvPiC9RzLt6KRZM2zAN8JhhM',
       'qwtS730SkOAv4bhNpqC4qe2LXDaWV24i',
       'LKPR0egJizvkY23HT5QJxjq8kp0SPsGe',
       'neZN0a439QuKezFjQY1OyIGUOlDITSuA',
       'fu5DZ4cpsbkLf4nXHRnvpARKomGqnleC',
+      // Free keys
       'D5F11',
       '1471D',
       '21B1E',
       'B98EE',
       'B27A9',
-      'd3vinthefirstdev'
+      // Specified Friend keys
+      '1F41351F63E2F',
+      'FA4222F8D3B78',
+      '6693DA38EE9FF',
+      '85A59FDF3A485'
     ];
 
     function generateBrowserFingerprint() {
