@@ -1,4 +1,4 @@
-import { newTab, switchTab, closeTab } from "/cat.mjs";
+import { newTab, switchTab, closeTab } from "/others/cat.mjs";
 
 window.newTab = newTab;
 let tabs = [];
@@ -7,7 +7,7 @@ const tabsDiv = document.getElementById("tabs");
 const getIcon = (url) =>
 	/^https?:\/\/[\w.-]+\.[a-z]{2,}/i.test(url)
 		? `https://www.google.com/s2/favicons?domain=${url}`
-		: "/assets/images/jmw.png";
+		: "/others/assets/images/jmw.png";
 
 function createTab(id, title = "New Tab", url = "") {
 	const tab = document.createElement("div");
