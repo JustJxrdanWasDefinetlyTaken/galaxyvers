@@ -340,5 +340,46 @@
 <script src="./others/assets/scripts/stats.js"></script>
 <script src="./scripts.js"></script>
 
+<!-- Iframe control functions -->
+<script>
+  function reload() {
+    var iframe = document.querySelector("iframe");
+    if (iframe) {
+      try {
+        // Try to hard reload the iframe content
+        iframe.contentWindow.location.reload(true);
+      } catch (error) {
+        // If cross-origin, reload the iframe src
+        console.log('Reloading iframe via src...', error);
+        iframe.src = iframe.src;
+      }
+    } else {
+      console.warn('No iframe found to reload');
+    }
+  }
+
+  function historyBack() {
+    var iframe = document.querySelector("iframe");
+    if (iframe) {
+      try {
+        iframe.contentWindow.history.back();
+      } catch (error) {
+        console.warn('Cannot navigate back in iframe:', error);
+      }
+    }
+  }
+
+  function historyForward() {
+    var iframe = document.querySelector("iframe");
+    if (iframe) {
+      try {
+        iframe.contentWindow.history.forward();
+      } catch (error) {
+        console.warn('Cannot navigate forward in iframe:', error);
+      }
+    }
+  }
+</script>
+
 </body>
 </html>
