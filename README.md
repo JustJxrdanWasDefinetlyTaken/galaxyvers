@@ -2,7 +2,7 @@
 
 
 - This was made for my friends tho shoutout to them
-- Also creds to <a href="https://github.com/JustJxrdanWasDefinetlyTaken">Jordan</a> check out his projects hes him
+- Also creds to <a href="https://github.com/JustJxrdanWasDefinetlyTaken">Jordan</a> check out Jordan's Mathwork. It is a big inspiration and big helps to him he means alot to GalaxyVerse
 <br></br>
 ### Coming soon
 - More stuff
