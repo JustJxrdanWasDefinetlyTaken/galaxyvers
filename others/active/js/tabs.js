@@ -7,7 +7,7 @@ const tabsDiv = document.getElementById("tabs");
 const getIcon = (url) =>
 	/^https?:\/\/[\w.-]+\.[a-z]{2,}/i.test(url)
 		? `https://www.google.com/s2/favicons?domain=${url}`
-		: "/others/assets/images/jmw.png";
+		: "/others/others/assets/images/GalaxyVerse.png";
 
 function createTab(id, title = "New Tab", url = "") {
 	const tab = document.createElement("div");
