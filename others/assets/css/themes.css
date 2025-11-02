@@ -65,7 +65,7 @@ body[theme="legacyv6"] {
 }
 
 body[theme="evil-teto"] {
-  background: url("/assets/images/themeimage/teto.png");
+  background: url("/others/assets/images/themeimage/teto.png");
   background-color:#444;
   background-attachment: fixed;
   --bgcolor: #444444;
@@ -79,7 +79,7 @@ body[theme="evil-teto"] {
 }
 
 body[theme="pearto"] {
-  background: url("/assets/images/themeimage/pearto.png");
+  background: url("/others/assets/images/themeimage/pearto.png");
   background-color:lightgray;
   background-attachment: fixed;
   --bgcolor: lightgray;
