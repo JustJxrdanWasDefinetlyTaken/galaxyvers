@@ -24,7 +24,7 @@ const games = [
   { name: "Crazy Cattle 3D", image: "others/assets/images/games/crazy-cattle-3d-icon.jpg", url: "others/assets/games/Crazy Cattle 3D.html" },
   { name: "Crossy Road", image: "others/assets/images/games/crossyroad.png", url: "others/assets/games/Crossy Road.html" },
   { name: "Drift Boss", image: "others/assets/images/games/driftboss.png", url: "others/assets/games/Drift Boss.html" },
-  { name: "Drift Hunters ", image: "others/assets/images/games/drift-hunters.png", url: "others/assets/games/Drift Hunters.html" },
+  { name: "Drift Hunters ", image: "others/assets/images/games/drift-hunters.png", url: "others/assets/games/Drift Huntersfix.html" },
   { name: "Escape Road", image: "others/assets/images/games/escaperoad.png", url: "others/assets/games/Escape Road.html" }, /*ok*/
   { name: "Flappy Bird", image: "others/assets/images/games/flappybird.png", url: "others/assets/games/Flappy Bird.html" },
   { name: "Football Bros", image: "others/assets/images/games/football-bros.webp", url: "others/assets/games/Football Bros.html" },
@@ -46,7 +46,7 @@ const games = [
   { name: "Slope", image: "others/assets/images/games/slope.png", url: "others/assets/games/Slope.html" },
   { name: "Solar Smash", image: "others/assets/images/games/Solar_smash.webp", url: "others/assets/games/Solar Smash.html" },
   { name: "Space Waves", image: "others/assets/images/games/spacewaves.png", url: "others/assets/games/Space Waves.html" },
-  { name: "Steal a Brainrot ONLINE V2", image: "others/assets/images/games/stealabrain.webp", url: "others/assets/games/Steal Brainrot Online UPD1.html" },
+  { name: "(BROKEN) Steal a Brainrot ONLINE ", image: "others/assets/images/games/stealabrain.webp", url: "others/assets/games/Steal Brainrot Online UPD1.html" },
   { name: "Stickman Hook", image: "others/assets/images/games/stickman Hook.jpg", url: "others/assets/games/Stickman Hook.html" },
   { name: "Subway Surfers San Francisco", image: "others/assets/images/games/subwaysanfran.jpeg", url: "others/assets/games/Subway Surfers_ San Francisco.html" },
   { name: "Subway Surfers Winter Holiday", image: "others/assets/images/games/subway-surfers.jpg", url: "others/assets/games/Subway Surfers_ Winter Holiday.html" },
