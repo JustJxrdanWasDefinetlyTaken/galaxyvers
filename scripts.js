@@ -1094,23 +1094,66 @@ function renderWebsites(websitesToRender) {
     return;
   }
   
+  // Create a simple list
+  const list = document.createElement('ul');
+  list.style.cssText = `
+    list-style: none;
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+  `;
+  
   websitesToRender.forEach(website => {
     if (!website || !website.name || !website.url) {
       console.warn('Invalid website object:', website);
       return;
     }
     
-    const card = document.createElement('div');
-    card.className = 'app-card';
-    card.tabIndex = 0;
-    card.innerHTML = `
-      <img src="${website.image || 'https://via.placeholder.com/250x250?text=Website'}" alt="${website.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/250x250?text=${encodeURIComponent(website.name)}'" />
-      <h3>${website.name}</h3>
+    const listItem = document.createElement('li');
+    listItem.style.cssText = `
+      padding: 15px;
+      margin-bottom: 10px;
+      background: var(--nav-color);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      transition: all 0.3s ease;
     `;
-    card.onclick = () => loadGame(website.url);
-    card.onkeypress = (e) => { if (e.key === 'Enter') loadGame(website.url); };
-    websitesList.appendChild(card);
+    
+    listItem.innerHTML = `
+      <a href="${website.url}" target="_blank" style="
+        color: var(--accent-color);
+        text-decoration: none;
+        font-size: 18px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      ">
+        <span style="font-size: 20px;">🔗</span>
+        <div>
+          <div style="font-weight: 600;">${website.name}</div>
+          <div style="font-size: 14px; color: var(--text-color); opacity: 0.7; margin-top: 4px;">${website.url}</div>
+        </div>
+      </a>
+    `;
+    
+    // Hover effect
+    listItem.addEventListener('mouseenter', function() {
+      this.style.background = 'var(--hover-bg)';
+      this.style.borderColor = 'var(--accent-color)';
+      this.style.transform = 'translateX(5px)';
+    });
+    
+    listItem.addEventListener('mouseleave', function() {
+      this.style.background = 'var(--nav-color)';
+      this.style.borderColor = 'var(--border-color)';
+      this.style.transform = 'translateX(0)';
+    });
+    
+    list.appendChild(listItem);
   });
+  
+  websitesList.appendChild(list);
 }
 
 function loadGame(url) {
