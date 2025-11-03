@@ -8,6 +8,9 @@
 
   <!-- Link to external CSS - FIXED PATH -->
   <link rel="stylesheet" href="./styles.css" />
+  
+  <!-- GalaxyVerse Console CSS -->
+  <link rel="stylesheet" href="./others/assets/css/console.css" />
 
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100..900&display=swap" rel="stylesheet" />
@@ -103,6 +106,7 @@
         <li><a class="active" href="#" id="homeLink">HỚme</a></li>
         <li><a href="#" id="gameLink">Gᾷmes</a></li>
         <li><a href="#" id="appsLink">Ἀpps</a></li>
+        <li><a href="#" id="websitesLink">Websites</a></li>
         <li><a href="#" id="settingsLink">Settings</a></li>
         <li><a href="#" id="aboutLink">About</a></li>
     </ul>
@@ -229,6 +233,18 @@
         <button id="backToHomeApps">Back to Home</button>
     </div>
 
+    <div id="content-websites" class="content" style="display:none;">
+        <h1>Websites</h1>
+        <div class="search-container">
+            <input type="text" id="websitesSearchInput" placeholder="Search websites..." />
+            <button id="websitesSearchBtn">Search</button>
+        </div>
+        <div id="websites-list" class="app-grid">
+            <!-- Website cards rendered here -->
+        </div>
+        <button id="backToHomeWebsites">Back to Home</button>
+    </div>
+
     <div id="content-settings" class="content" style="display:none;">
         <h1>Settings</h1>
         
@@ -339,6 +355,9 @@
 <script src="./others/assets/scripts/gms.js"></script>
 <script src="./others/assets/scripts/stats.js"></script>
 <script src="./scripts.js"></script>
+
+<!-- GalaxyVerse Console -->
+<script src="./others/assets/scripts/console.js"></script>
 
 <!-- Iframe control functions -->
 <script>
