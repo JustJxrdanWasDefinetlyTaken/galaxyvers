@@ -208,7 +208,7 @@ function shouldAutoApplySeasonalTheme() {
       '85A59FDF3A485',
       // Made by az bro
       'za!54390922', 
-      'jordansay67', //not a admin key                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+      'jordansay67',
     ];
 
     function generateBrowserFingerprint() {
@@ -976,6 +976,24 @@ function showApps() {
   }
 }
 
+function showWebsites() {
+  hideAll();
+  const websitesContent = document.getElementById('content-websites');
+  if (websitesContent) websitesContent.style.display = 'block';
+  const websitesLink = document.getElementById('websitesLink');
+  if (websitesLink) websitesLink.classList.add('active');
+  
+  if (typeof websites !== 'undefined' && Array.isArray(websites)) {
+    renderWebsites(websites);
+  } else {
+    console.error('websites array not found');
+    const websitesList = document.getElementById('websites-list');
+    if (websitesList) {
+      websitesList.innerHTML = '<p style="padding: 20px; text-align: center;">Websites are loading...</p>';
+    }
+  }
+}
+
 function showAbout() {
   hideAll();
   const aboutContent = document.getElementById('content-about');
@@ -1062,6 +1080,39 @@ function renderApps(appsToRender) {
   });
 }
 
+function renderWebsites(websitesToRender) {
+  const websitesList = document.getElementById('websites-list');
+  if (!websitesList) {
+    console.error('websites-list element not found');
+    return;
+  }
+  
+  websitesList.innerHTML = '';
+  
+  if (!websitesToRender || websitesToRender.length === 0) {
+    websitesList.innerHTML = '<p style="padding: 20px; text-align: center;">No websites found.</p>';
+    return;
+  }
+  
+  websitesToRender.forEach(website => {
+    if (!website || !website.name || !website.url) {
+      console.warn('Invalid website object:', website);
+      return;
+    }
+    
+    const card = document.createElement('div');
+    card.className = 'app-card';
+    card.tabIndex = 0;
+    card.innerHTML = `
+      <img src="${website.image || 'https://via.placeholder.com/250x250?text=Website'}" alt="${website.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/250x250?text=${encodeURIComponent(website.name)}'" />
+      <h3>${website.name}</h3>
+    `;
+    card.onclick = () => loadGame(website.url);
+    card.onkeypress = (e) => { if (e.key === 'Enter') loadGame(website.url); };
+    websitesList.appendChild(card);
+  });
+}
+
 function loadGame(url) {
   if (!url) {
     console.error('No URL provided to loadGame');
@@ -1129,6 +1180,26 @@ function searchGames() {
   
   const filtered = games.filter(game => game && game.name && game.name.toLowerCase().includes(query));
   renderGames(filtered);
+}
+
+function searchWebsites() {
+  const searchInput = document.getElementById('websitesSearchInput');
+  if (!searchInput) return;
+  
+  const query = searchInput.value.toLowerCase().trim();
+  
+  if (typeof websites === 'undefined' || !Array.isArray(websites)) {
+    console.error('websites array not found');
+    return;
+  }
+  
+  if (!query) {
+    renderWebsites(websites);
+    return;
+  }
+  
+  const filtered = websites.filter(site => site && site.name && site.name.toLowerCase().includes(query));
+  renderWebsites(filtered);
 }
 
 function toggleFullscreen() {
@@ -1476,18 +1547,21 @@ function initializeApp() {
   const homeLink = document.getElementById('homeLink');
   const gameLink = document.getElementById('gameLink');
   const appsLink = document.getElementById('appsLink');
+  const websitesLink = document.getElementById('websitesLink');
   const settingsLink = document.getElementById('settingsLink');
   const aboutLink = document.getElementById('aboutLink');
 
   if (homeLink) homeLink.addEventListener('click', (e) => { e.preventDefault(); showHome(); });
   if (gameLink) gameLink.addEventListener('click', (e) => { e.preventDefault(); showGames(); });
   if (appsLink) appsLink.addEventListener('click', (e) => { e.preventDefault(); showApps(); });
+  if (websitesLink) websitesLink.addEventListener('click', (e) => { e.preventDefault(); showWebsites(); });
   if (settingsLink) settingsLink.addEventListener('click', (e) => { e.preventDefault(); showSettings(); });
   if (aboutLink) aboutLink.addEventListener('click', (e) => { e.preventDefault(); showAbout(); });
 
   // Back to home buttons
   const backToHomeGame = document.getElementById('backToHomeGame');
   const backToHomeApps = document.getElementById('backToHomeApps');
+  const backToHomeWebsites = document.getElementById('backToHomeWebsites');
   
   if (backToHomeGame) {
     backToHomeGame.addEventListener('click', () => {
@@ -1500,6 +1574,10 @@ function initializeApp() {
   
   if (backToHomeApps) {
     backToHomeApps.addEventListener('click', () => showHome());
+  }
+  
+  if (backToHomeWebsites) {
+    backToHomeWebsites.addEventListener('click', () => showHome());
   }
 
   // Search functionality
@@ -1529,6 +1607,21 @@ function initializeApp() {
     homepageSearchInput.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') homepageSearch();
     });
+  }
+
+  // Websites search
+  const websitesSearchBtn = document.getElementById('websitesSearchBtn');
+  const websitesSearchInput = document.getElementById('websitesSearchInput');
+  
+  if (websitesSearchBtn) {
+    websitesSearchBtn.addEventListener('click', searchWebsites);
+  }
+  
+  if (websitesSearchInput) {
+    websitesSearchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') searchWebsites();
+    });
+    websitesSearchInput.addEventListener('input', debounce(searchWebsites, 300));
   }
 
   // Fullscreen button
