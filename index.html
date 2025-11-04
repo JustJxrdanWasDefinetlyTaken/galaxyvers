@@ -6,10 +6,13 @@
   <title>GalaxyVerse</title>
   <link rel="icon" href="others/assets/images/GalaxyVerse.png" />
 
-  <!-- Link to external CSS - FIXED PATH -->
+  <!-- external CSS-->
   <link rel="stylesheet" href="./styles.css" />
+  
+  <!-- Console CSS -->
+  <link rel="stylesheet" href="./others/assets/css/console.css" />
 
-  <!-- Google Fonts -->
+  <!-- Google -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100..900&display=swap" rel="stylesheet" />
 
   <style>
@@ -103,6 +106,7 @@
         <li><a class="active" href="#" id="homeLink">HỚme</a></li>
         <li><a href="#" id="gameLink">Gᾷmes</a></li>
         <li><a href="#" id="appsLink">Ἀpps</a></li>
+        <li><a href="#" id="websitesLink">Websites</a></li>
         <li><a href="#" id="settingsLink">Settings</a></li>
         <li><a href="#" id="aboutLink">About</a></li>
     </ul>
@@ -151,21 +155,12 @@
 <div id="updateLogModal" class="info-modal">
     <div class="info-modal-content">
         <span class="info-close" data-modal="updateLogModal">&times;</span>
-        <h2>Update Log V1.2.4</h2>
+        <h2>Update Log V1.2.5</h2>
         <div class="info-modal-body">
             <ul>
-                <li>Added Gᾷmes</li>
-                <li>Added Bad Parenting 1</li>
-                <li>Added Basket Random</li>
-                <li>Added Blade Ball</li>
-                <li>Added Block Blast</li>
-                <li>Added Highway Racer 2</li>
-                <li><b>BACK</b> Escape Road</li>
-                <li><b>BACK</b> Football Bros</li>
-                <li><b><u>Fixed</u></b> Some bugs</li>
-                <li><b><u>Fixed</u></b> Errors On Keys</li>
-                <li><b><u>Fixed</u></b> Games not loading</li>
-                <li><b><u>Fixed</u></b> Updates on websites faster</li>
+                <li>Added Console (Developers Will Understand)</li>
+                <li>Christmas Theme</li>
+                <li>Added 'Websites' Section</li>
             </ul>
 
             <h4><b>Announcements</b></h4>
@@ -227,6 +222,18 @@
             <!-- App cards rendered here -->
         </div>
         <button id="backToHomeApps">Back to Home</button>
+    </div>
+
+    <div id="content-websites" class="content" style="display:none;">
+        <h1>Websites</h1>
+        <div class="search-container">
+            <input type="text" id="websitesSearchInput" placeholder="Search websites..." />
+            <button id="websitesSearchBtn">Search</button>
+        </div>
+        <div id="websites-list" class="app-grid">
+            <!-- Website cards rendered here -->
+        </div>
+        <button id="backToHomeWebsites">Back to Home</button>
     </div>
 
     <div id="content-settings" class="content" style="display:none;">
@@ -339,6 +346,9 @@
 <script src="./others/assets/scripts/gms.js"></script>
 <script src="./others/assets/scripts/stats.js"></script>
 <script src="./scripts.js"></script>
+
+<!-- GalaxyVerse Console -->
+<script src="./others/assets/scripts/console.js"></script>
 
 <!-- Iframe control functions -->
 <script>

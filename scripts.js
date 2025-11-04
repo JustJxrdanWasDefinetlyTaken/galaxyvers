@@ -205,7 +205,10 @@ function shouldAutoApplySeasonalTheme() {
       '1F41351F63E2F',
       'FA4222F8D3B78',
       '6693DA38EE9FF',
-      '85A59FDF3A485'
+      '85A59FDF3A485',
+      // Made by az bro
+      'za!54390922', 
+      'jordansay67',
     ];
 
     function generateBrowserFingerprint() {
@@ -973,6 +976,24 @@ function showApps() {
   }
 }
 
+function showWebsites() {
+  hideAll();
+  const websitesContent = document.getElementById('content-websites');
+  if (websitesContent) websitesContent.style.display = 'block';
+  const websitesLink = document.getElementById('websitesLink');
+  if (websitesLink) websitesLink.classList.add('active');
+  
+  if (typeof websites !== 'undefined' && Array.isArray(websites)) {
+    renderWebsites(websites);
+  } else {
+    console.error('websites array not found');
+    const websitesList = document.getElementById('websites-list');
+    if (websitesList) {
+      websitesList.innerHTML = '<p style="padding: 20px; text-align: center;">Websites are loading...</p>';
+    }
+  }
+}
+
 function showAbout() {
   hideAll();
   const aboutContent = document.getElementById('content-about');
@@ -1059,6 +1080,82 @@ function renderApps(appsToRender) {
   });
 }
 
+function renderWebsites(websitesToRender) {
+  const websitesList = document.getElementById('websites-list');
+  if (!websitesList) {
+    console.error('websites-list element not found');
+    return;
+  }
+  
+  websitesList.innerHTML = '';
+  
+  if (!websitesToRender || websitesToRender.length === 0) {
+    websitesList.innerHTML = '<p style="padding: 20px; text-align: center;">No websites found.</p>';
+    return;
+  }
+  
+  // Create a simple list
+  const list = document.createElement('ul');
+  list.style.cssText = `
+    list-style: none;
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+  `;
+  
+  websitesToRender.forEach(website => {
+    if (!website || !website.name || !website.url) {
+      console.warn('Invalid website object:', website);
+      return;
+    }
+    
+    const listItem = document.createElement('li');
+    listItem.style.cssText = `
+      padding: 15px;
+      margin-bottom: 10px;
+      background: var(--nav-color);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    `;
+    
+    listItem.innerHTML = `
+      <a href="${website.url}" target="_blank" style="
+        color: var(--accent-color);
+        text-decoration: none;
+        font-size: 18px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      ">
+        <span style="font-size: 20px;">🔗</span>
+        <div>
+          <div style="font-weight: 600;">${website.name}</div>
+          <div style="font-size: 14px; color: var(--text-color); opacity: 0.7; margin-top: 4px;">${website.url}</div>
+        </div>
+      </a>
+    `;
+    
+    // Hover effect
+    listItem.addEventListener('mouseenter', function() {
+      this.style.background = 'var(--hover-bg)';
+      this.style.borderColor = 'var(--accent-color)';
+      this.style.transform = 'translateX(5px)';
+    });
+    
+    listItem.addEventListener('mouseleave', function() {
+      this.style.background = 'var(--nav-color)';
+      this.style.borderColor = 'var(--border-color)';
+      this.style.transform = 'translateX(0)';
+    });
+    
+    list.appendChild(listItem);
+  });
+  
+  websitesList.appendChild(list);
+}
+
 function loadGame(url) {
   if (!url) {
     console.error('No URL provided to loadGame');
@@ -1136,6 +1233,26 @@ function searchGames() {
   
   const filtered = games.filter(game => game && game.name && game.name.toLowerCase().includes(query));
   renderGames(filtered);
+}
+
+function searchWebsites() {
+  const searchInput = document.getElementById('websitesSearchInput');
+  if (!searchInput) return;
+  
+  const query = searchInput.value.toLowerCase().trim();
+  
+  if (typeof websites === 'undefined' || !Array.isArray(websites)) {
+    console.error('websites array not found');
+    return;
+  }
+  
+  if (!query) {
+    renderWebsites(websites);
+    return;
+  }
+  
+  const filtered = websites.filter(site => site && site.name && site.name.toLowerCase().includes(query));
+  renderWebsites(filtered);
 }
 
 function toggleFullscreen() {
@@ -1483,18 +1600,21 @@ function initializeApp() {
   const homeLink = document.getElementById('homeLink');
   const gameLink = document.getElementById('gameLink');
   const appsLink = document.getElementById('appsLink');
+  const websitesLink = document.getElementById('websitesLink');
   const settingsLink = document.getElementById('settingsLink');
   const aboutLink = document.getElementById('aboutLink');
 
   if (homeLink) homeLink.addEventListener('click', (e) => { e.preventDefault(); showHome(); });
   if (gameLink) gameLink.addEventListener('click', (e) => { e.preventDefault(); showGames(); });
   if (appsLink) appsLink.addEventListener('click', (e) => { e.preventDefault(); showApps(); });
+  if (websitesLink) websitesLink.addEventListener('click', (e) => { e.preventDefault(); showWebsites(); });
   if (settingsLink) settingsLink.addEventListener('click', (e) => { e.preventDefault(); showSettings(); });
   if (aboutLink) aboutLink.addEventListener('click', (e) => { e.preventDefault(); showAbout(); });
 
   // Back to home buttons
   const backToHomeGame = document.getElementById('backToHomeGame');
   const backToHomeApps = document.getElementById('backToHomeApps');
+  const backToHomeWebsites = document.getElementById('backToHomeWebsites');
   
   if (backToHomeGame) {
     backToHomeGame.addEventListener('click', () => {
@@ -1507,6 +1627,10 @@ function initializeApp() {
   
   if (backToHomeApps) {
     backToHomeApps.addEventListener('click', () => showHome());
+  }
+  
+  if (backToHomeWebsites) {
+    backToHomeWebsites.addEventListener('click', () => showHome());
   }
 
   // Search functionality
@@ -1536,6 +1660,21 @@ function initializeApp() {
     homepageSearchInput.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') homepageSearch();
     });
+  }
+
+  // Websites search
+  const websitesSearchBtn = document.getElementById('websitesSearchBtn');
+  const websitesSearchInput = document.getElementById('websitesSearchInput');
+  
+  if (websitesSearchBtn) {
+    websitesSearchBtn.addEventListener('click', searchWebsites);
+  }
+  
+  if (websitesSearchInput) {
+    websitesSearchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') searchWebsites();
+    });
+    websitesSearchInput.addEventListener('input', debounce(searchWebsites, 300));
   }
 
   // Fullscreen button

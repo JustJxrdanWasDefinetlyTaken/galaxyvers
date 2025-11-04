@@ -1,6 +1,6 @@
-// ===== GAMES AND APPS DATA =====
-// File: others/assets/scripts/games.js
-// This file contains all game and app definitions for GalaxyVerse
+// ===== GAMES, APPS, AND WEBSITES DATA =====
+// File: others/assets/scripts/gms.js
+// This file contains all game, app, and website definitions for GalaxyVerse
 
 // ===== GAME DATA =====
 const games = [
@@ -24,8 +24,8 @@ const games = [
   { name: "Crazy Cattle 3D", image: "others/assets/images/games/crazy-cattle-3d-icon.jpg", url: "others/assets/games/Crazy Cattle 3D.html" },
   { name: "Crossy Road", image: "others/assets/images/games/crossyroad.png", url: "others/assets/games/Crossy Road.html" },
   { name: "Drift Boss", image: "others/assets/images/games/driftboss.png", url: "others/assets/games/Drift Boss.html" },
-  { name: "Drift Hunters ", image: "others/assets/images/games/drift-hunters.png", url: "others/assets/games/Drift Hunters.html" },
-  { name: "Escape Road", image: "others/assets/images/games/escaperoad.png", url: "others/assets/games/Escape Road.html" }, /*ok*/
+  { name: "Drift Hunters ", image: "others/assets/images/games/drift-hunters.png", url: "others/assets/games/Drift Huntersfix.html" },
+  { name: "Escape Road", image: "others/assets/images/games/escaperoad.png", url: "others/assets/games/Escape Road.html" },
   { name: "Flappy Bird", image: "others/assets/images/games/flappybird.png", url: "others/assets/games/Flappy Bird.html" },
   { name: "Football Bros", image: "others/assets/images/games/football-bros.webp", url: "others/assets/games/Football Bros.html" },
   { name: "Friday Night Funkin': Darkness Takeover", image: "others/assets/images/games/takeover.jpg", url: "others/assets/games/Friday Night Funkin'_ Darkness Takeover.html" },
@@ -46,7 +46,7 @@ const games = [
   { name: "Slope", image: "others/assets/images/games/slope.png", url: "others/assets/games/Slope.html" },
   { name: "Solar Smash", image: "others/assets/images/games/Solar_smash.webp", url: "others/assets/games/Solar Smash.html" },
   { name: "Space Waves", image: "others/assets/images/games/spacewaves.png", url: "others/assets/games/Space Waves.html" },
-  { name: "Steal a Brainrot ONLINE V2", image: "others/assets/images/games/stealabrain.webp", url: "others/assets/games/Steal Brainrot Online UPD1.html" },
+  { name: "(BROKEN) Steal a Brainrot ONLINE ", image: "others/assets/images/games/stealabrain.webp", url: "others/assets/games/Steal Brainrot Online UPD1.html" },
   { name: "Stickman Hook", image: "others/assets/images/games/stickman Hook.jpg", url: "others/assets/games/Stickman Hook.html" },
   { name: "Subway Surfers San Francisco", image: "others/assets/images/games/subwaysanfran.jpeg", url: "others/assets/games/Subway Surfers_ San Francisco.html" },
   { name: "Subway Surfers Winter Holiday", image: "others/assets/images/games/subway-surfers.jpg", url: "others/assets/games/Subway Surfers_ Winter Holiday.html" },
@@ -61,6 +61,34 @@ const apps = [
   { name: "Spotify", image: "others/assets/images/apps/spotify.png", url: "others/assets/apps/Spotify.html" },
   { name: "Vscode", image: "others/assets/images/apps/vscode.jpeg", url: "others/assets/apps/Vscode.html" },
   { name: "YouTube", image: "/others/assets/images/apps/youtube.png", url: "/others/assets/apps/YouTube.html"}
+];
+
+// ===== WEBSITES DATA - GALAXYVERSE NETWORK =====
+const websites = [
+  {
+    name: "GalaxyVerse Main",
+    url: "https://schoologydashboard.org/"
+  },
+  {
+    name: "GalaxyVerse - GVerse",
+    url: "https://gverse.schoologydashboard.org.cdn.cloudflare.net/"
+  },
+  {
+    name: "GalaxyVerse - AHS",
+    url: "http://ahs.schoologydashboard.org.cdn.cloudflare.net/"
+  },
+  {
+    name: "GalaxyVerse - Learn",
+    url: "http://learn.schoologydashboard.org.cdn.cloudflare.net/"
+  },
+  {
+    name: "GalaxyVerse - Original",
+    url: "https://galaxyverse-c1v.pages.dev/"
+  },
+  {
+    name: "GalaxyVerse - Org",
+    url: "https://galaxyverse.org/"
+  }
 ];
 
 // ===== HELPER FUNCTIONS =====
@@ -113,6 +141,19 @@ function searchAppsData(query) {
 }
 
 /**
+ * Search websites by query string
+ * @param {string} query - Search query
+ * @returns {Array} Filtered websites array
+ */
+function searchWebsitesData(query) {
+  if (!query || query.trim() === '') {
+    return websites;
+  }
+  const searchTerm = query.toLowerCase().trim();
+  return websites.filter(site => site.name.toLowerCase().includes(searchTerm));
+}
+
+/**
  * Get a random game
  * @returns {Object} Random game object
  */
@@ -137,17 +178,28 @@ function getTotalAppsCount() {
   return apps.length;
 }
 
+/**
+ * Get total count of websites
+ * @returns {number} Total websites
+ */
+function getTotalWebsitesCount() {
+  return websites.length;
+}
+
 // Export for use in other files (if using modules)
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     games,
     apps,
+    websites,
     getGameOfTheDay,
     searchGamesData,
     searchAppsData,
+    searchWebsitesData,
     getRandomGame,
     getTotalGamesCount,
-    getTotalAppsCount
+    getTotalAppsCount,
+    getTotalWebsitesCount
   };
 }
 
