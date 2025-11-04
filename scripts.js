@@ -1067,6 +1067,16 @@ function loadGame(url) {
   }
   
   try {
+    // Check if URL is a YouTube link
+    const isYouTube = url.includes('/others/assets/apps/YouTube.html') || url.includes('youtu.be');
+    
+    if (isYouTube) {
+      // Open YouTube links directly in a new tab
+      window.open(url, '_blank');
+      console.log('Opening YouTube link in new tab:', url);
+      return;
+    }
+    
     hideAll();
     const gameDisplay = document.getElementById('game-display');
     const gameIframe = document.getElementById('game-iframe');

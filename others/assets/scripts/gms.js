@@ -60,7 +60,7 @@ const apps = [
   { name: "Soundcloud", image: "others/assets/images/apps/soundcloud.png", url: "others/assets/apps/soundcloud.html" },
   { name: "Spotify", image: "others/assets/images/apps/spotify.png", url: "others/assets/apps/Spotify.html" },
   { name: "Vscode", image: "others/assets/images/apps/vscode.jpeg", url: "others/assets/apps/Vscode.html" },
-  { name: "YouTube", image: "others/assets/images/apps/youtube.png", url: "others/assets/apps/YouTube.html" }
+  { name: "YouTube", image: "/others/assets/images/apps/youtube.png", url: "/others/assets/apps/YouTube.html"}
 ];
 
 // ===== HELPER FUNCTIONS =====
@@ -149,4 +149,13 @@ if (typeof module !== 'undefined' && module.exports) {
     getTotalGamesCount,
     getTotalAppsCount
   };
+}
+
+function openApp(app) {
+  if (app.name === "YouTube") {
+    window.location.href = app.url; // go straight to URL
+  } else {
+    // existing iframe loading code here
+    document.getElementById("iframe").src = app.url;
+  }
 }

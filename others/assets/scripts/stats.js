@@ -257,3 +257,17 @@
 
   console.log('✅ Game Favorites & Statistics system loaded');
 })();
+function openGame(game) {
+  // YouTube skip iframe
+  if (game.name === "YouTube") {
+    window.location.href = game.url;
+    return;
+  }
+
+  // otherwise iframe
+  const iframe = document.getElementById("iframe");
+  iframe.src = game.url;
+
+  // start tracking playtime
+  GameStats.startTracking(game.url);
+}
