@@ -208,7 +208,7 @@ function shouldAutoApplySeasonalTheme() {
       '85A59FDF3A485',
       // Made by az bro
       'za!54390922', 
-      'jordansay67',
+      'jordansay67'
     ];
 
     function generateBrowserFingerprint() {
@@ -380,6 +380,7 @@ function shouldAutoApplySeasonalTheme() {
             font-size: 16px;
             margin: 0 0 30px 0;
           ">Enter your access key to continue<br>
+          <a href="https://docs.google.com/document/d/1RfHWPQ-8Kq2NDV6vxfOgquBqIKwp4OoL7K1NXkYLUEg/edit?usp=sharing">GalaxyVerse</a> Policy
           V1.2.5 - Christmas Gift from Jordan</p>
           
           <input type="text" id="keyInput" placeholder="Enter your key" style="
