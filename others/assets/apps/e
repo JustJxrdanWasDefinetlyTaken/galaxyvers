@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>YouTube Search + Privacy Embedder</title>
+<style>
+:root {
+  --bg-color:#121826;--nav-color:#1e2433;--accent-color:#4f90ff;--text-color:#e0e6f1;
+  --border-color:#38415d;--hover-bg:#2a2f48;--btn-bg:#3b466f;--btn-hover-bg:#4f90ff;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial;background:var(--bg-color);color:var(--text-color)}
+.app{max-width:900px;margin:40px auto;padding:20px;border-radius:10px;background:linear-gradient(180deg, var(--nav-color), rgba(17,23,34,0.98));border:1px solid var(--border-color)}
+h1{font-size:20px;margin-bottom:10px}
+.controls{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+input[type="search"]{background:transparent;border:1px solid var(--border-color);color:var(--text-color);padding:10px 12px;border-radius:8px;outline:none;flex:1}
+input[type="search"]::placeholder{color:#9aa4c0}
+button, select{background:var(--btn-bg);border:none;color:var(--text-color);padding:10px 14px;border-radius:8px;cursor:pointer;font-weight:500}
+button:hover, select:hover{background:var(--btn-hover-bg);color:#022}
+.results{display:grid;gap:12px;margin-top:12px}
+.result{display:flex;gap:10px;align-items:center;padding:8px;border-radius:8px;cursor:pointer;border:1px solid transparent;background:transparent}
+.result:hover{background:var(--hover-bg)}
+.thumb{width:120px;height:68px;flex-shrink:0;border-radius:6px;overflow:hidden}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.meta{flex:1}
+.title{font-size:14px;margin:0 0 4px 0}
+.channel{font-size:12px;color:#9aa4c0}
+.player{margin-top:20px;border:1px solid var(--border-color);border-radius:10px;overflow:hidden;background:#000}
+.iframe-wrap{position:relative;padding-bottom:56.25%;height:0}
+.iframe-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0}
+.info{padding:10px;font-size:14px;color:#9aa4c0}
+.btn-group{margin-top:6px;display:flex;gap:6px;flex-wrap:wrap}
+.small-btn{padding:6px 10px;border-radius:6px;background:var(--btn-bg);border:none;color:var(--text-color);cursor:pointer}
+.small-btn:hover{background:var(--btn-hover-bg);color:#022}
+</style>
+</head>
+<body>
+<div class="app">
+  <h1>YouTube Search + Privacy Embedder</h1>
+  <div class="controls">
+    <input id="q" type="search" placeholder="Search YouTube videos..." />
+    <button id="searchBtn">Search</button>
+    <select id="serverSelect">
+      <option value="nocookie">YouTube (No Cookie)</option>
+      <option value="youtube">YouTube</option>
+      <option value="piped">Piped</option>
+      <option value="yewtu">Yewtu</option>
+    </select>
+  </div>
+  <div class="results" id="results">
+    <div style="font-size:13px;color:#9aa4c0">Type a query and click search to see videos.</div>
+  </div>
+  <div class="player" id="player" style="display:none">
+    <div class="iframe-wrap" id="iframeWrap"></div>
+    <div class="info" id="videoInfo"></div>
+    <div class="btn-group">
+      <button id="openEmbed" class="small-btn" style="display:none">Open Embed</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const searchBtn = document.getElementById('searchBtn');
+const qInput = document.getElementById('q');
+const resultsEl = document.getElementById('results');
+const player = document.getElementById('player');
+const iframeWrap = document.getElementById('iframeWrap');
+const videoInfo = document.getElementById('videoInfo');
+const serverSelect = document.getElementById('serverSelect');
+const openEmbed = document.getElementById('openEmbed');
+
+searchBtn.addEventListener('click', doSearch);
+qInput.addEventListener('keydown', e => { if(e.key==='Enter') doSearch(); });
+
+async function doSearch() {
+  const q = qInput.value.trim();
+  if (!q) { resultsEl.innerHTML='<div style="font-size:13px;color:#9aa4c0">Please enter a search term.</div>'; return; }
+  resultsEl.innerHTML='<div style="font-size:13px;color:#9aa4c0">Searching...</div>';
+
+  try {
+    const html = await fetch(`https://corsproxy.io/?https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`).then(r => r.text());
+
+    // extract video IDs, titles, and channels
+    const ids = [...html.matchAll(/\"videoId\":\"([a-zA-Z0-9_-]{11})\"/g)].map(m=>m[1]);
+    const titles = [...html.matchAll(/\"title\":\{\"runs\":\[\{\"text\":\"([^\"]+)/g)].map(m=>m[1]);
+    const channels = [...html.matchAll(/\"ownerText\":\{\"runs\":\[\{\"text\":\"([^\"]+)/g)].map(m=>m[1]);
+
+    resultsEl.innerHTML='';
+    if(ids.length===0){ resultsEl.innerHTML='<div style="font-size:13px;color:#9aa4c0">No results found.</div>'; return; }
+
+    ids.slice(0,12).forEach((id,i)=>{
+      const div = document.createElement('div');
+      div.className = 'result';
+      const title = titles[i] || 'Video';
+      const channel = channels[i] || 'Unknown';
+
+      const metaDiv = document.createElement('div');
+      metaDiv.className = 'meta';
+      metaDiv.innerHTML = `<p class='title'>${title}</p><p class='channel'>${channel}</p>`;
+
+      div.appendChild(metaDiv);
+      div.onclick = () => playVideo(id,title);
+      resultsEl.appendChild(div);
+    });
+
+  } catch(err) {
+    console.error(err);
+    resultsEl.innerHTML='<div style="font-size:13px;color:#9aa4c0">Failed to search YouTube. Possibly blocked by CORS.</div>';
+  }
+}
+
+function playVideo(id,title) {
+  const server = serverSelect.value;
+  let src;
+  switch(server) {
+    case 'nocookie': src=`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&iv_load_policy=3&loop=1`; break;
+    case 'youtube': src=`https://www.youtube.com/embed/${id}?rel=0`; break;
+    case 'piped': src=`https://piped.video/embed/${id}`; break;
+    case 'yewtu': src=`https://yewtu.be/embed/${id}`; break;
+    default: src=`https://www.youtube-nocookie.com/embed/${id}`;
+  }
+
+  iframeWrap.innerHTML = `<iframe src="${src}" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+  videoInfo.textContent = `${title} — via ${server}`;
+  player.style.display='block';
+  player.scrollIntoView({behavior:'smooth'});
+
+  openEmbed.style.display='inline-block';
+  openEmbed.onclick = () => window.open(src,'_blank');
+}
+</script>
+</body>
+</html>
