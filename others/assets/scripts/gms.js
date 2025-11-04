@@ -5,7 +5,7 @@
 // ===== GAME DATA =====
 const games = [
   { name: "Feedback", image: "https://iili.io/3OM27wv.th.jpg", url: "https://forms.gle/GhMEg7s8H9aRSy4d9" },
-  { name: "1v1 Old", image: "others/assets/images/games/1v1lololdest.jpeg", url: "others/assets/games/1v1old2.html" },
+  { name: "1v1 Old", image: "others/assets/images/games/1v1lol.jpeg", url: "others/assets/games/1v1old2.html" },
   { name: "1v1 Oldest", image: "others/assets/images/games/1v1lololdest.jpeg", url: "others/assets/games/1v1.lol_oldest.html" },
   { name: "8 Ball Pool", image: "others/assets/images/games/8-ball-pool-2021-08-05.webp", url: "others/assets/games/8 Ball Pool.html" },
   { name: "A Small World Cup", image: "others/assets/images/games/asmallworldcup.png", url: "others/assets/games/A Small World Cup.html" },
