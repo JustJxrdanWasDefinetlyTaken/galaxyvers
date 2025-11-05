@@ -7,6 +7,7 @@ const GVerseConsole = {
   currentFilter: 'all',
   commandHistory: [],
   historyIndex: -1,
+  originalConsole: {},
 
   init() {
     // Create console HTML structure
@@ -16,7 +17,7 @@ const GVerseConsole = {
     this.output = document.getElementById('console-output');
     this.input = document.getElementById('console-input');
 
-    // Intercept console methods
+    // Intercept console methods BEFORE any other code runs
     this.interceptConsole();
 
     // Setup keyboard shortcuts
@@ -52,6 +53,9 @@ const GVerseConsole = {
       });
     });
 
+    // Update tab counts
+    this.updateTabCounts();
+
     // Add welcome message
     this.addLog('🌌 GalaxyVerse Console initialized. Type JavaScript code to execute.', 'info');
     this.addLog('Press Ctrl+Shift+K to toggle console', 'info');
@@ -73,10 +77,11 @@ const GVerseConsole = {
         </div>
 
         <div class="console-tabs">
-          <button class="console-tab active" data-tab="all">All</button>
-          <button class="console-tab" data-tab="log">Logs</button>
-          <button class="console-tab" data-tab="warn">Warnings</button>
-          <button class="console-tab" data-tab="error">Errors</button>
+          <button class="console-tab active" data-tab="all">All <span class="tab-count" id="count-all">0</span></button>
+          <button class="console-tab" data-tab="log">Logs <span class="tab-count" id="count-log">0</span></button>
+          <button class="console-tab" data-tab="warn">Warnings <span class="tab-count" id="count-warn">0</span></button>
+          <button class="console-tab" data-tab="error">Errors <span class="tab-count" id="count-error">0</span></button>
+          <button class="console-tab" data-tab="info">Info <span class="tab-count" id="count-info">0</span></button>
         </div>
 
         <div class="console-output" id="console-output"></div>
@@ -92,50 +97,86 @@ const GVerseConsole = {
   },
 
   interceptConsole() {
-    const originalLog = console.log;
-    const originalWarn = console.warn;
-    const originalError = console.error;
-    const originalInfo = console.info;
+    // Store original console methods
+    this.originalConsole.log = console.log.bind(console);
+    this.originalConsole.warn = console.warn.bind(console);
+    this.originalConsole.error = console.error.bind(console);
+    this.originalConsole.info = console.info.bind(console);
+    this.originalConsole.debug = console.debug.bind(console);
 
+    // Override console.log
     console.log = (...args) => {
-      originalLog.apply(console, args);
+      this.originalConsole.log(...args);
       this.addLog(args.map(arg => this.formatArg(arg)).join(' '), 'log');
     };
 
+    // Override console.warn
     console.warn = (...args) => {
-      originalWarn.apply(console, args);
+      this.originalConsole.warn(...args);
       this.addLog(args.map(arg => this.formatArg(arg)).join(' '), 'warn');
     };
 
+    // Override console.error
     console.error = (...args) => {
-      originalError.apply(console, args);
+      this.originalConsole.error(...args);
       this.addLog(args.map(arg => this.formatArg(arg)).join(' '), 'error');
     };
 
+    // Override console.info
     console.info = (...args) => {
-      originalInfo.apply(console, args);
+      this.originalConsole.info(...args);
       this.addLog(args.map(arg => this.formatArg(arg)).join(' '), 'info');
+    };
+
+    // Override console.debug
+    console.debug = (...args) => {
+      this.originalConsole.debug(...args);
+      this.addLog(args.map(arg => this.formatArg(arg)).join(' '), 'log');
     };
 
     // Capture window errors
     window.addEventListener('error', (e) => {
-      this.addLog(`${e.message} at ${e.filename}:${e.lineno}:${e.colno}`, 'error');
+      const message = `${e.message} at ${e.filename}:${e.lineno}:${e.colno}`;
+      this.addLog(message, 'error');
+      // Don't prevent default to allow normal error handling
     });
 
     // Capture unhandled promise rejections
     window.addEventListener('unhandledrejection', (e) => {
-      this.addLog(`Unhandled Promise Rejection: ${e.reason}`, 'error');
+      const message = `Unhandled Promise Rejection: ${e.reason}`;
+      this.addLog(message, 'error');
+      // Don't prevent default
     });
+
+    // Capture resource loading errors
+    window.addEventListener('error', (e) => {
+      if (e.target !== window && (e.target.tagName === 'IMG' || e.target.tagName === 'SCRIPT' || e.target.tagName === 'LINK')) {
+        const message = `Failed to load resource: ${e.target.src || e.target.href}`;
+        this.addLog(message, 'error');
+      }
+    }, true);
   },
 
   formatArg(arg) {
-    if (typeof arg === 'object' && arg !== null) {
+    if (arg === null) return 'null';
+    if (arg === undefined) return 'undefined';
+    
+    if (typeof arg === 'object') {
       try {
+        // Handle special objects
+        if (arg instanceof Error) {
+          return `${arg.name}: ${arg.message}\n${arg.stack || ''}`;
+        }
+        if (arg instanceof HTMLElement) {
+          return `<${arg.tagName.toLowerCase()}${arg.id ? ' id="' + arg.id + '"' : ''}${arg.className ? ' class="' + arg.className + '"' : ''}>`;
+        }
+        // Regular objects
         return JSON.stringify(arg, null, 2);
       } catch (e) {
         return String(arg);
       }
     }
+    
     return String(arg);
   },
 
@@ -149,9 +190,30 @@ const GVerseConsole = {
       this.logs.shift();
     }
 
+    // Update tab counts
+    this.updateTabCounts();
+
+    // Render if console is open
     if (this.isOpen) {
       this.render();
     }
+  },
+
+  updateTabCounts() {
+    const counts = {
+      all: this.logs.length,
+      log: this.logs.filter(l => l.type === 'log').length,
+      warn: this.logs.filter(l => l.type === 'warn').length,
+      error: this.logs.filter(l => l.type === 'error').length,
+      info: this.logs.filter(l => l.type === 'info').length
+    };
+
+    Object.keys(counts).forEach(type => {
+      const countElement = document.getElementById(`count-${type}`);
+      if (countElement) {
+        countElement.textContent = counts[type];
+      }
+    });
   },
 
   render() {
@@ -161,11 +223,20 @@ const GVerseConsole = {
 
     this.output.innerHTML = filtered.map(log => {
       const typeLabel = log.type.toUpperCase();
+      const typeIcon = {
+        log: '📝',
+        warn: '⚠️',
+        error: '❌',
+        info: 'ℹ️',
+        debug: '🐛'
+      }[log.type] || '📝';
+
       return `
         <div class="console-log ${log.type}">
+          <span class="log-icon">${typeIcon}</span>
           <span class="log-timestamp">${log.timestamp}</span>
           <span class="log-type">[${typeLabel}]</span>
-          <span>${this.escapeHtml(log.message)}</span>
+          <span class="log-message">${this.escapeHtml(log.message)}</span>
         </div>
       `;
     }).join('');
@@ -229,6 +300,7 @@ const GVerseConsole = {
   clear() {
     this.logs = [];
     this.render();
+    this.updateTabCounts();
     this.addLog('Console cleared', 'info');
   },
 
@@ -255,7 +327,7 @@ const GVerseConsole = {
   }
 };
 
-// Initialize console when DOM is ready
+// Initialize console as early as possible
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => GVerseConsole.init());
 } else {
