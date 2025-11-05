@@ -1,9 +1,24 @@
-// ===== CONSOLE INTEGRATION =====
-// The console system should be loaded BEFORE this script
-// Load order: console.js -> gms.js -> stats.js -> scripts.js
+// Wait for console to be ready before proceeding
+if (window.GVerseConsole && !window.GVerseConsole.initialized) {
+  console.log('⏳ Waiting for console initialization...');
+  const waitForConsole = setInterval(() => {
+    if (window.GVerseConsole.initialized) {
+      clearInterval(waitForConsole);
+      console.log('✅ Console ready, continuing scripts.js initialization');
+    }
+  }, 50);
+}
 
-// Log that scripts.js is loading
+// ===== CONSOLE INTEGRATION =====
+// ⚠️ CRITICAL: The console system MUST be loaded BEFORE this script
+// Required load order in your HTML:
+// 1. <script src="others/assets/scripts/console.js"></script>
+// 2. <script src="others/assets/scripts/gms.js"></script>
+// 3. <script src="others/assets/scripts/stats.js"></script>
+// 4. <script src="scripts.js"></script>
+
 console.log('📦 Loading scripts.js...');
+console.log('🔍 Checking console status:', window.GVerseConsole ? 'Available' : 'Not loaded');
 
 // ===== CRITICAL FIX: Load games.js data first or provide fallback =====
 // Make sure gms.js is loaded BEFORE this script in your HTML:
@@ -1544,7 +1559,14 @@ if (document.readyState === 'loading') {
 }
 
 function initializeApp() {
-  console.log('🚀 Initializing GalaxyVerse...');
+  try {
+    console.log('🚀 Initializing GalaxyVerse...');
+    console.log('📊 Console Status:', {
+      available: !!window.GVerseConsole,
+      initialized: window.GVerseConsole?.initialized || false,
+      isOpen: window.GVerseConsole?.isOpen || false,
+      logCount: window.GVerseConsole?.logs?.length || 0
+    });
   
   loadSettings();
   showHome();
@@ -1766,6 +1788,11 @@ function initializeApp() {
     fullscreenBtn.addEventListener('click', toggleFullscreen);
   }
 
-  console.log('✅ GalaxyVerse initialized successfully');
+console.log('✅ GalaxyVerse initialized successfully');
   console.log('📊 Console is active - Press Ctrl+Shift+K to toggle');
+  
+  } catch (error) {
+    console.error('❌ Critical error during GalaxyVerse initialization:', error);
+    alert('An error occurred during initialization. Check the console for details.');
+  }
 }
