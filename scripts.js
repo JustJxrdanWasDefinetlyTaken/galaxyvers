@@ -184,7 +184,7 @@ function shouldAutoApplySeasonalTheme() {
       'd4vid_ghost',
       'azthedev',
       'testingkeyfordevelopers',
-      'spartan_alloy3',
+      'MichaelIsKronos',
       'aanzoski',
       'jordanthedev',
       'd3vinthefirstdev',
@@ -195,20 +195,28 @@ function shouldAutoApplySeasonalTheme() {
       'LKPR0egJizvkY23HT5QJxjq8kp0SPsGe',
       'neZN0a439QuKezFjQY1OyIGUOlDITSuA',
       'fu5DZ4cpsbkLf4nXHRnvpARKomGqnleC',
+      '9KizEpa5P4E7GaXVZ5GD0s5eHEwqWfrx',
+      'LBT5fWdAu8RAaDJZrB8yMteE7YZT370L',
       // Free keys
-      'D5F11',
-      '1471D',
-      '21B1E',
-      'B98EE',
-      'B27A9',
+      'hy906fm5VaNf',
+      '5HScgYoA9T0m',
+      'I4EVjWOt7a8H',
+      'D57xIn8T0qix',
+      '3bD0jxY5Y7uL',
       // Specified Friend keys
-      '1F41351F63E2F',
-      'FA4222F8D3B78',
-      '6693DA38EE9FF',
-      '85A59FDF3A485',
+      'ZH3X3R651E8FW0Z',
+      'FUBOY5J79L76W75',
+      'G1FKP8QK1YPZ3SZ',
+      'ETQZYA2SA87I59U',
+      'W5QZ263S35NN0OQ',
       // Made by az bro
       'za!54390922', 
-      'jordansay67'
+      'jordansays67az',
+      'azsays41jordan',
+      // Uh idek for Hector
+      'HectorISmessifr',
+      'thisisfordomain',
+      'specialkeygivenbyaz'
     ];
 
     function generateBrowserFingerprint() {
