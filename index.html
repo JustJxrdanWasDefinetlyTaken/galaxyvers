@@ -159,14 +159,14 @@
         <div class="info-modal-body">
             <ul>
                 <li>Added Youtube (Jordan)</li>
-                <li>Added erorr logs to the console ctrl + shift + k</li>
+                <li>Added error logs to the console ctrl + shift + k</li>
                 <li>Fixing firebase key system errors</li>
                 <li>Just give Hector his key az</li>
             </ul>
 
             <h4><b>Announcements</b></h4>
             <ul>
-                <li>Fixed key sytem entirely</li>
+                <li>Fixed key system entirely</li>
                 <li>Key saves on all websites</li>
             </ul>
             
@@ -338,18 +338,23 @@
 <!-- Snow container -->
 <div id="snow-container"></div>
 
-<!-- Firebase SDK - MUST BE IN THIS ORDER -->
+<!-- ============================================ -->
+<!-- CRITICAL: Scripts MUST load in this order! -->
+<!-- ============================================ -->
+
+<!-- 1. Console.js MUST be FIRST -->
+<script src="./others/assets/scripts/console.js"></script>
+
+<!-- 2. Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
-<!-- FIXED: Load scripts in correct order, no duplicates -->
-<script src="others/assets/scripts/console.js"></script>
-   <script src="others/assets/scripts/gms.js"></script>
-   <script src="others/assets/scripts/stats.js"></script>
-   <script src="scripts.js"></script>
+<!-- 3. Data files -->
+<script src="./others/assets/scripts/gms.js"></script>
+<script src="./others/assets/scripts/stats.js"></script>
 
-<!-- GalaxyVerse Console -->
-<script src="./others/assets/scripts/console.js"></script>
+<!-- 4. Main scripts LAST -->
+<script src="./scripts.js"></script>
 
 <!-- Iframe control functions -->
 <script>
