@@ -1,2 +1,1 @@
-# Treat .bf files as Brainfuck
-*.bf linguist-language=Brainfuck
+others/*.bf linguist-language=Brainfuck
