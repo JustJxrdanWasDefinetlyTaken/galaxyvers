@@ -103,9 +103,9 @@
 <nav class="navbar">
     <a href="#" class="logo">GalaxyVerse</a>
     <ul>
-        <li><a class="active" href="#" id="homeLink">Home</a></li>
-        <li><a href="#" id="gameLink">Games</a></li>
-        <li><a href="#" id="appsLink">Apps</a></li>
+        <li><a class="active" href="#" id="homeLink">HỚme</a></li>
+        <li><a href="#" id="gameLink">Gᾷmes</a></li>
+        <li><a href="#" id="appsLink">Ἀpps</a></li>
         <li><a href="#" id="websitesLink">Websites</a></li>
         <li><a href="#" id="settingsLink">Settings</a></li>
         <li><a href="#" id="aboutLink">About</a></li>
@@ -130,7 +130,7 @@
                 <li><a href="https://www.galaxyverse.org/" target="_blank" rel="noopener noreferrer">GalaxyVerse</a></li>
                 <li><a href="https://github.com/JustJxrdanWasDefinetlyTaken" target="_blank" rel="noopener noreferrer">Jordan's Projects</a></li>
                 <li><a href="https://github.com/3kho" target="_blank" rel="noopener noreferrer">3kho used for cdn</a></li>
-                <li><a href="https://gn-math.dev/" target="_blank" rel="noopener noreferrer">gn-math for some games</a></li>
+                <li><a href="https://gn-math.dev/" target="_blank" rel="noopener noreferrer">gn-math for some gᾷmes</a></li>
                 <li>Vyper Group</li>
                 <li>Velara</li>
             </ul>
@@ -159,21 +159,21 @@
         <div class="info-modal-body">
             <ul>
                 <li>Added Youtube (Jordan)</li>
-                <li>Added error logs to the console ctrl + shift + k</li>
+                <li>Added erorr logs to the console ctrl + shift + k</li>
                 <li>Fixing firebase key system errors</li>
                 <li>Just give Hector his key az</li>
             </ul>
 
             <h4><b>Announcements</b></h4>
             <ul>
-                <li>Fixed key system entirely</li>
+                <li>Fixed key sytem entirely</li>
                 <li>Key saves on all websites</li>
             </ul>
             
             <h4>Coming Soon</h4>
             <ul>
                 <li>Soundcloud</li>
-                <li>More games</li>
+                <li>More gᾷmes</li>
             </ul>
         </div>
     </div>
@@ -182,11 +182,11 @@
 <div class="container">
     <div id="content-home" class="content">
         <h1>Welcome to GalaxyVerse</h1>
-        <h3>GalaxyVerse is a place for you where you can find unblocked games for your school to cure your boredom.</h3>
+        <h3>GalaxyVerse is a place for you where you can find unblocked gᾷmes for your school to cure your boredom.</h3>
         <h4>Read Update Logs</h4>
         <p>Jordan gave us Youtube as a early christmas present</p>
         <div class="homepage-search-container">
-            <input type="text" id="homepageSearchInput" placeholder="In apps" />
+            <input type="text" id="homepageSearchInput" placeholder="In ᾷpps" />
             <button id="homepageSearchBtn">Search</button>
         </div>
 
@@ -201,13 +201,13 @@
     </div>
 
     <div id="content-gms" class="content" style="display:none;">
-        <h1>Games</h1>
+        <h1>gᾷmes</h1>
         <div class="search-container">
-            <input type="text" id="searchInput" placeholder="Search for games..." />
+            <input type="text" id="searchInput" placeholder="Search for gᾷmes..." />
             <button id="searchBtn">Search</button>
         </div>
-        <div id="game-list">
-            <!-- Game cards rendered here by JavaScript -->
+        <div id="game-list" class="game-grid">
+            <!-- Game cards rendered here -->
         </div>
     </div>
 
@@ -217,9 +217,9 @@
     </div>
 
     <div id="content-aps" class="content" style="display:none;">
-        <h1>Apps</h1>
-        <div id="app-list">
-            <!-- App cards rendered here by JavaScript -->
+        <h1>Ἀpps</h1>
+        <div id="app-list" class="app-grid">
+            <!-- App cards rendered here -->
         </div>
         <button id="backToHomeApps">Back to Home</button>
     </div>
@@ -230,8 +230,8 @@
             <input type="text" id="websitesSearchInput" placeholder="Search websites..." />
             <button id="websitesSearchBtn">Search</button>
         </div>
-        <div id="websites-list">
-            <!-- Website cards rendered here by JavaScript -->
+        <div id="websites-list" class="app-grid">
+            <!-- Website cards rendered here -->
         </div>
         <button id="backToHomeWebsites">Back to Home</button>
     </div>
@@ -338,23 +338,18 @@
 <!-- Snow container -->
 <div id="snow-container"></div>
 
-<!-- ============================================ -->
-<!-- CRITICAL: Scripts MUST load in this order! -->
-<!-- ============================================ -->
-
-<!-- 1. Console.js MUST be FIRST -->
-<script src="./others/assets/scripts/console.js"></script>
-
-<!-- 2. Firebase SDK -->
+<!-- Firebase SDK - MUST BE IN THIS ORDER -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
-<!-- 3. Data files -->
-<script src="./others/assets/scripts/gms.js"></script>
-<script src="./others/assets/scripts/stats.js"></script>
+<!-- FIXED: Load scripts in correct order, no duplicates -->
+<script src="others/assets/scripts/console.js"></script>
+   <script src="others/assets/scripts/gms.js"></script>
+   <script src="others/assets/scripts/stats.js"></script>
+   <script src="scripts.js"></script>
 
-<!-- 4. Main scripts LAST -->
-<script src="./scripts.js"></script>
+<!-- GalaxyVerse Console -->
+<script src="./others/assets/scripts/console.js"></script>
 
 <!-- Iframe control functions -->
 <script>
