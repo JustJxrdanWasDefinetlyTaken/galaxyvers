@@ -14,9 +14,11 @@ const games = [
   { name: "Bad Parenting 1", image: "others/assets/images/games/badparent.jpeg", url: "others/assets/games/Bad Parenting 1.html" },
   { name: "Bad Time Simulator", image: "others/assets/images/games/badtimesim.png", url: "others/assets/games/Bad Time Simulator.html" },
   { name: "Baldi's Basics Plus", image: "others/assets/images/games/baldis.png", url: "others/assets/games/Baldi's Basics Plus.html" },
+  { name: "Baseball Bros", image: "others/assets/images/games/baseballbros.jpeg", url: "others/assets/games/Baseball Bros.html" },
   { name: "Basketbros.IO", image: "others/assets/images/games/basketbros-io.jpg", url: "others/assets/games/Basket Bros.html" },
   { name: "Basket Random", image: "others/assets/images/games/basketrandom.png", url: "others/assets/games/Basket Random.html" },
   { name: "BitLife", image: "others/assets/images/games/bitlife.jpeg", url: "others/assets/games/BitLife.html" },
+  { name: "Blackjack", image: "others/assets/images/games/blackjack.png", url: "others/assets/games/BlackJack.html" },
   { name: "Blade Ball", image: "others/assets/images/games/bladeball.png", url: "others/assets/games/Blade Ball.html" },
   { name: "Block Blast", image: "others/assets/images/games/blockblast.jpeg", url: "others/assets/games/Blade Ball.html" },
   { name: "Bloxorz", image: "others/assets/images/games/blockorz.jpeg", url: "others/assets/games/Bloxorz.html" },
@@ -26,6 +28,7 @@ const games = [
   { name: "Crazy Cattle 3D", image: "others/assets/images/games/crazy-cattle-3d-icon.jpg", url: "others/assets/games/Crazy Cattle 3D.html" },
   { name: "Crazy Cars", image: "others/assets/images/games/crazycars.jpg", url: "others/assets/games/Crazy Cars.html" },
   { name: "Crossy Road", image: "others/assets/images/games/crossyroad.png", url: "others/assets/games/Crossy Road.html" },
+  { name: "Cuphead", image: "others/assets/images/games/cuphead.webp", url: "others/assets/games/Cuphead.html" },
   { name: "Drift Boss", image: "others/assets/images/games/driftboss.png", url: "others/assets/games/Drift Boss.html" },
   { name: "Drift Hunters ", image: "others/assets/images/games/drift-hunters.png", url: "others/assets/games/Drift Huntersfix.html" },
   { name: "Escape Road", image: "others/assets/images/games/escaperoad.png", url: "others/assets/games/Escape Road.html" },
@@ -57,6 +60,7 @@ const games = [
   { name: "Space Waves", image: "others/assets/images/games/spacewaves.png", url: "others/assets/games/Space Waves.html" },
   { name: "(BROKEN) Steal a Brainrot ONLINE ", image: "others/assets/images/games/stealabrain.webp", url: "others/assets/games/Steal Brainrot Online UPD1.html" },
   { name: "Stickman Hook", image: "others/assets/images/games/stickman Hook.jpg", url: "others/assets/games/Stickman Hook.html" },
+  { name: "Subway Surfers", image: "others/assets/images/games/subwaysurfers.png", url: "others/assets/games/Subway Surfers.html" },
   { name: "Subway Surfers San Francisco", image: "others/assets/images/games/subwaysanfran.jpeg", url: "others/assets/games/Subway Surfers_ San Francisco.html" },
   { name: "Subway Surfers Winter Holiday", image: "others/assets/images/games/subway-surfers.jpg", url: "others/assets/games/Subway Surfers_ Winter Holiday.html" },
   { name: "Temple Run 2", image: "others/assets/images/games/temple run 2.png", url: "others/assets/games/Temple Run 2.html" },
@@ -67,7 +71,6 @@ const games = [
 const apps = [
   { name: "Soundboard", image: "others/assets/images/apps/soundboard.png", url: "others/assets/apps/Soundboard.html" },
   { name: "Soundcloud", image: "others/assets/images/apps/soundcloud.png", url: "others/assets/apps/soundcloud.html" },
-  { name: "Spotify", image: "others/assets/images/apps/spotify.png", url: "others/assets/apps/Spotify.html" },
   { name: "Vscode", image: "others/assets/images/apps/vscode.jpeg", url: "others/assets/apps/Vscode.html" },
   { name: "YouTube", image: "/others/assets/images/apps/youtube.png", url: "/others/assets/apps/yt.html"}
 ];
