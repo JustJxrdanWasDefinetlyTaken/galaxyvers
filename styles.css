@@ -73,7 +73,7 @@ body {
   font-size: 28px;
   font-weight: 700;
   color: var(--accent-color);
-  text-transform: lowercase;
+  text-transform: none;
   letter-spacing: 3px;
   user-select: none;
   cursor: default;
@@ -542,7 +542,7 @@ body {
 
 /* Container and content styles */
 .container {
-  max-width: 1600px;
+  max-width: 1200px;
   margin: 20px auto;
   padding: 20px;
   text-align: center;
@@ -557,22 +557,18 @@ body {
   to { opacity: 1; }
 }
 
-/* ===== GAME AND APP LISTS - 5 PER ROW (LIKE IMAGE) ===== */
-#game-list,
-#app-list {
+/* Game and App grids */
+.game-grid, .app-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 20px;
-  padding: 20px;
-  margin: 20px auto;
-  max-width: 1600px;
+  margin-top: 20px;
+  justify-items: center;
 }
 
-/* Game and App cards - Image Style */
-.game-card,
-.app-card {
+.game-card, .app-card {
   position: relative;
-  width: 100%;
+  width: 250px;
   height: 250px;
   border-radius: 20px;
   overflow: hidden;
@@ -585,14 +581,12 @@ body {
   justify-content: flex-end;
 }
 
-.game-card:hover,
-.app-card:hover {
+.game-card:hover, .app-card:hover {
   transform: translateY(-10px);
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.9);
 }
 
-.game-card img,
-.app-card img {
+.game-card img, .app-card img {
   position: absolute;
   top: 0;
   left: 0;
@@ -604,8 +598,7 @@ body {
   user-select: none;
 }
 
-.game-card h3,
-.app-card h3 {
+.game-card h3, .app-card h3 {
   position: relative;
   margin: 0;
   padding: 10px 15px;
@@ -656,8 +649,7 @@ body {
 
 /* Back buttons */
 #backToHomeApps,
-#backToHomeGame,
-#backToHomeWebsites {
+#backToHomeGame {
   padding: 10px 20px;
   border-radius: 8px;
   border: none;
@@ -670,8 +662,7 @@ body {
 }
 
 #backToHomeApps:hover,
-#backToHomeGame:hover,
-#backToHomeWebsites:hover {
+#backToHomeGame:hover {
   background-color: var(--btn-hover-bg);
   color: #fff;
 }
@@ -710,65 +701,7 @@ body {
   background-color: #3a7ae8;
 }
 
-/* ===== RESPONSIVE DESIGN ===== */
-
-/* Extra large screens - 5 columns (default) */
-@media (min-width: 1600px) {
-  #game-list,
-  #app-list {
-    grid-template-columns: repeat(5, 1fr);
-  }
-}
-
-/* Large screens - 4 columns */
-@media (max-width: 1599px) and (min-width: 1200px) {
-  #game-list,
-  #app-list {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-/* Medium screens - 3 columns */
-@media (max-width: 1199px) and (min-width: 900px) {
-  #game-list,
-  #app-list {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-/* Small screens - 2 columns */
-@media (max-width: 899px) and (min-width: 600px) {
-  #game-list,
-  #app-list {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-    padding: 15px;
-  }
-  
-  .game-card,
-  .app-card {
-    height: 200px;
-  }
-}
-
-/* Extra small screens - 1 column */
-@media (max-width: 599px) {
-  #game-list,
-  #app-list {
-    grid-template-columns: 1fr;
-    gap: 12px;
-    padding: 12px;
-  }
-  
-  .game-card,
-  .app-card {
-    height: 250px;
-    max-width: 400px;
-    margin: 0 auto;
-  }
-}
-
-/* Mobile responsive adjustments */
+/* Responsive Design */
 @media (max-width: 768px) {
   .navbar {
     flex-direction: column;
@@ -793,6 +726,15 @@ body {
   .info-btn {
     width: 100%;
     max-width: 300px;
+  }
+
+  .game-grid, .app-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+
+  .game-card, .app-card {
+    width: 200px;
+    height: 200px;
   }
 
   .info-modal-content {
