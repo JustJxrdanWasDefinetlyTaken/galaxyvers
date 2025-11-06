@@ -209,7 +209,7 @@ function shouldAutoApplySeasonalTheme() {
       // DEVS KEYS
       'd4vid_ghost',
       'azthedev',
-      'testingkeyfordevelopers',
+      'aztestkey123',
       'MichaelIsKronos',
       'aanzoski',
       'jordanthedev',
