@@ -73,7 +73,7 @@ body {
   font-size: 28px;
   font-weight: 700;
   color: var(--accent-color);
-  text-transform: none;
+  text-transform: initial;
   letter-spacing: 3px;
   user-select: none;
   cursor: default;
