@@ -417,7 +417,7 @@ function shouldAutoApplySeasonalTheme() {
             margin: 0 0 30px 0;
           ">Enter your access key to continue<br>
           <a href="https://docs.google.com/document/d/1RfHWPQ-8Kq2NDV6vxfOgquBqIKwp4OoL7K1NXkYLUEg/edit?usp=sharing">GalaxyVerse</a> Policy<br>
-          V1.2.5 - Christmas Gift from Jordan</p>
+          V1.2.6 - Keys + 4 games</p>
           
           <input type="text" id="keyInput" placeholder="Enter your key" style="
             width: 100%;
