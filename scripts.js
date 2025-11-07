@@ -239,12 +239,12 @@ function shouldAutoApplySeasonalTheme() {
       'jordanthedev',
       'd3vinthefirstdev',
       // PAYED KEYS
-      'CxgMvuMFYdu9JwDePpddn2LOOgZPKn05',
-      '1AG4JsMjOvPiC9RzLt6KRZM2zAN8JhhM',
-      'qwtS730SkOAv4bhNpqC4qe2LXDaWV24i',
+      '9L4CxSxnkR1jHXMiuWCozAE2uHVmemzU',
+      'Nm2PErFp4dhBqw2Y8cEh2uJc2nAQ7SrO',
+      'l6el7XAxpHBb5MO1oWuFUf3XDgCIcJBT',
       'LKPR0egJizvkY23HT5QJxjq8kp0SPsGe',
-      'neZN0a439QuKezFjQY1OyIGUOlDITSuA',
-      'fu5DZ4cpsbkLf4nXHRnvpARKomGqnleC',
+      'RoBmU7nXLjwD47YkOjh94esQHqRAgNeD',
+      'JA3R5mEiBJBVX4259kySPVZFV097m32J',
       '9KizEpa5P4E7GaXVZ5GD0s5eHEwqWfrx',
       'LBT5fWdAu8RAaDJZrB8yMteE7YZT370L',
       // Free keys
@@ -259,14 +259,13 @@ function shouldAutoApplySeasonalTheme() {
       'G1FKP8QK1YPZ3SZ',
       'ETQZYA2SA87I59U',
       'W5QZ263S35NN0OQ',
-      // Made by az bro
-      'za!54390922', 
+      // Made by az bro 
       'jordansays67az',
       'azsays41jordan',
       // Uh idek for Hector
       'HectorISmessifr',
       'thisisfordomain',
-      'specialkeygivenbyaz'
+      'jordanisnotaskid'
     ];
 
     async function initializeKeySystem() {
@@ -472,7 +471,7 @@ function shouldAutoApplySeasonalTheme() {
             margin-bottom: 20px;
           ">
           <a href="https://docs.google.com/document/d/1RfHWPQ-8Kq2NDV6vxfOgquBqIKwp4OoL7K1NXkYLUEg/edit?usp=sharing" target="_blank" style="color: #4f90ff;">GalaxyVerse Policy</a><br>
-          V1.2.7 - HWID Protection</p>
+          V1.2.7 - HWID Protection + 12 Games</p>
           
           <input type="text" id="keyInput" placeholder="Enter your key" style="
             width: 100%;
