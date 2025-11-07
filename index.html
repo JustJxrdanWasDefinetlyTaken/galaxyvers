@@ -104,9 +104,9 @@
 <nav class="navbar">
     <a href="#" class="logo">GalaxyVerse</a>
     <ul>
-        <li><a class="active" href="#" id="homeLink">HỚme</a></li>
-        <li><a href="#" id="gameLink">Gᾷmes</a></li>
-        <li><a href="#" id="appsLink">Ἀpps</a></li>
+        <li><a class="active" href="#" id="homeLink">Home</a></li>
+        <li><a href="#" id="gameLink">Games</a></li>
+        <li><a href="#" id="appsLink">Apps</a></li>
         <li><a href="#" id="websitesLink">Websites</a></li>
         <li><a href="#" id="settingsLink">Settings</a></li>
         <li><a href="#" id="aboutLink">About</a></li>
@@ -131,7 +131,7 @@
                 <li><a href="https://www.galaxyverse.org/" target="_blank" rel="noopener noreferrer">GalaxyVerse</a></li>
                 <li><a href="https://github.com/JustJxrdanWasDefinetlyTaken" target="_blank" rel="noopener noreferrer">Jordan's Projects</a></li>
                 <li><a href="https://github.com/3kho" target="_blank" rel="noopener noreferrer">3kho used for cdn</a></li>
-                <li><a href="https://gn-math.dev/" target="_blank" rel="noopener noreferrer">gn-math for some gᾷmes</a></li>
+                <li><a href="https://gn-math.dev/" target="_blank" rel="noopener noreferrer">gn-math for some games</a></li>
                 <li>Vyper Group</li>
                 <li>Velara</li>
             </ul>
@@ -156,24 +156,30 @@
 <div id="updateLogModal" class="info-modal">
     <div class="info-modal-content">
         <span class="info-close" data-modal="updateLogModal">&times;</span>
-        <h2>Update Log V1.2.6</h2>
+        <h2>Update Log V1.2.7</h2>
         <div class="info-modal-body">
             <ul>
-                <li>Added Baseball Bros</li>
-                <li>Added Subway Surfers Original</li>
-                <li>Added Blackjack</li>
-                <li>Added Cuphead</li>
+                <li><strong>🔐 HWID Protection Added</strong> - Keys now permanently locked to devices</li>
+                <li><strong>🛡️ Enhanced Security</strong> - Multi-layer device fingerprinting</li>
+                <li><strong>🔒 Anti-Transfer Protection</strong> - Keys cannot be shared between devices</li>
+                <li>Fixed key verification system</li>
+                <li>Improved Firebase security rules</li>
             </ul>
 
-            <h4><b>Announcements</b></h4>
+            <h4><b>Security Features</b></h4>
             <ul>
-                <li>I need suggestions</li>
+                <li>Hardware ID (HWID) fingerprinting</li>
+                <li>Canvas & WebGL fingerprinting</li>
+                <li>Audio fingerprinting</li>
+                <li>Font detection fingerprinting</li>
+                <li>Real-time device verification</li>
             </ul>
             
             <h4>Coming Soon</h4>
             <ul>
                 <li>Soundcloud</li>
-                <li>More gᾷmes</li>
+                <li>More games</li>
+                <li>Admin dashboard</li>
             </ul>
         </div>
     </div>
@@ -182,11 +188,11 @@
 <div class="container">
     <div id="content-home" class="content">
         <h1>Welcome to GalaxyVerse</h1>
-        <h1>I need suggestions ASAP</h1>
-        <h3>GalaxyVerse is a place for you where you can find gᾷmes for your school. One you are bored just come here and get some gᾷmes.
+        <h1>🔐 Now with HWID Protection</h1>
+        <h3>GalaxyVerse is a place for you where you can find games for your school. One you are bored just come here and get some games.
         Soon you will never be bored here and soon to be the best in the district.</h3>
         <div class="homepage-search-container">
-            <input type="text" id="homepageSearchInput" placeholder="In ᾷpps" />
+            <input type="text" id="homepageSearchInput" placeholder="Search YouTube" />
             <button id="homepageSearchBtn">Search</button>
         </div>
 
@@ -201,9 +207,9 @@
     </div>
 
     <div id="content-gms" class="content" style="display:none;">
-        <h1>gᾷmes</h1>
+        <h1>Games</h1>
         <div class="search-container">
-            <input type="text" id="searchInput" placeholder="Search for gᾷmes..." />
+            <input type="text" id="searchInput" placeholder="Search for games..." />
             <button id="searchBtn">Search</button>
         </div>
         <div id="game-list" class="game-grid">
@@ -214,10 +220,12 @@
     <div id="content-about" class="content" style="display:none;">
         <h2>About</h2>
         <p>This website was made by Az, Jordan, and Contributors</p>
+        <p><strong>Version 1.2.7 - HWID Protection Update</strong></p>
+        <p>Enhanced security with hardware-based device fingerprinting</p>
     </div>
 
     <div id="content-aps" class="content" style="display:none;">
-        <h1>Ἀpps</h1>
+        <h1>Apps</h1>
         <div id="app-list" class="app-grid">
             <!-- App cards rendered here -->
         </div>
@@ -342,14 +350,21 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
-<!-- FIXED: Load scripts in correct order, no duplicates -->
+<!-- CRITICAL: Load scripts in EXACT ORDER -->
+<!-- 1. Console system -->
 <script src="others/assets/scripts/console.js"></script>
-   <script src="others/assets/scripts/gms.js"></script>
-   <script src="others/assets/scripts/stats.js"></script>
-   <script src="scripts.js"></script>
 
-<!-- GalaxyVerse Console -->
-<script src="./others/assets/scripts/console.js"></script>
+<!-- 2. Enhanced Fingerprint System (NEW - MUST BE BEFORE SCRIPTS.JS) -->
+<script src="others/assets/scripts/fingerprint-enhanced.js"></script>
+
+<!-- 3. Games data -->
+<script src="others/assets/scripts/gms.js"></script>
+
+<!-- 4. Stats tracking -->
+<script src="others/assets/scripts/stats.js"></script>
+
+<!-- 5. Main scripts (with HWID protection integrated) -->
+<script src="scripts.js"></script>
 
 <!-- Iframe control functions -->
 <script>
@@ -357,10 +372,8 @@
     var iframe = document.querySelector("iframe");
     if (iframe) {
       try {
-        // Try to hard reload the iframe content
         iframe.contentWindow.location.reload(true);
       } catch (error) {
-        // If cross-origin, reload the iframe src
         console.log('Reloading iframe via src...', error);
         iframe.src = iframe.src;
       }
