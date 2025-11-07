@@ -10,43 +10,26 @@ if (window.GVerseConsole && !window.GVerseConsole.initialized) {
 }
 
 // ===== CONSOLE INTEGRATION =====
-// ⚠️ CRITICAL: The console system MUST be loaded BEFORE this script
-// Required load order in your HTML:
-// 1. <script src="others/assets/scripts/console.js"></script>
-// 2. <script src="others/assets/scripts/gms.js"></script>
-// 3. <script src="others/assets/scripts/stats.js"></script>
-// 4. <script src="scripts.js"></script>
-
-console.log('📦 Loading scripts.js...');
+console.log('📦 Loading scripts.js with HWID Protection...');
 console.log('🔍 Checking console status:', window.GVerseConsole ? 'Available' : 'Not loaded');
-
-// ===== CRITICAL FIX: Load games.js data first or provide fallback =====
-// Make sure gms.js is loaded BEFORE this script in your HTML:
-// <script src="others/assets/scripts/console.js"></script>
-// <script src="others/assets/scripts/gms.js"></script>
-// <script src="others/assets/scripts/stats.js"></script>
-// <script src="scripts.js"></script>
 
 // ===== SEASONAL THEME SYSTEM (BUILT-IN) =====
 function getSeasonalTheme() {
   const now = new Date();
   const year = now.getFullYear();
-  const month = now.getMonth(); // 0-11
+  const month = now.getMonth();
   const day = now.getDate();
   
-  // Halloween: Oct 27-30, 2025
   if (year === 2025 && month === 9 && day >= 27 && day <= 30) {
     console.log('🎃 Halloween season detected!');
     return 'halloween';
   }
   
-  // Christmas: Nov 1, 2025 - Dec 31, 2025
   if (year === 2025 && ((month === 10 && day >= 1) || month === 11)) {
     console.log('🎄 Christmas season detected!');
     return 'christmas';
   }
   
-  // Original theme: Jan 1, 2026 onwards
   if (year >= 2026) {
     console.log('✨ Default season');
     return 'original';
@@ -56,9 +39,7 @@ function getSeasonalTheme() {
 }
 
 function shouldAutoApplySeasonalTheme() {
-  // Check if user has disabled auto-apply of seasonal themes
   const autoApply = localStorage.getItem('autoApplySeasonalThemes');
-  // Default to true if not set
   return autoApply !== 'false';
 }
 
@@ -70,10 +51,10 @@ function shouldAutoApplySeasonalTheme() {
     init: function() {
       if (this.initialized) return;
       this.initialized = true;
-      console.log('🔍 WebsiteKeyTracker initialized (v2.0 - Unified Network)');
+      console.log('🔍 WebsiteKeyTracker initialized (v3.0 - HWID Enhanced)');
     },
     
-    trackKeyUsage: async function(key, website, fingerprint) {
+    trackKeyUsage: async function(key, website, fingerprint, hwid) {
       try {
         if (typeof firebase === 'undefined' || !firebase.database) {
           console.error('❌ Firebase not available for tracking');
@@ -86,6 +67,7 @@ function shouldAutoApplySeasonalTheme() {
         await trackingRef.set({
           website: website,
           fingerprint: fingerprint,
+          hwid: hwid,
           timestamp: Date.now(),
           date: new Date().toISOString(),
           userAgent: navigator.userAgent,
@@ -102,9 +84,9 @@ function shouldAutoApplySeasonalTheme() {
   window.WebsiteKeyTracker.init();
 })();
 
-// ===== FIREBASE KEY SYSTEM - CROSS-WEBSITE UNIFIED ACCESS =====
+// ===== FIREBASE KEY SYSTEM WITH HWID PROTECTION =====
 (function() {
-  console.log('🔑 Initializing Firebase Key System...');
+  console.log('🔑 Initializing Firebase Key System with HWID Protection...');
   
   function normalizeHostname(hostname) {
     hostname = hostname.split(':')[0];
@@ -157,25 +139,67 @@ function shouldAutoApplySeasonalTheme() {
     return hostname;
   }
 
+  // Legacy fingerprint function (kept for backward compatibility)
+  function generateBrowserFingerprint() {
+    try {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return 'fp_' + Math.random().toString(36).substr(2, 9);
+      
+      ctx.textBaseline = 'top';
+      ctx.font = '14px Arial';
+      ctx.fillText('Browser Fingerprint', 2, 2);
+      const canvasData = canvas.toDataURL();
+      
+      const fingerprint = {
+        userAgent: navigator.userAgent,
+        language: navigator.language,
+        platform: navigator.platform,
+        screenResolution: `${screen.width}x${screen.height}`,
+        colorDepth: screen.colorDepth,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        canvasHash: canvasData.substring(0, 50),
+        hardwareConcurrency: navigator.hardwareConcurrency || 0
+      };
+      
+      const fingerprintString = JSON.stringify(fingerprint);
+      let hash = 0;
+      for (let i = 0; i < fingerprintString.length; i++) {
+        const char = fingerprintString.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+      }
+      return 'fp_' + Math.abs(hash).toString(36);
+    } catch (error) {
+      console.error('❌ Fingerprint generation error:', error);
+      return 'fp_' + Math.random().toString(36).substr(2, 9);
+    }
+  }
+
   function waitForFirebase(callback, maxAttempts = 50) {
     let attempts = 0;
     const checkFirebase = setInterval(() => {
       attempts++;
-      if (typeof firebase !== 'undefined' && firebase.apps) {
+      if (typeof firebase !== 'undefined' && firebase.apps && window.EnhancedFingerprint) {
         clearInterval(checkFirebase);
-        console.log('✅ Firebase detected');
+        console.log('✅ Firebase and Enhanced Fingerprint detected');
         callback();
       } else if (attempts >= maxAttempts) {
         clearInterval(checkFirebase);
-        console.error('❌ Firebase failed to load - continuing anyway');
+        console.error('❌ Firebase or Enhanced Fingerprint failed to load');
         callback();
       }
     }, 100);
   }
 
-  waitForFirebase(function() {
+  waitForFirebase(async function() {
     if (typeof firebase === 'undefined') {
       console.warn('⚠️ Firebase not available, running in offline mode');
+      return;
+    }
+
+    if (!window.EnhancedFingerprint) {
+      console.error('❌ Enhanced Fingerprint system not loaded!');
       return;
     }
 
@@ -245,55 +269,28 @@ function shouldAutoApplySeasonalTheme() {
       'specialkeygivenbyaz'
     ];
 
-    function generateBrowserFingerprint() {
-      try {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return 'fp_' + Math.random().toString(36).substr(2, 9);
-        
-        ctx.textBaseline = 'top';
-        ctx.font = '14px Arial';
-        ctx.fillText('Browser Fingerprint', 2, 2);
-        const canvasData = canvas.toDataURL();
-        
-        const fingerprint = {
-          userAgent: navigator.userAgent,
-          language: navigator.language,
-          platform: navigator.platform,
-          screenResolution: `${screen.width}x${screen.height}`,
-          colorDepth: screen.colorDepth,
-          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-          canvasHash: canvasData.substring(0, 50),
-          hardwareConcurrency: navigator.hardwareConcurrency || 0
-        };
-        
-        const fingerprintString = JSON.stringify(fingerprint);
-        let hash = 0;
-        for (let i = 0; i < fingerprintString.length; i++) {
-          const char = fingerprintString.charCodeAt(i);
-          hash = ((hash << 5) - hash) + char;
-          hash = hash & hash;
-        }
-        return 'fp_' + Math.abs(hash).toString(36);
-      } catch (error) {
-        console.error('❌ Fingerprint generation error:', error);
-        return 'fp_' + Math.random().toString(36).substr(2, 9);
-      }
-    }
-
     async function initializeKeySystem() {
       const normalizedSite = normalizeHostname(window.location.hostname || 'localhost');
       const actualSite = getActualWebsite(window.location.hostname || 'localhost');
       console.log('🌐 Current site (normalized):', normalizedSite);
       console.log('🌐 Current site (actual):', actualSite);
       
+      // Generate HWID and legacy fingerprint
+      console.log('🔐 Generating device HWID...');
+      const hwid = await window.EnhancedFingerprint.generateHWID();
       const browserFingerprint = generateBrowserFingerprint();
-      console.log('🔒 Browser fingerprint:', browserFingerprint);
+      const deviceInfo = window.EnhancedFingerprint.getDeviceInfo();
+      
+      console.log('🔒 HWID:', hwid.substring(0, 20) + '...');
+      console.log('🔒 Fingerprint:', browserFingerprint);
+      console.log('💻 Device:', deviceInfo.browser, 'on', deviceInfo.os);
       
       try {
         await database.ref('fingerprints/' + browserFingerprint).update({
+          hwid: hwid,
           lastSeen: new Date().toISOString(),
-          lastSeenSite: actualSite
+          lastSeenSite: actualSite,
+          deviceInfo: deviceInfo
         });
       } catch (error) {
         console.log('ℹ️ Fingerprint not yet registered');
@@ -302,7 +299,7 @@ function shouldAutoApplySeasonalTheme() {
       const storedKey = localStorage.getItem('galaxyverse_user_key');
       
       if (storedKey) {
-        console.log('🔑 Found stored key, verifying...');
+        console.log('🔑 Found stored key, verifying with HWID...');
         try {
           const keyRef = database.ref('usedKeys/' + storedKey);
           const snapshot = await keyRef.once('value');
@@ -310,8 +307,34 @@ function shouldAutoApplySeasonalTheme() {
           if (snapshot.exists()) {
             const keyData = snapshot.val();
             
+            // CRITICAL: Check HWID match
+            if (keyData.hwid && keyData.hwid !== hwid) {
+              console.error('🚫 HWID MISMATCH! This key is registered to a different device.');
+              
+              // Log security event
+              await database.ref('securityLogs/hwidMismatches/' + Date.now()).set({
+                key: storedKey,
+                storedHWID: keyData.hwid,
+                attemptedHWID: hwid,
+                fingerprint: browserFingerprint,
+                website: actualSite,
+                timestamp: Date.now(),
+                date: new Date().toISOString(),
+                userAgent: navigator.userAgent
+              });
+              
+              // Clear local storage
+              localStorage.removeItem('galaxyverse_user_key');
+              localStorage.removeItem('galaxyverse_access');
+              
+              alert('⚠️ Security Alert: This key is registered to another device. Access denied.');
+              showKeyEntryScreen();
+              return;
+            }
+            
+            // Check fingerprint match (secondary check)
             if (keyData.fingerprint === browserFingerprint) {
-              console.log('✅ Valid key found for fingerprint. Access granted across ALL GalaxyVerse sites.');
+              console.log('✅ HWID and Fingerprint verified. Access granted across ALL GalaxyVerse sites.');
               
               const websites = keyData.websites || [];
               
@@ -321,28 +344,36 @@ function shouldAutoApplySeasonalTheme() {
                   websites: [...websites, actualSite],
                   lastAccessed: new Date().toISOString(),
                   lastAccessedSite: actualSite,
+                  lastVerified: new Date().toISOString(),
                   timesAccessed: (keyData.timesAccessed || 0) + 1
                 });
               } else {
-                console.log('✓ Site already in websites list');
                 await keyRef.update({
                   timesAccessed: (keyData.timesAccessed || 0) + 1,
                   lastAccessed: new Date().toISOString(),
-                  lastAccessedSite: actualSite
+                  lastAccessedSite: actualSite,
+                  lastVerified: new Date().toISOString()
                 });
               }
               
               if (typeof window.WebsiteKeyTracker !== 'undefined') {
-                window.WebsiteKeyTracker.trackKeyUsage(storedKey, actualSite, browserFingerprint);
+                window.WebsiteKeyTracker.trackKeyUsage(storedKey, actualSite, browserFingerprint, hwid);
               }
               
               localStorage.setItem('galaxyverse_access', 'granted');
               console.log('✅ Access granted automatically');
               return;
             } else {
-              console.warn('⚠️ Stored key belongs to another browser. Clearing local data.');
-              localStorage.removeItem('galaxyverse_user_key');
-              localStorage.removeItem('galaxyverse_access');
+              console.warn('⚠️ Fingerprint mismatch but HWID matches - updating fingerprint');
+              // HWID matches but fingerprint changed (browser update, cookies cleared, etc.)
+              await keyRef.update({
+                fingerprint: browserFingerprint,
+                lastVerified: new Date().toISOString()
+              });
+              
+              localStorage.setItem('galaxyverse_access', 'granted');
+              console.log('✅ Fingerprint updated, access granted');
+              return;
             }
           } else {
             console.warn('⚠️ Stored key not found in database. Clearing local data.');
@@ -360,7 +391,7 @@ function shouldAutoApplySeasonalTheme() {
     }
 
     function showKeyEntryScreen() {
-      console.log('🔐 Showing key entry screen');
+      console.log('🔐 Showing key entry screen with HWID protection');
       
       const keyOverlay = document.createElement('div');
       keyOverlay.id = 'galaxyverse-key-overlay';
@@ -378,6 +409,8 @@ function shouldAutoApplySeasonalTheme() {
         font-family: 'Roboto', sans-serif;
       `;
 
+      const deviceInfo = window.EnhancedFingerprint.getDeviceInfo();
+
       keyOverlay.innerHTML = `
         <div style="
           background: rgba(30, 36, 51, 0.95);
@@ -386,7 +419,7 @@ function shouldAutoApplySeasonalTheme() {
           padding: 40px;
           box-shadow: 0 15px 50px rgba(79, 144, 255, 0.3);
           text-align: center;
-          max-width: 450px;
+          max-width: 500px;
           width: 90%;
         ">
           <div style="
@@ -414,10 +447,32 @@ function shouldAutoApplySeasonalTheme() {
           <p style="
             color: #9ca3af;
             font-size: 16px;
-            margin: 0 0 30px 0;
-          ">Enter your access key to continue<br>
-          <a href="https://docs.google.com/document/d/1RfHWPQ-8Kq2NDV6vxfOgquBqIKwp4OoL7K1NXkYLUEg/edit?usp=sharing">GalaxyVerse</a> Policy<br>
-          V1.2.6 - Keys + 4 games</p>
+            margin: 0 0 10px 0;
+          ">Enter your access key to continue</p>
+          
+          <div style="
+            background: rgba(79, 144, 255, 0.1);
+            border: 1px solid rgba(79, 144, 255, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #9ca3af;
+          ">
+            <div style="margin-bottom: 8px; color: #4f90ff; font-weight: bold;">🔒 HWID Protection Active</div>
+            <div style="font-size: 12px;">
+              Device: ${deviceInfo.browser} on ${deviceInfo.os}<br>
+              Screen: ${deviceInfo.screen} | Cores: ${deviceInfo.cores}
+            </div>
+          </div>
+          
+          <p style="
+            color: #9ca3af;
+            font-size: 14px;
+            margin-bottom: 20px;
+          ">
+          <a href="https://docs.google.com/document/d/1RfHWPQ-8Kq2NDV6vxfOgquBqIKwp4OoL7K1NXkYLUEg/edit?usp=sharing" target="_blank" style="color: #4f90ff;">GalaxyVerse Policy</a><br>
+          V1.2.7 - HWID Protection</p>
           
           <input type="text" id="keyInput" placeholder="Enter your key" style="
             width: 100%;
@@ -493,11 +548,11 @@ function shouldAutoApplySeasonalTheme() {
             color: #6b7280;
             font-size: 12px;
           ">
-            🌟 Each key is linked to your browser fingerprint<br>
-            ✨ Once claimed, it works across ALL GalaxyVerse websites<br>
-            💫 Automatically recognized on any GalaxyVerse domain<br>
-            If you purchased a key and it logs you out use it again<br><br>
-            Contact the admins if you need a key. Lifetime key is $5.
+            🔐 Each key is permanently linked to your device HWID<br>
+            🌟 Cannot be transferred or used on other devices<br>
+            ✨ Works across ALL GalaxyVerse websites<br>
+            💫 Automatically recognized on any GalaxyVerse domain<br><br>
+            Contact admins for lifetime key ($5)
           </div>
         </div>
       `;
@@ -521,11 +576,9 @@ function shouldAutoApplySeasonalTheme() {
         if (snapshot.val() === true) {
           statusDot.style.background = '#4ade80';
           statusText.textContent = 'Connected';
-          console.log('✅ Firebase connection active');
         } else {
           statusDot.style.background = '#ff4444';
           statusText.textContent = 'Disconnected';
-          console.warn('⚠️ Firebase connection lost');
         }
       });
 
@@ -535,23 +588,15 @@ function shouldAutoApplySeasonalTheme() {
         keyError.style.display = 'none';
         
         try {
-          console.log('Test 1: Checking connection...');
           await database.ref('.info/connected').once('value');
-          console.log('✅ Connection test passed');
-          
-          console.log('Test 2: Testing read access...');
           await database.ref('usedKeys').limitToFirst(1).once('value');
-          console.log('✅ Read test passed');
           
-          console.log('Test 3: Testing write access...');
           const testRef = database.ref('connectionTest/' + Date.now());
           await testRef.set({ test: true, timestamp: Date.now() });
-          console.log('✅ Write test passed');
-          
           await testRef.remove();
           
           keyError.style.color = '#4ade80';
-          keyError.textContent = '✅ All tests passed! Connection is working.';
+          keyError.textContent = '✅ All tests passed! Connection working.';
           keyError.style.display = 'block';
           
           testConnectionBtn.textContent = 'Test Connection';
@@ -559,13 +604,7 @@ function shouldAutoApplySeasonalTheme() {
         } catch (error) {
           console.error('❌ Connection test failed:', error);
           keyError.style.color = '#ff4444';
-          
-          if (error.code === 'PERMISSION_DENIED') {
-            keyError.textContent = '❌ Permission Denied: Firebase rules need to be updated. Contact admin.';
-          } else {
-            keyError.textContent = `❌ Connection test failed: ${error.message}`;
-          }
-          
+          keyError.textContent = `❌ Connection failed: ${error.message}`;
           keyError.style.display = 'block';
           testConnectionBtn.textContent = 'Test Connection';
           testConnectionBtn.disabled = false;
@@ -596,7 +635,6 @@ function shouldAutoApplySeasonalTheme() {
         const enteredKey = keyInput.value.trim();
         
         if (!enteredKey) {
-          console.warn('⚠️ Empty key entered');
           keyError.textContent = '❌ Please enter a key';
           keyError.style.color = '#ff4444';
           keyError.style.display = 'block';
@@ -605,7 +643,6 @@ function shouldAutoApplySeasonalTheme() {
         }
 
         if (!validKeys.includes(enteredKey)) {
-          console.warn('⚠️ Invalid key attempted:', enteredKey);
           keyError.textContent = '❌ Invalid key. Please try again';
           keyError.style.color = '#ff4444';
           keyError.style.display = 'block';
@@ -615,34 +652,26 @@ function shouldAutoApplySeasonalTheme() {
         }
 
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Checking...';
+        submitBtn.textContent = 'Generating HWID...';
         submitBtn.style.cursor = 'wait';
         
-        console.log('🔑 Verifying key:', enteredKey);
+        console.log('🔑 Verifying key with HWID protection:', enteredKey);
 
         try {
           const normalizedSite = normalizeHostname(window.location.hostname || 'localhost');
           const actualSite = getActualWebsite(window.location.hostname || 'localhost');
-          const browserFingerprint = generateBrowserFingerprint();
           
-          console.log('🌐 Verifying for site:', actualSite);
-          console.log('🌐 Normalized site:', normalizedSite);
-          console.log('🔒 Browser fingerprint:', browserFingerprint);
+          // Generate HWID
+          submitBtn.textContent = 'Analyzing Device...';
+          const hwid = await window.EnhancedFingerprint.generateHWID();
+          const browserFingerprint = generateBrowserFingerprint();
+          const deviceInfo = window.EnhancedFingerprint.getDeviceInfo();
+          
+          console.log('🔒 Generated HWID:', hwid.substring(0, 20) + '...');
+          console.log('🔒 Fingerprint:', browserFingerprint);
           
           submitBtn.textContent = 'Connecting...';
-          try {
-            await database.ref('.info/connected').once('value');
-          } catch (connectionError) {
-            console.error('❌ Firebase connection test failed:', connectionError);
-            keyError.textContent = '❌ Cannot connect to server. Check your internet connection and try again.';
-            keyError.style.color = '#ff4444';
-            keyError.style.display = 'block';
-            keyInput.style.borderColor = '#ff4444';
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Verify Key';
-            submitBtn.style.cursor = 'pointer';
-            return;
-          }
+          await database.ref('.info/connected').once('value');
           
           submitBtn.textContent = 'Verifying...';
           
@@ -651,24 +680,29 @@ function shouldAutoApplySeasonalTheme() {
           
           if (snapshot.exists()) {
             const keyData = snapshot.val();
+            const keyOwnerHWID = keyData.hwid;
             const keyOwnerFingerprint = keyData.fingerprint;
             
-            if (browserFingerprint !== keyOwnerFingerprint) {
-              console.warn('⚠️ Key already claimed by different fingerprint');
+            // CRITICAL: Check HWID match
+            if (hwid !== keyOwnerHWID) {
+              console.error('🚫 HWID MISMATCH! Key belongs to different device.');
               
-              const securityLogRef = database.ref('securityLogs/unauthorizedKeyAttempts/' + Date.now());
-              await securityLogRef.set({
+              // Log security event
+              await database.ref('securityLogs/unauthorizedKeyAttempts/' + Date.now()).set({
                 attemptedKey: enteredKey,
                 keyOwnerFingerprint: keyOwnerFingerprint,
+                keyOwnerHWID: keyOwnerHWID,
                 attemptedByFingerprint: browserFingerprint,
+                attemptedByHWID: hwid,
                 website: actualSite,
                 normalizedSite: normalizedSite,
                 timestamp: Date.now(),
                 date: new Date().toISOString(),
-                userAgent: navigator.userAgent
+                userAgent: navigator.userAgent,
+                reason: 'HWID_MISMATCH'
               });
               
-              keyError.textContent = '❌ This key has already been claimed by another browser. Each key can only be used on ONE browser across ALL GalaxyVerse sites.';
+              keyError.textContent = '🚫 SECURITY ALERT: This key is permanently registered to another device. Keys cannot be transferred between devices.';
               keyError.style.color = '#ff4444';
               keyError.style.display = 'block';
               keyInput.style.borderColor = '#ff4444';
@@ -677,71 +711,78 @@ function shouldAutoApplySeasonalTheme() {
               submitBtn.textContent = 'Verify Key';
               submitBtn.style.cursor = 'pointer';
               return;
-            } else {
-              console.log('✅ Key matches fingerprint - updating access');
-              
-              const websites = keyData.websites || [];
-              const timesAccessed = keyData.timesAccessed || 0;
-              
-              if (!websites.includes(actualSite)) {
-                console.log('📝 Adding site to website list');
-                await keyRef.update({
-                  websites: [...websites, actualSite],
-                  timesAccessed: timesAccessed + 1,
-                  lastAccessed: new Date().toISOString(),
-                  lastAccessedSite: actualSite,
-                  network: normalizedSite
-                });
-              } else {
-                console.log('✓ Site already in list, updating access time');
-                await keyRef.update({
-                  timesAccessed: timesAccessed + 1,
-                  lastAccessed: new Date().toISOString(),
-                  lastAccessedSite: actualSite,
-                  network: normalizedSite
-                });
-              }
-              
-              await database.ref('fingerprints/' + browserFingerprint).set({
-                key: enteredKey,
-                lastSeen: new Date().toISOString(),
-                lastSeenSite: actualSite
-              });
-              
-              localStorage.setItem('galaxyverse_access', 'granted');
-              localStorage.setItem('galaxyverse_user_key', enteredKey);
-              
-              if (typeof window.WebsiteKeyTracker !== 'undefined') {
-                window.WebsiteKeyTracker.trackKeyUsage(enteredKey, actualSite, browserFingerprint);
-              }
-              
-              keyError.style.color = '#4ade80';
-              keyError.textContent = '✅ Welcome back! Access granted across ALL GalaxyVerse sites';
-              keyError.style.display = 'block';
-              keyInput.style.borderColor = '#4ade80';
-              submitBtn.style.background = 'linear-gradient(135deg, #4ade80, #22c55e)';
-              submitBtn.textContent = 'Success!';
-
-              console.log('✅ Access granted successfully');
-
-              setTimeout(() => {
-                keyOverlay.style.opacity = '0';
-                keyOverlay.style.transition = 'opacity 0.5s ease';
-                setTimeout(() => {
-                  keyOverlay.remove();
-                  const mainContent = document.getElementById('app') || document.body;
-                  if (mainContent && mainContent !== document.body) {
-                    mainContent.style.filter = '';
-                    mainContent.style.pointerEvents = '';
-                  }
-                }, 500);
-              }, 1500);
-              return;
             }
+            
+            // HWID matches - update access
+            console.log('✅ HWID verified - updating access');
+            
+            const websites = keyData.websites || [];
+            const timesAccessed = keyData.timesAccessed || 0;
+            
+            if (!websites.includes(actualSite)) {
+              await keyRef.update({
+                websites: [...websites, actualSite],
+                timesAccessed: timesAccessed + 1,
+                lastAccessed: new Date().toISOString(),
+                lastAccessedSite: actualSite,
+                lastVerified: new Date().toISOString(),
+                network: normalizedSite,
+                deviceInfo: deviceInfo
+              });
+            } else {
+              await keyRef.update({
+                timesAccessed: timesAccessed + 1,
+                lastAccessed: new Date().toISOString(),
+                lastAccessedSite: actualSite,
+                lastVerified: new Date().toISOString(),
+                network: normalizedSite,
+                deviceInfo: deviceInfo
+              });
+            }
+            
+            await database.ref('fingerprints/' + browserFingerprint).set({
+              key: enteredKey,
+              hwid: hwid,
+              lastSeen: new Date().toISOString(),
+              lastSeenSite: actualSite,
+              deviceInfo: deviceInfo
+            });
+            
+            localStorage.setItem('galaxyverse_access', 'granted');
+            localStorage.setItem('galaxyverse_user_key', enteredKey);
+            
+            if (typeof window.WebsiteKeyTracker !== 'undefined') {
+              window.WebsiteKeyTracker.trackKeyUsage(enteredKey, actualSite, browserFingerprint, hwid);
+            }
+            
+            keyError.style.color = '#4ade80';
+            keyError.textContent = '✅ Welcome back! HWID verified - Access granted';
+            keyError.style.display = 'block';
+            keyInput.style.borderColor = '#4ade80';
+            submitBtn.style.background = 'linear-gradient(135deg, #4ade80, #22c55e)';
+            submitBtn.textContent = 'Success!';
+
+            console.log('✅ Access granted successfully');
+
+            setTimeout(() => {
+              keyOverlay.style.opacity = '0';
+              keyOverlay.style.transition = 'opacity 0.5s ease';
+              setTimeout(() => {
+                keyOverlay.remove();
+                const mainContent = document.getElementById('app') || document.body;
+                if (mainContent && mainContent !== document.body) {
+                  mainContent.style.filter = '';
+                  mainContent.style.pointerEvents = '';
+                }
+              }, 500);
+            }, 1500);
+            return;
           } else {
-            console.log('🆕 Claiming new key for fingerprint across ALL GalaxyVerse sites');
+            // New key claim - register HWID
+            console.log('🆕 Claiming new key with HWID registration');
             await keyRef.set({
               used: true,
+              hwid: hwid,
               fingerprint: browserFingerprint,
               firstUsedOn: actualSite,
               firstUsedDate: new Date().toISOString(),
@@ -750,32 +791,36 @@ function shouldAutoApplySeasonalTheme() {
               timesAccessed: 1,
               lastAccessed: new Date().toISOString(),
               lastAccessedSite: actualSite,
+              lastVerified: new Date().toISOString(),
               network: normalizedSite,
-              claimedAcrossNetwork: true
+              claimedAcrossNetwork: true,
+              deviceInfo: deviceInfo
             });
 
             await database.ref('fingerprints/' + browserFingerprint).set({
               key: enteredKey,
+              hwid: hwid,
               createdAt: new Date().toISOString(),
               lastSeen: new Date().toISOString(),
-              lastSeenSite: actualSite
+              lastSeenSite: actualSite,
+              deviceInfo: deviceInfo
             });
 
             localStorage.setItem('galaxyverse_access', 'granted');
             localStorage.setItem('galaxyverse_user_key', enteredKey);
 
             if (typeof window.WebsiteKeyTracker !== 'undefined') {
-              window.WebsiteKeyTracker.trackKeyUsage(enteredKey, actualSite, browserFingerprint);
+              window.WebsiteKeyTracker.trackKeyUsage(enteredKey, actualSite, browserFingerprint, hwid);
             }
 
             keyError.style.color = '#4ade80';
-            keyError.textContent = '✅ Key claimed! Welcome to GalaxyVerse - works on ALL sites in the network';
+            keyError.textContent = '✅ Key claimed! HWID registered - Works on ALL GalaxyVerse sites';
             keyError.style.display = 'block';
             keyInput.style.borderColor = '#4ade80';
             submitBtn.style.background = 'linear-gradient(135deg, #4ade80, #22c55e)';
             submitBtn.textContent = 'Success!';
 
-            console.log('✅ Key claimed successfully');
+            console.log('✅ Key claimed successfully with HWID');
 
             setTimeout(() => {
               keyOverlay.style.opacity = '0';
@@ -981,23 +1026,15 @@ function applyTheme(themeName) {
 function loadSettings() {
   console.log('⚙️ Loading settings...');
   
-  // Determine which theme to use
   let themeToUse = 'original';
-  
-  // Check if we should auto-apply seasonal themes
   const savedTheme = localStorage.getItem('selectedTheme');
   
   if (!savedTheme && shouldAutoApplySeasonalTheme()) {
-    // No saved theme and auto-apply is enabled - use seasonal
     themeToUse = getSeasonalTheme();
     console.log('🎨 Auto-applying seasonal theme:', themeToUse);
   } else if (savedTheme) {
-    // User has selected a theme
     themeToUse = savedTheme;
     console.log('🎨 Using saved theme:', themeToUse);
-  } else {
-    // Use original as fallback
-    themeToUse = 'original';
   }
 
   const savedTitle = localStorage.getItem('TabCloak_Title');
@@ -1011,7 +1048,6 @@ function loadSettings() {
     document.title = savedTitle;
     const titleInput = document.getElementById('customTitle');
     if (titleInput) titleInput.value = savedTitle;
-    console.log('🔖 Loaded saved tab title:', savedTitle);
   }
 
   if (savedFavicon) {
@@ -1024,7 +1060,6 @@ function loadSettings() {
     link.href = savedFavicon;
     const faviconInput = document.getElementById('customFavicon');
     if (faviconInput) faviconInput.value = savedFavicon;
-    console.log('🖼️ Loaded saved tab favicon');
   }
 
   if (savedSnow === 'disabled') {
@@ -1040,12 +1075,10 @@ function loadSettings() {
   const redirectInput = document.getElementById('redirect-url-input');
   if (hotkeyInput) hotkeyInput.value = savedHotkey;
   if (redirectInput) redirectInput.value = savedRedirect;
-  console.log('🔑 Loaded panic button settings - Hotkey:', savedHotkey);
 
   const aboutBlankToggle = document.getElementById('aboutBlankToggle');
   if (aboutBlankToggle) {
     aboutBlankToggle.checked = savedAboutBlank === 'enabled';
-    console.log('🔒 About:blank cloaking:', savedAboutBlank === 'enabled' ? 'enabled' : 'disabled');
   }
 
   applyTheme(themeToUse);
@@ -1057,11 +1090,11 @@ function setupPanicButton() {
   const savedHotkey = localStorage.getItem('hotkey') || '`';
   const savedRedirect = localStorage.getItem('redirectURL') || 'https://google.com';
   
-  console.log('🚨 Panic button setup - Hotkey:', savedHotkey, '| Redirect:', savedRedirect);
+  console.log('🚨 Panic button setup - Hotkey:', savedHotkey);
   
   document.addEventListener('keydown', (e) => {
     if (e.key === savedHotkey) {
-      console.log('🚨 Panic button activated! Redirecting to:', savedRedirect);
+      console.log('🚨 Panic button activated!');
       window.location.href = savedRedirect;
     }
   });
@@ -1083,7 +1116,7 @@ function setupPanicButton() {
         hotkeyInput.value = e.key;
         localStorage.setItem('hotkey', e.key);
         hotkeyInput.blur();
-        console.log('🔑 Panic button hotkey changed to:', e.key);
+        console.log('🔑 Hotkey changed to:', e.key);
       }
     });
   }
@@ -1096,7 +1129,7 @@ function setupPanicButton() {
       const url = redirectInput.value.trim();
       if (url) {
         localStorage.setItem('redirectURL', url);
-        console.log('🔗 Panic button redirect URL changed to:', url);
+        console.log('🔗 Redirect URL changed to:', url);
         alert('Redirect URL updated!');
       }
     });
@@ -1123,34 +1156,21 @@ function hideAll() {
 function displayGameOfTheDay() {
   console.log('🎮 Displaying Game of the Day');
   const gotdContainer = document.getElementById('game-of-the-day-container');
-  if (!gotdContainer) {
-    console.warn('⚠️ Game of the Day container not found');
-    return;
-  }
+  if (!gotdContainer) return;
   
   if (typeof getGameOfTheDay !== 'function') {
-    console.error('❌ getGameOfTheDay function not found. Make sure gms.js is loaded BEFORE scripts.js');
-    gotdContainer.innerHTML = `
-      <div class="gotd-card">
-        <div class="gotd-badge">🌟 Game of the Day</div>
-        <p style="padding: 20px;">Loading games...</p>
-      </div>
-    `;
+    console.error('❌ getGameOfTheDay not found');
     return;
   }
   
   try {
     const game = getGameOfTheDay();
-    if (!game) {
-      console.error('❌ No game returned from getGameOfTheDay');
-      return;
-    }
+    if (!game) return;
     
-    console.log('✅ Game of the Day loaded:', game.name);
     gotdContainer.innerHTML = `
       <div class="gotd-card">
         <div class="gotd-badge">🌟 Game of the Day</div>
-        <img src="${game.image}" alt="${game.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x300?text=${encodeURIComponent(game.name)}'" />
+        <img src="${game.image}" alt="${game.name}" loading="lazy" />
         <h3>${game.name}</h3>
         <button class="gotd-play-btn" onclick="loadGame('${game.url}')">Play Now</button>
       </div>
@@ -1162,7 +1182,6 @@ function displayGameOfTheDay() {
 
 // ===== NAVIGATION FUNCTIONS =====
 function showHome() {
-  console.log('🏠 Navigating to Home');
   hideAll();
   const homeContent = document.getElementById('content-home');
   if (homeContent) homeContent.style.display = 'block';
@@ -1174,14 +1193,12 @@ function showHome() {
 }
 
 function showGames() {
-  console.log('🎮 Navigating to Games');
   hideAll();
   const gamesContent = document.getElementById('content-gms');
   if (gamesContent) gamesContent.style.display = 'block';
   const gameLink = document.getElementById('gameLink');
   if (gameLink) gameLink.classList.add('active');
   
-  // Add filter buttons if they don't exist
   if (!document.querySelector('.game-filters') && window.GameStats) {
     const searchContainer = document.querySelector('.search-container');
     if (searchContainer) {
@@ -1191,7 +1208,6 @@ function showGames() {
   }
   
   if (typeof games !== 'undefined' && Array.isArray(games)) {
-    // Check if there's an active filter
     const activeFilter = document.querySelector('.filter-btn.active');
     if (activeFilter) {
       const filter = activeFilter.dataset.filter;
@@ -1199,17 +1215,10 @@ function showGames() {
     } else {
       renderGames(games);
     }
-  } else {
-    console.error('❌ games array not found. Make sure gms.js is loaded BEFORE scripts.js');
-    const gameList = document.getElementById('game-list');
-    if (gameList) {
-      gameList.innerHTML = '<p style="padding: 20px; text-align: center;">Games are loading... Please refresh if this persists.</p>';
-    }
   }
 }
 
 function showApps() {
-  console.log('📱 Navigating to Apps');
   hideAll();
   const appsContent = document.getElementById('content-aps');
   if (appsContent) appsContent.style.display = 'block';
@@ -1218,17 +1227,10 @@ function showApps() {
   
   if (typeof apps !== 'undefined' && Array.isArray(apps)) {
     renderApps(apps);
-  } else {
-    console.error('❌ apps array not found. Make sure gms.js is loaded BEFORE scripts.js');
-    const appList = document.getElementById('app-list');
-    if (appList) {
-      appList.innerHTML = '<p style="padding: 20px; text-align: center;">Apps are loading... Please refresh if this persists.</p>';
-    }
   }
 }
 
 function showWebsites() {
-  console.log('🌐 Navigating to Websites');
   hideAll();
   const websitesContent = document.getElementById('content-websites');
   if (websitesContent) websitesContent.style.display = 'block';
@@ -1237,17 +1239,10 @@ function showWebsites() {
   
   if (typeof websites !== 'undefined' && Array.isArray(websites)) {
     renderWebsites(websites);
-  } else {
-    console.error('❌ websites array not found');
-    const websitesList = document.getElementById('websites-list');
-    if (websitesList) {
-      websitesList.innerHTML = '<p style="padding: 20px; text-align: center;">Websites are loading...</p>';
-    }
   }
 }
 
 function showAbout() {
-  console.log('ℹ️ Navigating to About');
   hideAll();
   const aboutContent = document.getElementById('content-about');
   if (aboutContent) aboutContent.style.display = 'block';
@@ -1256,7 +1251,6 @@ function showAbout() {
 }
 
 function showSettings() {
-  console.log('⚙️ Navigating to Settings');
   hideAll();
   const settingsContent = document.getElementById('content-settings');
   if (settingsContent) settingsContent.style.display = 'block';
@@ -1266,25 +1260,18 @@ function showSettings() {
 
 // ===== RENDER FUNCTIONS =====
 function renderGames(gamesToRender) {
-  console.log('🎮 Rendering', gamesToRender.length, 'games');
   const gameList = document.getElementById('game-list');
-  if (!gameList) {
-    console.error('❌ game-list element not found');
-    return;
-  }
+  if (!gameList) return;
   
   gameList.innerHTML = '';
   
   if (!gamesToRender || gamesToRender.length === 0) {
-    gameList.innerHTML = '<p style="padding: 20px; text-align: center;">No games found. Try a different search term.</p>';
+    gameList.innerHTML = '<p style="padding: 20px; text-align: center;">No games found.</p>';
     return;
   }
   
   gamesToRender.forEach(game => {
-    if (!game || !game.name || !game.url) {
-      console.warn('⚠️ Invalid game object:', game);
-      return;
-    }
+    if (!game || !game.name || !game.url) return;
     
     const isFavorited = window.GameStats ? window.GameStats.isFavorite(game.url) : false;
     
@@ -1293,7 +1280,7 @@ function renderGames(gamesToRender) {
     card.tabIndex = 0;
     card.innerHTML = `
       ${window.GameStats ? window.GameStats.createFavoriteButton(game.url, isFavorited) : ''}
-      <img src="${game.image || 'https://via.placeholder.com/250x250?text=Game'}" alt="${game.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/250x250?text=${encodeURIComponent(game.name)}'" />
+      <img src="${game.image || 'https://via.placeholder.com/250x250?text=Game'}" alt="${game.name}" loading="lazy" />
       <h3>${game.name}</h3>
     `;
     card.onclick = () => loadGame(game.url);
@@ -1303,90 +1290,53 @@ function renderGames(gamesToRender) {
 }
 
 function renderApps(appsToRender) {
-  console.log('📱 Rendering', appsToRender.length, 'apps');
   const appList = document.getElementById('app-list');
-  if (!appList) {
-    console.error('❌ app-list element not found');
-    return;
-  }
+  if (!appList) return;
   
   appList.innerHTML = '';
   
   if (!appsToRender || appsToRender.length === 0) {
-    appList.innerHTML = '<p style="padding: 20px; text-align: center;">No apps found.</p>';
+    appList.innerHTML = '<p>No apps found.</p>';
     return;
   }
   
   appsToRender.forEach(app => {
-    if (!app || !app.name || !app.url) {
-      console.warn('⚠️ Invalid app object:', app);
-      return;
-    }
+    if (!app || !app.name || !app.url) return;
     
     const card = document.createElement('div');
     card.className = 'app-card';
-    card.tabIndex = 0;
     card.innerHTML = `
-      <img src="${app.image || 'https://via.placeholder.com/250x250?text=App'}" alt="${app.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/250x250?text=${encodeURIComponent(app.name)}'" />
+      <img src="${app.image || 'https://via.placeholder.com/250x250?text=App'}" alt="${app.name}" loading="lazy" />
       <h3>${app.name}</h3>
     `;
     card.onclick = () => loadGame(app.url);
-    card.onkeypress = (e) => { if (e.key === 'Enter') loadGame(app.url); };
     appList.appendChild(card);
   });
 }
 
 function renderWebsites(websitesToRender) {
-  console.log('🌐 Rendering', websitesToRender.length, 'websites');
   const websitesList = document.getElementById('websites-list');
-  if (!websitesList) {
-    console.error('❌ websites-list element not found');
-    return;
-  }
+  if (!websitesList) return;
   
   websitesList.innerHTML = '';
   
   if (!websitesToRender || websitesToRender.length === 0) {
-    websitesList.innerHTML = '<p style="padding: 20px; text-align: center;">No websites found.</p>';
+    websitesList.innerHTML = '<p>No websites found.</p>';
     return;
   }
   
-  // Create a simple list
   const list = document.createElement('ul');
-  list.style.cssText = `
-    list-style: none;
-    padding: 20px;
-    max-width: 800px;
-    margin: 0 auto;
-  `;
+  list.style.cssText = 'list-style: none; padding: 20px; max-width: 800px; margin: 0 auto;';
   
   websitesToRender.forEach(website => {
-    if (!website || !website.name || !website.url) {
-      console.warn('⚠️ Invalid website object:', website);
-      return;
-    }
+    if (!website || !website.name || !website.url) return;
     
     const listItem = document.createElement('li');
-    listItem.style.cssText = `
-      padding: 15px;
-      margin-bottom: 10px;
-      background: var(--nav-color);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      transition: all 0.3s ease;
-    `;
+    listItem.style.cssText = 'padding: 15px; margin-bottom: 10px; background: var(--nav-color); border: 1px solid var(--border-color); border-radius: 8px; transition: all 0.3s ease;';
     
     listItem.innerHTML = `
-      <a href="${website.url}" target="_blank" style="
-        color: var(--accent-color);
-        text-decoration: none;
-        font-size: 18px;
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      ">
-        <span style="font-size: 20px;">🔗</span>
+      <a href="${website.url}" target="_blank" style="color: var(--accent-color); text-decoration: none; font-size: 18px; display: flex; align-items: center; gap: 10px;">
+        <span>🔗</span>
         <div>
           <div style="font-weight: 600;">${website.name}</div>
           <div style="font-size: 14px; color: var(--text-color); opacity: 0.7; margin-top: 4px;">${website.url}</div>
@@ -1394,7 +1344,6 @@ function renderWebsites(websitesToRender) {
       </a>
     `;
     
-    // Hover effect
     listItem.addEventListener('mouseenter', function() {
       this.style.background = 'var(--hover-bg)';
       this.style.borderColor = 'var(--accent-color)';
@@ -1415,21 +1364,19 @@ function renderWebsites(websitesToRender) {
 
 function loadGame(url) {
   if (!url) {
-    console.error('❌ No URL provided to loadGame');
-    alert('Error: Game URL is missing. Please try another game.');
+    console.error('❌ No URL provided');
+    alert('Error: Game URL is missing.');
     return;
   }
   
   console.log('🎮 Loading game:', url);
   
   try {
-    // Check if URL is a YouTube link
     const isYouTube = url.includes('/others/assets/apps/YouTube.html') || url.includes('youtu.be');
     
     if (isYouTube) {
-      // Open YouTube links directly in a new tab
       window.open(url, '_blank');
-      console.log('▶️ Opening YouTube link in new tab:', url);
+      console.log('▶️ Opening YouTube in new tab');
       return;
     }
     
@@ -1439,11 +1386,10 @@ function loadGame(url) {
     
     if (!gameDisplay || !gameIframe) {
       console.error('❌ Game display elements not found');
-      alert('Error: Unable to load game. Please refresh the page.');
+      alert('Error: Unable to load game.');
       return;
     }
     
-    // Stop tracking previous game
     if (window.GameStats) {
       window.GameStats.stopTracking();
     }
@@ -1452,7 +1398,6 @@ function loadGame(url) {
     gameIframe.src = url;
     gameDisplay.style.display = 'block';
     
-    // Start tracking new game after iframe loads
     gameIframe.onload = function() {
       console.log('✅ Game loaded successfully');
       if (window.GameStats) {
@@ -1462,26 +1407,23 @@ function loadGame(url) {
     
     gameIframe.onerror = function() {
       console.error('❌ Failed to load game:', url);
-      alert('Error loading game. The game file may be missing or inaccessible.');
+      alert('Error loading game.');
     };
   } catch (error) {
     console.error('❌ Error in loadGame:', error);
-    alert('An error occurred while loading the game. Please try again.');
+    alert('An error occurred while loading the game.');
   }
 }
 
 function searchGames() {
   const searchInput = document.getElementById('searchInput');
-  if (!searchInput) {
-    console.error('❌ searchInput element not found');
-    return;
-  }
+  if (!searchInput) return;
   
   const query = searchInput.value.toLowerCase().trim();
   console.log('🔍 Searching games for:', query);
   
   if (typeof games === 'undefined' || !Array.isArray(games)) {
-    console.error('❌ games array not found. Make sure gms.js is loaded BEFORE scripts.js');
+    console.error('❌ games array not found');
     return;
   }
   
@@ -1500,7 +1442,6 @@ function searchWebsites() {
   if (!searchInput) return;
   
   const query = searchInput.value.toLowerCase().trim();
-  console.log('🔍 Searching websites for:', query);
   
   if (typeof websites === 'undefined' || !Array.isArray(websites)) {
     console.error('❌ websites array not found');
@@ -1513,26 +1454,20 @@ function searchWebsites() {
   }
   
   const filtered = websites.filter(site => site && site.name && site.name.toLowerCase().includes(query));
-  console.log('✅ Found', filtered.length, 'matching websites');
   renderWebsites(filtered);
 }
 
 function toggleFullscreen() {
   const gameIframe = document.getElementById('game-iframe');
-  if (!gameIframe) {
-    console.error('❌ game-iframe element not found');
-    return;
-  }
+  if (!gameIframe) return;
   
   try {
     if (!document.fullscreenElement) {
-      console.log('🖥️ Entering fullscreen mode');
       gameIframe.requestFullscreen().catch(err => {
-        console.error('❌ Error attempting to enable fullscreen:', err);
-        alert('Fullscreen mode is not available. Try clicking on the game first.');
+        console.error('❌ Fullscreen error:', err);
+        alert('Fullscreen not available. Click on the game first.');
       });
     } else {
-      console.log('🖥️ Exiting fullscreen mode');
       document.exitFullscreen();
     }
   } catch (error) {
@@ -1545,7 +1480,6 @@ function homepageSearch() {
   if (!input) return;
   const query = input.value.trim();
   if (!query) return;
-  console.log('🔍 Homepage search:', query);
   const encodedQuery = encodeURIComponent(query);
   const url = `https://www.youtube.com/results?search_query=${encodedQuery}`;
   window.open(url, '_blank');
@@ -1560,13 +1494,14 @@ if (document.readyState === 'loading') {
 
 function initializeApp() {
   try {
-    console.log('🚀 Initializing GalaxyVerse...');
+    console.log('🚀 Initializing GalaxyVerse with HWID Protection...');
     console.log('📊 Console Status:', {
       available: !!window.GVerseConsole,
       initialized: window.GVerseConsole?.initialized || false,
       isOpen: window.GVerseConsole?.isOpen || false,
       logCount: window.GVerseConsole?.logs?.length || 0
     });
+    console.log('🔐 Enhanced Fingerprint:', !!window.EnhancedFingerprint);
   
   loadSettings();
   showHome();
@@ -1574,7 +1509,6 @@ function initializeApp() {
 
   const themeSelect = document.getElementById('themeSelect');
   if (themeSelect) {
-    // Set current theme value
     const savedTheme = localStorage.getItem('selectedTheme');
     if (savedTheme) {
       themeSelect.value = savedTheme;
@@ -1599,14 +1533,12 @@ function initializeApp() {
 
   if (creditsBtn && creditsModal) {
     creditsBtn.addEventListener('click', () => {
-      console.log('ℹ️ Opening credits modal');
       creditsModal.style.display = 'block';
     });
   }
 
   if (updateLogBtn && updateLogModal) {
     updateLogBtn.addEventListener('click', () => {
-      console.log('📋 Opening update log modal');
       updateLogModal.style.display = 'block';
     });
   }
@@ -1617,7 +1549,6 @@ function initializeApp() {
       const modalElement = document.getElementById(modalId);
       if (modalElement) {
         modalElement.style.display = 'none';
-        console.log('❌ Closed modal:', modalId);
       }
     });
   });
@@ -1636,7 +1567,6 @@ function initializeApp() {
       const title = titleInput ? titleInput.value.trim() : '';
       const favicon = faviconInput ? faviconInput.value.trim() : '';
       applyTabCloaking(title, favicon);
-      console.log('✅ Tab cloaking applied');
       alert('Tab cloaking applied!');
     });
   }
@@ -1655,7 +1585,6 @@ function initializeApp() {
       if (faviconInput) faviconInput.value = '';
       const presetSelect = document.getElementById('presetSelect');
       if (presetSelect) presetSelect.value = '';
-      console.log('🔄 Tab cloaking reset');
       alert('Tab cloaking reset!');
     });
   }
@@ -1670,7 +1599,6 @@ function initializeApp() {
         if (titleInput) titleInput.value = selected.title;
         if (faviconInput) faviconInput.value = selected.favicon;
         applyTabCloaking(selected.title, selected.favicon);
-        console.log('✅ Applied preset:', e.target.value);
       }
     });
   }
@@ -1693,15 +1621,13 @@ function initializeApp() {
     aboutBlankToggle.addEventListener('change', (e) => {
       if (e.target.checked) {
         localStorage.setItem('aboutBlank', 'enabled');
-        console.log('🔒 About:blank cloaking enabled');
       } else {
         localStorage.removeItem('aboutBlank');
-        console.log('🔓 About:blank cloaking disabled');
       }
     });
   }
 
-  // Navigation event listeners
+  // Navigation
   const homeLink = document.getElementById('homeLink');
   const gameLink = document.getElementById('gameLink');
   const appsLink = document.getElementById('appsLink');
@@ -1716,7 +1642,7 @@ function initializeApp() {
   if (settingsLink) settingsLink.addEventListener('click', (e) => { e.preventDefault(); showSettings(); });
   if (aboutLink) aboutLink.addEventListener('click', (e) => { e.preventDefault(); showAbout(); });
 
-  // Back to home buttons
+  // Back buttons
   const backToHomeGame = document.getElementById('backToHomeGame');
   const backToHomeApps = document.getElementById('backToHomeApps');
   const backToHomeWebsites = document.getElementById('backToHomeWebsites');
@@ -1738,7 +1664,7 @@ function initializeApp() {
     backToHomeWebsites.addEventListener('click', () => showHome());
   }
 
-  // Search functionality
+  // Search
   const searchBtn = document.getElementById('searchBtn');
   const searchInput = document.getElementById('searchInput');
   
@@ -1782,17 +1708,17 @@ function initializeApp() {
     websitesSearchInput.addEventListener('input', debounce(searchWebsites, 300));
   }
 
-  // Fullscreen button
+  // Fullscreen
   const fullscreenBtn = document.getElementById('fullscreenBtn');
   if (fullscreenBtn) {
     fullscreenBtn.addEventListener('click', toggleFullscreen);
   }
 
-console.log('✅ GalaxyVerse initialized successfully');
-  console.log('📊 Console is active - Press Ctrl+Shift+K to toggle');
+  console.log('✅ GalaxyVerse initialized with HWID Protection');
+  console.log('📊 Console active - Press Ctrl+Shift+K to toggle');
   
   } catch (error) {
-    console.error('❌ Critical error during GalaxyVerse initialization:', error);
-    alert('An error occurred during initialization. Check the console for details.');
+    console.error('❌ Critical error during initialization:', error);
+    alert('An error occurred during initialization. Check console.');
   }
 }
