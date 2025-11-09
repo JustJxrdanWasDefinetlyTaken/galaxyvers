@@ -1,76 +1,80 @@
-// ===== ENHANCED FINGERPRINT SYSTEM WITH HWID PROTECTION =====
-// This system creates a unique, stable hardware identifier for each device
-// that cannot be easily spoofed or changed
+// ===== ENHANCED CROSS-DOMAIN HWID SYSTEM =====
+// File: others/assets/scripts/fingerprint-enhanced.js
+// This file should REPLACE your existing fingerprint-enhanced.js
 
 (function() {
   'use strict';
 
   window.EnhancedFingerprint = {
     initialized: false,
+    cachedHWID: null,
     
     init: function() {
       if (this.initialized) return;
       this.initialized = true;
-      console.log('🔐 Enhanced Fingerprint System initialized (v3.0 - HWID Protection)');
+      console.log('🔐 Enhanced Cross-Domain Fingerprint System initialized (v4.0)');
     },
 
-    // Generate comprehensive hardware fingerprint
+    // Generate comprehensive hardware fingerprint - CACHED for consistency
     async generateHWID() {
+      // Return cached HWID if available (ensures consistency across same session)
+      if (this.cachedHWID) {
+        console.log('🔒 Using cached HWID');
+        return this.cachedHWID;
+      }
+
       try {
         const components = await this.collectHardwareData();
         const hwid = await this.hashComponents(components);
+        this.cachedHWID = hwid; // Cache it
         console.log('🔒 HWID Generated:', hwid.substring(0, 16) + '...');
         return hwid;
       } catch (error) {
         console.error('❌ HWID generation error:', error);
-        return this.generateFallbackHWID();
+        const fallback = this.generateFallbackHWID();
+        this.cachedHWID = fallback;
+        return fallback;
       }
     },
 
     // Collect comprehensive hardware data
     async collectHardwareData() {
       const data = {
-        // Browser & System
+        // Browser & System (most stable identifiers)
         userAgent: navigator.userAgent,
         language: navigator.language,
         languages: navigator.languages.join(','),
         platform: navigator.platform,
         
-        // Hardware
+        // Hardware (very stable)
         hardwareConcurrency: navigator.hardwareConcurrency || 0,
         deviceMemory: navigator.deviceMemory || 0,
         maxTouchPoints: navigator.maxTouchPoints || 0,
         
-        // Screen
+        // Screen (stable unless user changes monitor/resolution)
         screenResolution: `${screen.width}x${screen.height}`,
         screenDepth: `${screen.colorDepth}x${screen.pixelDepth}`,
         availableResolution: `${screen.availWidth}x${screen.availHeight}`,
         
-        // Time & Location
+        // Time & Location (stable)
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         timezoneOffset: new Date().getTimezoneOffset(),
         
-        // Graphics
+        // Graphics (very stable)
         canvas: await this.getCanvasFingerprint(),
         webgl: await this.getWebGLFingerprint(),
         
-        // Audio
+        // Audio (stable)
         audio: await this.getAudioFingerprint(),
         
-        // Fonts
+        // Fonts (relatively stable)
         fonts: await this.getFontFingerprint(),
         
-        // Plugins (deprecated but still useful)
-        plugins: this.getPluginData(),
-        
-        // Additional identifiers
+        // Additional stable identifiers
         doNotTrack: navigator.doNotTrack,
         cookieEnabled: navigator.cookieEnabled,
-        localStorage: this.isLocalStorageAvailable(),
-        sessionStorage: this.isSessionStorageAvailable(),
-        indexedDB: !!window.indexedDB,
         
-        // Media devices (with permission check)
+        // Media devices (stable)
         mediaDevices: await this.getMediaDevicesInfo()
       };
 
@@ -87,7 +91,6 @@
         canvas.width = 200;
         canvas.height = 50;
 
-        // Draw complex pattern
         ctx.textBaseline = 'top';
         ctx.font = '14px Arial';
         ctx.textBaseline = 'alphabetic';
@@ -98,7 +101,6 @@
         ctx.fillStyle = 'rgba(102, 204, 0, 0.7)';
         ctx.fillText('Canvas Fingerprint', 4, 17);
 
-        // Add geometric shapes
         ctx.beginPath();
         ctx.arc(50, 25, 20, 0, Math.PI * 2, true);
         ctx.closePath();
@@ -142,7 +144,7 @@
         const gainNode = context.createGain();
         const scriptProcessor = context.createScriptProcessor(4096, 1, 1);
 
-        gainNode.gain.value = 0; // Mute
+        gainNode.gain.value = 0;
         oscillator.connect(analyser);
         analyser.connect(scriptProcessor);
         scriptProcessor.connect(gainNode);
@@ -166,7 +168,6 @@
             resolve(hash.substring(0, 50));
           };
 
-          // Timeout after 100ms
           setTimeout(() => {
             oscillator.stop();
             context.close();
@@ -221,25 +222,7 @@
       }
     },
 
-    // Plugin data
-    getPluginData() {
-      try {
-        if (!navigator.plugins || navigator.plugins.length === 0) {
-          return 'no-plugins';
-        }
-        
-        const plugins = Array.from(navigator.plugins)
-          .map(p => p.name)
-          .sort()
-          .join(',');
-        
-        return this.simpleHash(plugins);
-      } catch (error) {
-        return 'plugin-error';
-      }
-    },
-
-    // Media devices info (without requesting permission)
+    // Media devices info
     async getMediaDevicesInfo() {
       try {
         if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
@@ -254,32 +237,10 @@
       }
     },
 
-    // Storage availability checks
-    isLocalStorageAvailable() {
-      try {
-        localStorage.setItem('test', 'test');
-        localStorage.removeItem('test');
-        return true;
-      } catch (e) {
-        return false;
-      }
-    },
-
-    isSessionStorageAvailable() {
-      try {
-        sessionStorage.setItem('test', 'test');
-        sessionStorage.removeItem('test');
-        return true;
-      } catch (e) {
-        return false;
-      }
-    },
-
-    // Hash all components together
+    // Hash all components together using SHA-256
     async hashComponents(components) {
       const componentString = JSON.stringify(components, Object.keys(components).sort());
       
-      // Use Web Crypto API for strong hashing if available
       if (window.crypto && window.crypto.subtle) {
         try {
           const encoder = new TextEncoder();
@@ -293,7 +254,6 @@
         }
       }
 
-      // Fallback to simple hash
       return 'hwid_' + this.simpleHash(componentString);
     },
 
@@ -303,12 +263,12 @@
       for (let i = 0; i < str.length; i++) {
         const char = str.charCodeAt(i);
         hash = ((hash << 5) - hash) + char;
-        hash = hash & hash; // Convert to 32-bit integer
+        hash = hash & hash;
       }
       return Math.abs(hash).toString(36);
     },
 
-    // Fallback HWID if all else fails
+    // Fallback HWID
     generateFallbackHWID() {
       const fallbackData = [
         navigator.userAgent,
@@ -335,7 +295,7 @@
       return matches;
     },
 
-    // Get readable device info (for display purposes)
+    // Get readable device info
     getDeviceInfo() {
       return {
         browser: this.getBrowserInfo(),
@@ -366,6 +326,5 @@
     }
   };
 
-  // Initialize on load
   window.EnhancedFingerprint.init();
 })();
