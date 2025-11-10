@@ -1245,6 +1245,116 @@ function displayGameOfTheDay() {
         <div class="gotd-badge">🌟 Game of the Day</div>
         <img src="${game.image}" alt="${game.name}" loading="lazy" />
         <h3>${game.name}</h3>
+        <button class="gotd-play-btn" onclick="loadGame('${game.url}')">Play Now</button>
+      </div>
+    `;
+  } catch (error) {
+    console.error('❌ Error displaying Game of the Day:', error);
+  }
+}
+
+// ===== NAVIGATION FUNCTIONS =====
+function showHome() {
+  hideAll();
+  const homeContent = document.getElementById('content-home');
+  if (homeContent) homeContent.style.display = 'block';
+  const homeLink = document.getElementById('homeLink');
+  if (homeLink) homeLink.classList.add('active');
+  const infoButtons = document.querySelector('.homepage-info-buttons');
+  if (infoButtons) infoButtons.style.display = 'flex';
+  displayGameOfTheDay();
+}
+
+function showGames() {
+  hideAll();
+  const gamesContent = document.getElementById('content-gms');
+  if (gamesContent) gamesContent.style.display = 'block';
+  const gameLink = document.getElementById('gameLink');
+  if (gameLink) gameLink.classList.add('active');
+  
+  if (!document.querySelector('.game-filters') && window.GameStats) {
+    const searchContainer = document.querySelector('.search-container');
+    if (searchContainer) {
+      const filtersHTML = window.GameStats.createFilterButtons();
+      searchContainer.insertAdjacentHTML('afterend', filtersHTML);
+    }
+  }
+  
+  if (typeof games !== 'undefined' && Array.isArray(games)) {
+    const activeFilter = document.querySelector('.filter-btn.active');
+    if (activeFilter) {
+      const filter = activeFilter.dataset.filter;
+      window.filterGames(filter);
+    } else {
+      renderGames(games);
+    }
+  }
+}
+
+function showApps() {
+  hideAll();
+  const appsContent = document.getElementById('content-aps');
+  if (appsContent) appsContent.style.display = 'block';
+  const appsLink = document.getElementById('appsLink');
+  if (appsLink) appsLink.classList.add('active');
+  
+  if (typeof apps !== 'undefined' && Array.isArray(apps)) {
+    renderApps(apps);
+  }
+}
+
+function showWebsites() {
+  hideAll();
+  const websitesContent = document.getElementById('content-websites');
+  if (websitesContent) websitesContent.style.display = 'block';
+  const websitesLink = document.getElementById('websitesLink');
+  if (websitesLink) websitesLink.classList.add('active');
+  
+  if (typeof websites !== 'undefined' && Array.isArray(websites)) {
+    renderWebsites(websites);
+  }
+}
+
+function showAbout() {
+  hideAll();
+  const aboutContent = document.getElementById('content-about');
+  if (aboutContent) aboutContent.style.display = 'block';
+  const aboutLink = document.getElementById('aboutLink');
+  if (aboutLink) aboutLink.classList.add('active');
+}
+
+function showSettings() {
+  hideAll();
+  const settingsContent = document.getElementById('content-settings');
+  if (settingsContent) settingsContent.style.display = 'block';
+  const settingsLink = document.getElementById('settingsLink');
+  if (settingsLink) settingsLink.classList.add('active');
+}
+
+// ===== RENDER FUNCTIONS =====
+function renderGames(gamesToRender) {
+  const gameList = document.getElementById('game-list');
+  if (!gameList) return;
+  
+  gameList.innerHTML = '';
+  
+  if (!gamesToRender || gamesToRender.length === 0) {
+    gameList.innerHTML = '<p style="padding: 20px; text-align: center;">No games found.</p>';
+    return;
+  }
+  
+  gamesToRender.forEach(game => {
+    if (!game || !game.name || !game.url) return;
+    
+    const isFavorited = window.GameStats ? window.GameStats.isFavorite(game.url) : false;
+    
+    const card = document.createElement('div');
+    card.className = 'game-card';
+    card.tabIndex = 0;
+    card.innerHTML = `
+      ${window.GameStats ? window.GameStats.createFavoriteButton(game.url, isFavorited) : ''}
+      <img src="${game.image || 'https://via.placeholder.com/250x250?text=Game'}" alt="${game.name}" loading="lazy" />
+      <h3>${game.name}</h3>
     `;
     card.onclick = () => loadGame(game.url);
     card.onkeypress = (e) => { if (e.key === 'Enter') loadGame(game.url); };
@@ -1436,16 +1546,6 @@ function toggleFullscreen() {
   } catch (error) {
     console.error('❌ Fullscreen error:', error);
   }
-}
-
-function homepageSearch() {
-  const input = document.getElementById('homepageSearchInput');
-  if (!input) return;
-  const query = input.value.trim();
-  if (!query) return;
-  const encodedQuery = encodeURIComponent(query);
-  const url = `https://www.youtube.com/results?search_query=${encodedQuery}`;
-  window.open(url, '_blank');
 }
 
 // ===== INITIALIZATION =====
@@ -1642,20 +1742,6 @@ function initializeApp() {
     searchInput.addEventListener('input', debounce(searchGames, 300));
   }
 
-  // Homepage search
-  const homepageSearchBtn = document.getElementById('homepageSearchBtn');
-  const homepageSearchInput = document.getElementById('homepageSearchInput');
-  
-  if (homepageSearchBtn) {
-    homepageSearchBtn.addEventListener('click', homepageSearch);
-  }
-  
-  if (homepageSearchInput) {
-    homepageSearchInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') homepageSearch();
-    });
-  }
-
   // Websites search
   const websitesSearchBtn = document.getElementById('websitesSearchBtn');
   const websitesSearchInput = document.getElementById('websitesSearchInput');
@@ -1685,114 +1771,4 @@ function initializeApp() {
     console.error('❌ Critical error during initialization:', error);
     alert('An error occurred during initialization. Check console.');
   }
-}game.name}</h3>
-        <button class="gotd-play-btn" onclick="loadGame('${game.url}')">Play Now</button>
-      </div>
-    `;
-  } catch (error) {
-    console.error('❌ Error displaying Game of the Day:', error);
-  }
 }
-
-// ===== NAVIGATION FUNCTIONS =====
-function showHome() {
-  hideAll();
-  const homeContent = document.getElementById('content-home');
-  if (homeContent) homeContent.style.display = 'block';
-  const homeLink = document.getElementById('homeLink');
-  if (homeLink) homeLink.classList.add('active');
-  const infoButtons = document.querySelector('.homepage-info-buttons');
-  if (infoButtons) infoButtons.style.display = 'flex';
-  displayGameOfTheDay();
-}
-
-function showGames() {
-  hideAll();
-  const gamesContent = document.getElementById('content-gms');
-  if (gamesContent) gamesContent.style.display = 'block';
-  const gameLink = document.getElementById('gameLink');
-  if (gameLink) gameLink.classList.add('active');
-  
-  if (!document.querySelector('.game-filters') && window.GameStats) {
-    const searchContainer = document.querySelector('.search-container');
-    if (searchContainer) {
-      const filtersHTML = window.GameStats.createFilterButtons();
-      searchContainer.insertAdjacentHTML('afterend', filtersHTML);
-    }
-  }
-  
-  if (typeof games !== 'undefined' && Array.isArray(games)) {
-    const activeFilter = document.querySelector('.filter-btn.active');
-    if (activeFilter) {
-      const filter = activeFilter.dataset.filter;
-      window.filterGames(filter);
-    } else {
-      renderGames(games);
-    }
-  }
-}
-
-function showApps() {
-  hideAll();
-  const appsContent = document.getElementById('content-aps');
-  if (appsContent) appsContent.style.display = 'block';
-  const appsLink = document.getElementById('appsLink');
-  if (appsLink) appsLink.classList.add('active');
-  
-  if (typeof apps !== 'undefined' && Array.isArray(apps)) {
-    renderApps(apps);
-  }
-}
-
-function showWebsites() {
-  hideAll();
-  const websitesContent = document.getElementById('content-websites');
-  if (websitesContent) websitesContent.style.display = 'block';
-  const websitesLink = document.getElementById('websitesLink');
-  if (websitesLink) websitesLink.classList.add('active');
-  
-  if (typeof websites !== 'undefined' && Array.isArray(websites)) {
-    renderWebsites(websites);
-  }
-}
-
-function showAbout() {
-  hideAll();
-  const aboutContent = document.getElementById('content-about');
-  if (aboutContent) aboutContent.style.display = 'block';
-  const aboutLink = document.getElementById('aboutLink');
-  if (aboutLink) aboutLink.classList.add('active');
-}
-
-function showSettings() {
-  hideAll();
-  const settingsContent = document.getElementById('content-settings');
-  if (settingsContent) settingsContent.style.display = 'block';
-  const settingsLink = document.getElementById('settingsLink');
-  if (settingsLink) settingsLink.classList.add('active');
-}
-
-// ===== RENDER FUNCTIONS =====
-function renderGames(gamesToRender) {
-  const gameList = document.getElementById('game-list');
-  if (!gameList) return;
-  
-  gameList.innerHTML = '';
-  
-  if (!gamesToRender || gamesToRender.length === 0) {
-    gameList.innerHTML = '<p style="padding: 20px; text-align: center;">No games found.</p>';
-    return;
-  }
-  
-  gamesToRender.forEach(game => {
-    if (!game || !game.name || !game.url) return;
-    
-    const isFavorited = window.GameStats ? window.GameStats.isFavorite(game.url) : false;
-    
-    const card = document.createElement('div');
-    card.className = 'game-card';
-    card.tabIndex = 0;
-    card.innerHTML = `
-      ${window.GameStats ? window.GameStats.createFavoriteButton(game.url, isFavorited) : ''}
-      <img src="${game.image || 'https://via.placeholder.com/250x250?text=Game'}" alt="${game.name}" loading="lazy" />
-      <h3>${
