@@ -10,7 +10,7 @@ if (window.GVerseConsole && !window.GVerseConsole.initialized) {
 }
 
 // ===== CONSOLE INTEGRATION =====
-console.log('📦 Loading scripts.js with HWID Protection...');
+console.log('📦 Loading scripts.js with Cross-Domain HWID Protection...');
 console.log('🔍 Checking console status:', window.GVerseConsole ? 'Available' : 'Not loaded');
 
 // ===== SEASONAL THEME SYSTEM (BUILT-IN) =====
@@ -51,7 +51,7 @@ function shouldAutoApplySeasonalTheme() {
     init: function() {
       if (this.initialized) return;
       this.initialized = true;
-      console.log('🔍 WebsiteKeyTracker initialized (v3.0 - HWID Enhanced)');
+      console.log('🔍 WebsiteKeyTracker initialized (v4.0 - Cross-Domain HWID)');
     },
     
     trackKeyUsage: async function(key, website, fingerprint, hwid) {
@@ -84,29 +84,33 @@ function shouldAutoApplySeasonalTheme() {
   window.WebsiteKeyTracker.init();
 })();
 
-// ===== FIREBASE KEY SYSTEM WITH HWID PROTECTION =====
+// ===== FIREBASE CROSS-DOMAIN KEY SYSTEM WITH HWID PROTECTION =====
 (function() {
-  console.log('🔑 Initializing Firebase Key System with HWID Protection...');
+  console.log('🔑 Initializing Cross-Domain Firebase Key System with HWID...');
   
+  // ===== DOMAIN NORMALIZATION =====
   function normalizeHostname(hostname) {
-    hostname = hostname.split(':')[0];
+    hostname = hostname.split(':')[0].toLowerCase();
     
+    // All these domains are part of the GalaxyVerse network
     const galaxyverseDomains = [
       'schoologydashboard.org',
-      'gverse.schoologydashboard.org',
       'ahs.schoologydashboard.org',
       'learn.schoologydashboard.org',
+      'gverse.schoologydashboard.org',
       'galaxyverse-c1v.pages.dev',
       'galaxyverse.org',
       'cloudflare.net'
     ];
     
+    // Check if hostname contains any GalaxyVerse domain
     for (const domain of galaxyverseDomains) {
-      if (hostname.includes(domain.replace('.org', '').replace('.dev', '').replace('.net', ''))) {
+      if (hostname.includes(domain.replace(/\./g, ''))) {
         return 'galaxyverse-network';
       }
     }
     
+    // Localhost is also part of the network (for testing)
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
       return 'galaxyverse-network';
     }
@@ -115,31 +119,29 @@ function shouldAutoApplySeasonalTheme() {
   }
 
   function getActualWebsite(hostname) {
-    hostname = hostname.split(':')[0];
+    hostname = hostname.split(':')[0].toLowerCase();
     
+    // Map cloudflare.net URLs to actual domains
     if (hostname.includes('cloudflare.net')) {
-      if (hostname.includes('ahs.schoologydashboard.org')) return 'ahs.schoologydashboard.org';
-      if (hostname.includes('learn.schoologydashboard.org')) return 'learn.schoologydashboard.org';
-      if (hostname.includes('gverse.schoologydashboard.org')) return 'gverse.schoologydashboard.org';
-      if (hostname.includes('schoologydashboard.org')) return 'schoologydashboard.org';
-      return hostname;
-    }
-    
-    if (hostname.includes('schoologydashboard.org')) {
-      if (hostname.includes('gverse')) return 'gverse.schoologydashboard.org';
       if (hostname.includes('ahs')) return 'ahs.schoologydashboard.org';
       if (hostname.includes('learn')) return 'learn.schoologydashboard.org';
+      if (hostname.includes('gverse')) return 'gverse.schoologydashboard.org';
       return 'schoologydashboard.org';
     }
     
-    if (hostname.includes('galaxyverse-c1v.pages.dev')) return 'galaxyverse-c1v.pages.dev';
+    // Direct domain access
+    if (hostname.includes('ahs.schoologydashboard')) return 'ahs.schoologydashboard.org';
+    if (hostname.includes('learn.schoologydashboard')) return 'learn.schoologydashboard.org';
+    if (hostname.includes('gverse.schoologydashboard')) return 'gverse.schoologydashboard.org';
+    if (hostname.includes('schoologydashboard')) return 'schoologydashboard.org';
+    if (hostname.includes('galaxyverse-c1v')) return 'galaxyverse-c1v.pages.dev';
     if (hostname.includes('galaxyverse.org')) return 'galaxyverse.org';
     if (hostname === 'localhost' || hostname === '127.0.0.1') return 'localhost';
     
     return hostname;
   }
 
-  // Legacy fingerprint function (kept for backward compatibility)
+  // Legacy fingerprint (kept for backward compatibility)
   function generateBrowserFingerprint() {
     try {
       const canvas = document.createElement('canvas');
@@ -271,10 +273,10 @@ function shouldAutoApplySeasonalTheme() {
     async function initializeKeySystem() {
       const normalizedSite = normalizeHostname(window.location.hostname || 'localhost');
       const actualSite = getActualWebsite(window.location.hostname || 'localhost');
-      console.log('🌐 Current site (normalized):', normalizedSite);
-      console.log('🌐 Current site (actual):', actualSite);
+      console.log('🌐 Network:', normalizedSite);
+      console.log('🌐 Current domain:', actualSite);
       
-      // Generate HWID and legacy fingerprint
+      // Generate HWID and fingerprint
       console.log('🔐 Generating device HWID...');
       const hwid = await window.EnhancedFingerprint.generateHWID();
       const browserFingerprint = generateBrowserFingerprint();
@@ -284,21 +286,91 @@ function shouldAutoApplySeasonalTheme() {
       console.log('🔒 Fingerprint:', browserFingerprint);
       console.log('💻 Device:', deviceInfo.browser, 'on', deviceInfo.os);
       
+      // ===== STEP 1: CHECK FIREBASE FOR EXISTING KEY BY HWID =====
+      console.log('🔍 Step 1: Searching Firebase for existing key with this HWID...');
+      
       try {
-        await database.ref('fingerprints/' + browserFingerprint).update({
-          hwid: hwid,
-          lastSeen: new Date().toISOString(),
-          lastSeenSite: actualSite,
-          deviceInfo: deviceInfo
-        });
+        const usedKeysRef = database.ref('usedKeys');
+        const snapshot = await usedKeysRef.once('value');
+        
+        if (snapshot.exists()) {
+          const allKeys = snapshot.val();
+          let foundKey = null;
+          
+          // Search all keys for matching HWID
+          for (const [key, keyData] of Object.entries(allKeys)) {
+            if (keyData.hwid === hwid) {
+              foundKey = key;
+              console.log('✅ Found existing key in Firebase for this HWID:', key);
+              break;
+            }
+          }
+          
+          if (foundKey) {
+            // HWID match found in Firebase - auto-login
+            console.log('🎉 HWID matches Firebase record - Auto-login across ALL domains!');
+            
+            // Update last accessed info
+            const keyRef = database.ref('usedKeys/' + foundKey);
+            const keyData = (await keyRef.once('value')).val();
+            const websites = keyData.websites || [];
+            
+            if (!websites.includes(actualSite)) {
+              console.log('📝 Adding new domain to access list:', actualSite);
+              await keyRef.update({
+                websites: [...websites, actualSite],
+                lastAccessed: new Date().toISOString(),
+                lastAccessedSite: actualSite,
+                lastVerified: new Date().toISOString(),
+                timesAccessed: (keyData.timesAccessed || 0) + 1,
+                fingerprint: browserFingerprint,
+                deviceInfo: deviceInfo
+              });
+            } else {
+              await keyRef.update({
+                timesAccessed: (keyData.timesAccessed || 0) + 1,
+                lastAccessed: new Date().toISOString(),
+                lastAccessedSite: actualSite,
+                lastVerified: new Date().toISOString(),
+                fingerprint: browserFingerprint,
+                deviceInfo: deviceInfo
+              });
+            }
+            
+            // Update fingerprint database
+            await database.ref('fingerprints/' + browserFingerprint).set({
+              key: foundKey,
+              hwid: hwid,
+              lastSeen: new Date().toISOString(),
+              lastSeenSite: actualSite,
+              deviceInfo: deviceInfo
+            });
+            
+            // Save to localStorage for faster future access
+            localStorage.setItem('galaxyverse_user_key', foundKey);
+            localStorage.setItem('galaxyverse_access', 'granted');
+            
+            if (typeof window.WebsiteKeyTracker !== 'undefined') {
+              window.WebsiteKeyTracker.trackKeyUsage(foundKey, actualSite, browserFingerprint, hwid);
+            }
+            
+            console.log('✅ Cross-domain access granted automatically');
+            console.log('🌟 This key works on ALL GalaxyVerse domains!');
+            return; // SUCCESS - Exit here
+          }
+        }
+        
+        console.log('ℹ️ No existing key found in Firebase for this HWID');
       } catch (error) {
-        console.log('ℹ️ Fingerprint not yet registered');
+        console.error('❌ Error searching Firebase:', error);
       }
-
+      
+      // ===== STEP 2: CHECK LOCALSTORAGE =====
+      console.log('🔍 Step 2: Checking localStorage for saved key...');
       const storedKey = localStorage.getItem('galaxyverse_user_key');
       
       if (storedKey) {
-        console.log('🔑 Found stored key, verifying with HWID...');
+        console.log('📦 Found key in localStorage, verifying...');
         try {
           const keyRef = database.ref('usedKeys/' + storedKey);
           const snapshot = await keyRef.once('value');
@@ -308,9 +380,8 @@ function shouldAutoApplySeasonalTheme() {
             
             // CRITICAL: Check HWID match
             if (keyData.hwid && keyData.hwid !== hwid) {
-              console.error('🚫 HWID MISMATCH! This key is registered to a different device.');
+              console.error('🚫 HWID MISMATCH! localStorage key belongs to different device.');
               
-              // Log security event
               await database.ref('securityLogs/hwidMismatches/' + Date.now()).set({
                 key: storedKey,
                 storedHWID: keyData.hwid,
@@ -322,7 +393,6 @@ function shouldAutoApplySeasonalTheme() {
                 userAgent: navigator.userAgent
               });
               
-              // Clear local storage
               localStorage.removeItem('galaxyverse_user_key');
               localStorage.removeItem('galaxyverse_access');
               
@@ -331,66 +401,53 @@ function shouldAutoApplySeasonalTheme() {
               return;
             }
             
-            // Check fingerprint match (secondary check)
-            if (keyData.fingerprint === browserFingerprint) {
-              console.log('✅ HWID and Fingerprint verified. Access granted across ALL GalaxyVerse sites.');
-              
-              const websites = keyData.websites || [];
-              
-              if (!websites.includes(actualSite)) {
-                console.log('📝 Adding current site to websites list');
-                await keyRef.update({
-                  websites: [...websites, actualSite],
-                  lastAccessed: new Date().toISOString(),
-                  lastAccessedSite: actualSite,
-                  lastVerified: new Date().toISOString(),
-                  timesAccessed: (keyData.timesAccessed || 0) + 1
-                });
-              } else {
-                await keyRef.update({
-                  timesAccessed: (keyData.timesAccessed || 0) + 1,
-                  lastAccessed: new Date().toISOString(),
-                  lastAccessedSite: actualSite,
-                  lastVerified: new Date().toISOString()
-                });
-              }
-              
-              if (typeof window.WebsiteKeyTracker !== 'undefined') {
-                window.WebsiteKeyTracker.trackKeyUsage(storedKey, actualSite, browserFingerprint, hwid);
-              }
-              
-              localStorage.setItem('galaxyverse_access', 'granted');
-              console.log('✅ Access granted automatically');
-              return;
-            } else {
-              console.warn('⚠️ Fingerprint mismatch but HWID matches - updating fingerprint');
-              // HWID matches but fingerprint changed (browser update, cookies cleared, etc.)
+            // HWID matches - grant access
+            console.log('✅ localStorage key verified with HWID match');
+            
+            const websites = keyData.websites || [];
+            if (!websites.includes(actualSite)) {
               await keyRef.update({
-                fingerprint: browserFingerprint,
-                lastVerified: new Date().toISOString()
+                websites: [...websites, actualSite],
+                lastAccessed: new Date().toISOString(),
+                lastAccessedSite: actualSite,
+                lastVerified: new Date().toISOString(),
+                timesAccessed: (keyData.timesAccessed || 0) + 1,
+                fingerprint: browserFingerprint
               });
-              
-              localStorage.setItem('galaxyverse_access', 'granted');
-              console.log('✅ Fingerprint updated, access granted');
-              return;
+            } else {
+              await keyRef.update({
+                timesAccessed: (keyData.timesAccessed || 0) + 1,
+                lastAccessed: new Date().toISOString(),
+                lastAccessedSite: actualSite,
+                lastVerified: new Date().toISOString(),
+                fingerprint: browserFingerprint
+              });
             }
+            
+            if (typeof window.WebsiteKeyTracker !== 'undefined') {
+              window.WebsiteKeyTracker.trackKeyUsage(storedKey, actualSite, browserFingerprint, hwid);
+            }
+            
+            localStorage.setItem('galaxyverse_access', 'granted');
+            console.log('✅ Access granted via localStorage verification');
+            return; // SUCCESS
           } else {
-            console.warn('⚠️ Stored key not found in database. Clearing local data.');
+            console.warn('⚠️ localStorage key not found in Firebase');
             localStorage.removeItem('galaxyverse_user_key');
             localStorage.removeItem('galaxyverse_access');
           }
         } catch (error) {
-          console.error('❌ Error verifying stored key:', error);
+          console.error('❌ Error verifying localStorage key:', error);
         }
-      } else {
-        console.log('ℹ️ No stored key found');
       }
 
+      // ===== STEP 3: NO KEY FOUND - SHOW ENTRY SCREEN =====
+      console.log('🔐 No valid key found - showing entry screen');
       showKeyEntryScreen();
     }
 
     function showKeyEntryScreen() {
-      console.log('🔐 Showing key entry screen with HWID protection');
+      console.log('🔐 Showing key entry screen with cross-domain HWID protection');
       
       const keyOverlay = document.createElement('div');
       keyOverlay.id = 'galaxyverse-key-overlay';
@@ -458,7 +515,7 @@ function shouldAutoApplySeasonalTheme() {
             font-size: 13px;
             color: #9ca3af;
           ">
-            <div style="margin-bottom: 8px; color: #4f90ff; font-weight: bold;">🔒 HWID Protection Active</div>
+            <div style="margin-bottom: 8px; color: #4f90ff; font-weight: bold;">🔒 Cross-Domain HWID Protection</div>
             <div style="font-size: 12px;">
               Device: ${deviceInfo.browser} on ${deviceInfo.os}<br>
               Screen: ${deviceInfo.screen} | Cores: ${deviceInfo.cores}
@@ -471,7 +528,7 @@ function shouldAutoApplySeasonalTheme() {
             margin-bottom: 20px;
           ">
           <a href="https://docs.google.com/document/d/1RfHWPQ-8Kq2NDV6vxfOgquBqIKwp4OoL7K1NXkYLUEg/edit?usp=sharing" target="_blank" style="color: #4f90ff;">GalaxyVerse Policy</a><br>
-          V1.2.7 - HWID Protection + 12 Games</p>
+          V1.3.0 - Cross-Domain HWID System</p>
           
           <input type="text" id="keyInput" placeholder="Enter your key" style="
             width: 100%;
@@ -549,8 +606,8 @@ function shouldAutoApplySeasonalTheme() {
           ">
             🔐 Each key is permanently linked to your device HWID<br>
             🌟 Cannot be transferred or used on other devices<br>
-            ✨ Works across ALL GalaxyVerse websites<br>
-            💫 Automatically recognized on any GalaxyVerse domain<br><br>
+            ✨ Works across ALL GalaxyVerse websites automatically<br>
+            💫 Use on any domain - auto-recognized everywhere<br><br>
             Contact admins for lifetime key ($5)
           </div>
         </div>
@@ -654,13 +711,12 @@ function shouldAutoApplySeasonalTheme() {
         submitBtn.textContent = 'Generating HWID...';
         submitBtn.style.cursor = 'wait';
         
-        console.log('🔑 Verifying key with HWID protection:', enteredKey);
+        console.log('🔑 Verifying key with cross-domain HWID:', enteredKey);
 
         try {
           const normalizedSite = normalizeHostname(window.location.hostname || 'localhost');
           const actualSite = getActualWebsite(window.location.hostname || 'localhost');
           
-          // Generate HWID
           submitBtn.textContent = 'Analyzing Device...';
           const hwid = await window.EnhancedFingerprint.generateHWID();
           const browserFingerprint = generateBrowserFingerprint();
@@ -669,18 +725,24 @@ function shouldAutoApplySeasonalTheme() {
           console.log('🔒 Generated HWID:', hwid.substring(0, 20) + '...');
           console.log('🔒 Fingerprint:', browserFingerprint);
           
-          submitBtn.textContent = 'Connecting...';
+          submitBtn.textContent = 'Checking Firebase...';
           await database.ref('.info/connected').once('value');
           
-          submitBtn.textContent = 'Verifying...';
+          submitBtn.textContent = 'Verifying key...';
           
+          // ===== CHECK IF KEY EXISTS IN FIREBASE =====
           const keyRef = database.ref('usedKeys/' + enteredKey);
           const snapshot = await keyRef.once('value');
           
           if (snapshot.exists()) {
+            // KEY ALREADY REGISTERED
             const keyData = snapshot.val();
             const keyOwnerHWID = keyData.hwid;
-            const keyOwnerFingerprint = keyData.fingerprint;
+            
+            console.log('📝 Key found in database');
+            console.log('🔍 Comparing HWIDs...');
+            console.log('   Database HWID:', keyOwnerHWID?.substring(0, 20) + '...');
+            console.log('   Current HWID:', hwid.substring(0, 20) + '...');
             
             // CRITICAL: Check HWID match
             if (hwid !== keyOwnerHWID) {
@@ -689,19 +751,19 @@ function shouldAutoApplySeasonalTheme() {
               // Log security event
               await database.ref('securityLogs/unauthorizedKeyAttempts/' + Date.now()).set({
                 attemptedKey: enteredKey,
-                keyOwnerFingerprint: keyOwnerFingerprint,
                 keyOwnerHWID: keyOwnerHWID,
-                attemptedByFingerprint: browserFingerprint,
                 attemptedByHWID: hwid,
+                attemptedByFingerprint: browserFingerprint,
                 website: actualSite,
                 normalizedSite: normalizedSite,
                 timestamp: Date.now(),
                 date: new Date().toISOString(),
                 userAgent: navigator.userAgent,
+                deviceInfo: deviceInfo,
                 reason: 'HWID_MISMATCH'
               });
               
-              keyError.textContent = '🚫 SECURITY ALERT: This key is permanently registered to another device. Keys cannot be transferred between devices.';
+              keyError.textContent = '🚫 SECURITY ALERT: This key is permanently locked to another device. Each key can only be used on ONE device. If this is your key, contact support.';
               keyError.style.color = '#ff4444';
               keyError.style.display = 'block';
               keyInput.style.borderColor = '#ff4444';
@@ -712,33 +774,38 @@ function shouldAutoApplySeasonalTheme() {
               return;
             }
             
-            // HWID matches - update access
-            console.log('✅ HWID verified - updating access');
+            // ===== HWID MATCHES - GRANT ACCESS =====
+            console.log('✅ HWID matches! This is the correct device.');
+            submitBtn.textContent = 'Granting access...';
             
             const websites = keyData.websites || [];
-            const timesAccessed = keyData.timesAccessed || 0;
             
             if (!websites.includes(actualSite)) {
+              console.log('📝 Adding new domain to key:', actualSite);
               await keyRef.update({
                 websites: [...websites, actualSite],
-                timesAccessed: timesAccessed + 1,
+                timesAccessed: (keyData.timesAccessed || 0) + 1,
                 lastAccessed: new Date().toISOString(),
                 lastAccessedSite: actualSite,
                 lastVerified: new Date().toISOString(),
                 network: normalizedSite,
-                deviceInfo: deviceInfo
+                deviceInfo: deviceInfo,
+                fingerprint: browserFingerprint
               });
             } else {
+              console.log('📝 Updating existing domain access');
               await keyRef.update({
-                timesAccessed: timesAccessed + 1,
+                timesAccessed: (keyData.timesAccessed || 0) + 1,
                 lastAccessed: new Date().toISOString(),
                 lastAccessedSite: actualSite,
                 lastVerified: new Date().toISOString(),
                 network: normalizedSite,
-                deviceInfo: deviceInfo
+                deviceInfo: deviceInfo,
+                fingerprint: browserFingerprint
               });
             }
             
+            // Update fingerprint database
             await database.ref('fingerprints/' + browserFingerprint).set({
               key: enteredKey,
               hwid: hwid,
@@ -747,6 +814,7 @@ function shouldAutoApplySeasonalTheme() {
               deviceInfo: deviceInfo
             });
             
+            // Save to localStorage for cross-domain access
             localStorage.setItem('galaxyverse_access', 'granted');
             localStorage.setItem('galaxyverse_user_key', enteredKey);
             
@@ -755,13 +823,13 @@ function shouldAutoApplySeasonalTheme() {
             }
             
             keyError.style.color = '#4ade80';
-            keyError.textContent = '✅ Welcome back! HWID verified - Access granted';
+            keyError.textContent = '✅ Welcome back! Access granted across ALL GalaxyVerse domains';
             keyError.style.display = 'block';
             keyInput.style.borderColor = '#4ade80';
             submitBtn.style.background = 'linear-gradient(135deg, #4ade80, #22c55e)';
             submitBtn.textContent = 'Success!';
 
-            console.log('✅ Access granted successfully');
+            console.log('✅ Access granted - works on all GalaxyVerse domains now!');
 
             setTimeout(() => {
               keyOverlay.style.opacity = '0';
@@ -777,8 +845,10 @@ function shouldAutoApplySeasonalTheme() {
             }, 1500);
             return;
           } else {
-            // New key claim - register HWID
-            console.log('🆕 Claiming new key with HWID registration');
+            // ===== NEW KEY - REGISTER WITH HWID =====
+            console.log('🆕 New key! Registering with HWID...');
+            submitBtn.textContent = 'Registering device...';
+            
             await keyRef.set({
               used: true,
               hwid: hwid,
@@ -793,7 +863,13 @@ function shouldAutoApplySeasonalTheme() {
               lastVerified: new Date().toISOString(),
               network: normalizedSite,
               claimedAcrossNetwork: true,
-              deviceInfo: deviceInfo
+              deviceInfo: deviceInfo,
+              registeredDevice: {
+                browser: deviceInfo.browser,
+                os: deviceInfo.os,
+                screen: deviceInfo.screen,
+                cores: deviceInfo.cores
+              }
             });
 
             await database.ref('fingerprints/' + browserFingerprint).set({
@@ -813,13 +889,13 @@ function shouldAutoApplySeasonalTheme() {
             }
 
             keyError.style.color = '#4ade80';
-            keyError.textContent = '✅ Key claimed! HWID registered - Works on ALL GalaxyVerse sites';
+            keyError.textContent = '✅ Success! Key registered to this device permanently. Works on ALL GalaxyVerse domains!';
             keyError.style.display = 'block';
             keyInput.style.borderColor = '#4ade80';
             submitBtn.style.background = 'linear-gradient(135deg, #4ade80, #22c55e)';
             submitBtn.textContent = 'Success!';
 
-            console.log('✅ Key claimed successfully with HWID');
+            console.log('✅ New key registered with HWID - works across all domains!');
 
             setTimeout(() => {
               keyOverlay.style.opacity = '0';
@@ -839,13 +915,11 @@ function shouldAutoApplySeasonalTheme() {
           
           let errorMessage = '❌ Connection error. ';
           if (error.code === 'PERMISSION_DENIED') {
-            errorMessage += 'Access denied. Please check Firebase rules.';
+            errorMessage += 'Database access denied. Check Firebase rules.';
           } else if (error.message && error.message.includes('network')) {
-            errorMessage += 'Network error. Check your internet connection.';
-          } else if (error.message && error.message.includes('timeout')) {
-            errorMessage += 'Request timed out. Please try again.';
+            errorMessage += 'Network error. Check internet connection.';
           } else {
-            errorMessage += 'Please refresh the page and try again.';
+            errorMessage += error.message || 'Please try again.';
           }
           
           keyError.textContent = errorMessage;
@@ -1171,116 +1245,6 @@ function displayGameOfTheDay() {
         <div class="gotd-badge">🌟 Game of the Day</div>
         <img src="${game.image}" alt="${game.name}" loading="lazy" />
         <h3>${game.name}</h3>
-        <button class="gotd-play-btn" onclick="loadGame('${game.url}')">Play Now</button>
-      </div>
-    `;
-  } catch (error) {
-    console.error('❌ Error displaying Game of the Day:', error);
-  }
-}
-
-// ===== NAVIGATION FUNCTIONS =====
-function showHome() {
-  hideAll();
-  const homeContent = document.getElementById('content-home');
-  if (homeContent) homeContent.style.display = 'block';
-  const homeLink = document.getElementById('homeLink');
-  if (homeLink) homeLink.classList.add('active');
-  const infoButtons = document.querySelector('.homepage-info-buttons');
-  if (infoButtons) infoButtons.style.display = 'flex';
-  displayGameOfTheDay();
-}
-
-function showGames() {
-  hideAll();
-  const gamesContent = document.getElementById('content-gms');
-  if (gamesContent) gamesContent.style.display = 'block';
-  const gameLink = document.getElementById('gameLink');
-  if (gameLink) gameLink.classList.add('active');
-  
-  if (!document.querySelector('.game-filters') && window.GameStats) {
-    const searchContainer = document.querySelector('.search-container');
-    if (searchContainer) {
-      const filtersHTML = window.GameStats.createFilterButtons();
-      searchContainer.insertAdjacentHTML('afterend', filtersHTML);
-    }
-  }
-  
-  if (typeof games !== 'undefined' && Array.isArray(games)) {
-    const activeFilter = document.querySelector('.filter-btn.active');
-    if (activeFilter) {
-      const filter = activeFilter.dataset.filter;
-      window.filterGames(filter);
-    } else {
-      renderGames(games);
-    }
-  }
-}
-
-function showApps() {
-  hideAll();
-  const appsContent = document.getElementById('content-aps');
-  if (appsContent) appsContent.style.display = 'block';
-  const appsLink = document.getElementById('appsLink');
-  if (appsLink) appsLink.classList.add('active');
-  
-  if (typeof apps !== 'undefined' && Array.isArray(apps)) {
-    renderApps(apps);
-  }
-}
-
-function showWebsites() {
-  hideAll();
-  const websitesContent = document.getElementById('content-websites');
-  if (websitesContent) websitesContent.style.display = 'block';
-  const websitesLink = document.getElementById('websitesLink');
-  if (websitesLink) websitesLink.classList.add('active');
-  
-  if (typeof websites !== 'undefined' && Array.isArray(websites)) {
-    renderWebsites(websites);
-  }
-}
-
-function showAbout() {
-  hideAll();
-  const aboutContent = document.getElementById('content-about');
-  if (aboutContent) aboutContent.style.display = 'block';
-  const aboutLink = document.getElementById('aboutLink');
-  if (aboutLink) aboutLink.classList.add('active');
-}
-
-function showSettings() {
-  hideAll();
-  const settingsContent = document.getElementById('content-settings');
-  if (settingsContent) settingsContent.style.display = 'block';
-  const settingsLink = document.getElementById('settingsLink');
-  if (settingsLink) settingsLink.classList.add('active');
-}
-
-// ===== RENDER FUNCTIONS =====
-function renderGames(gamesToRender) {
-  const gameList = document.getElementById('game-list');
-  if (!gameList) return;
-  
-  gameList.innerHTML = '';
-  
-  if (!gamesToRender || gamesToRender.length === 0) {
-    gameList.innerHTML = '<p style="padding: 20px; text-align: center;">No games found.</p>';
-    return;
-  }
-  
-  gamesToRender.forEach(game => {
-    if (!game || !game.name || !game.url) return;
-    
-    const isFavorited = window.GameStats ? window.GameStats.isFavorite(game.url) : false;
-    
-    const card = document.createElement('div');
-    card.className = 'game-card';
-    card.tabIndex = 0;
-    card.innerHTML = `
-      ${window.GameStats ? window.GameStats.createFavoriteButton(game.url, isFavorited) : ''}
-      <img src="${game.image || 'https://via.placeholder.com/250x250?text=Game'}" alt="${game.name}" loading="lazy" />
-      <h3>${game.name}</h3>
     `;
     card.onclick = () => loadGame(game.url);
     card.onkeypress = (e) => { if (e.key === 'Enter') loadGame(game.url); };
@@ -1493,7 +1457,7 @@ if (document.readyState === 'loading') {
 
 function initializeApp() {
   try {
-    console.log('🚀 Initializing GalaxyVerse with HWID Protection...');
+    console.log('🚀 Initializing GalaxyVerse with Cross-Domain HWID Protection...');
     console.log('📊 Console Status:', {
       available: !!window.GVerseConsole,
       initialized: window.GVerseConsole?.initialized || false,
@@ -1713,11 +1677,122 @@ function initializeApp() {
     fullscreenBtn.addEventListener('click', toggleFullscreen);
   }
 
-  console.log('✅ GalaxyVerse initialized with HWID Protection');
+  console.log('✅ GalaxyVerse initialized with Cross-Domain HWID Protection');
   console.log('📊 Console active - Press Ctrl+Shift+K to toggle');
+  console.log('🌐 Cross-domain system: Keys work automatically across ALL GalaxyVerse sites');
   
   } catch (error) {
     console.error('❌ Critical error during initialization:', error);
     alert('An error occurred during initialization. Check console.');
   }
+}game.name}</h3>
+        <button class="gotd-play-btn" onclick="loadGame('${game.url}')">Play Now</button>
+      </div>
+    `;
+  } catch (error) {
+    console.error('❌ Error displaying Game of the Day:', error);
+  }
 }
+
+// ===== NAVIGATION FUNCTIONS =====
+function showHome() {
+  hideAll();
+  const homeContent = document.getElementById('content-home');
+  if (homeContent) homeContent.style.display = 'block';
+  const homeLink = document.getElementById('homeLink');
+  if (homeLink) homeLink.classList.add('active');
+  const infoButtons = document.querySelector('.homepage-info-buttons');
+  if (infoButtons) infoButtons.style.display = 'flex';
+  displayGameOfTheDay();
+}
+
+function showGames() {
+  hideAll();
+  const gamesContent = document.getElementById('content-gms');
+  if (gamesContent) gamesContent.style.display = 'block';
+  const gameLink = document.getElementById('gameLink');
+  if (gameLink) gameLink.classList.add('active');
+  
+  if (!document.querySelector('.game-filters') && window.GameStats) {
+    const searchContainer = document.querySelector('.search-container');
+    if (searchContainer) {
+      const filtersHTML = window.GameStats.createFilterButtons();
+      searchContainer.insertAdjacentHTML('afterend', filtersHTML);
+    }
+  }
+  
+  if (typeof games !== 'undefined' && Array.isArray(games)) {
+    const activeFilter = document.querySelector('.filter-btn.active');
+    if (activeFilter) {
+      const filter = activeFilter.dataset.filter;
+      window.filterGames(filter);
+    } else {
+      renderGames(games);
+    }
+  }
+}
+
+function showApps() {
+  hideAll();
+  const appsContent = document.getElementById('content-aps');
+  if (appsContent) appsContent.style.display = 'block';
+  const appsLink = document.getElementById('appsLink');
+  if (appsLink) appsLink.classList.add('active');
+  
+  if (typeof apps !== 'undefined' && Array.isArray(apps)) {
+    renderApps(apps);
+  }
+}
+
+function showWebsites() {
+  hideAll();
+  const websitesContent = document.getElementById('content-websites');
+  if (websitesContent) websitesContent.style.display = 'block';
+  const websitesLink = document.getElementById('websitesLink');
+  if (websitesLink) websitesLink.classList.add('active');
+  
+  if (typeof websites !== 'undefined' && Array.isArray(websites)) {
+    renderWebsites(websites);
+  }
+}
+
+function showAbout() {
+  hideAll();
+  const aboutContent = document.getElementById('content-about');
+  if (aboutContent) aboutContent.style.display = 'block';
+  const aboutLink = document.getElementById('aboutLink');
+  if (aboutLink) aboutLink.classList.add('active');
+}
+
+function showSettings() {
+  hideAll();
+  const settingsContent = document.getElementById('content-settings');
+  if (settingsContent) settingsContent.style.display = 'block';
+  const settingsLink = document.getElementById('settingsLink');
+  if (settingsLink) settingsLink.classList.add('active');
+}
+
+// ===== RENDER FUNCTIONS =====
+function renderGames(gamesToRender) {
+  const gameList = document.getElementById('game-list');
+  if (!gameList) return;
+  
+  gameList.innerHTML = '';
+  
+  if (!gamesToRender || gamesToRender.length === 0) {
+    gameList.innerHTML = '<p style="padding: 20px; text-align: center;">No games found.</p>';
+    return;
+  }
+  
+  gamesToRender.forEach(game => {
+    if (!game || !game.name || !game.url) return;
+    
+    const isFavorited = window.GameStats ? window.GameStats.isFavorite(game.url) : false;
+    
+    const card = document.createElement('div');
+    card.className = 'game-card';
+    card.tabIndex = 0;
+    card.innerHTML = `
+      ${window.GameStats ? window.GameStats.createFavoriteButton(game.url, isFavorited) : ''}
+      <img src="${game.image || 'https://via.placeholder.com/250x250?text=Game'}" alt="${game.name}" loading="lazy" />
+      <h3>${
