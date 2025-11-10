@@ -85,7 +85,7 @@ const games = [
 const apps = [
   { name: "Soundboard", image: "others/assets/images/apps/soundboard.png", url: "others/assets/apps/Soundboard.html" },
   { name: "Soundcloud", image: "others/assets/images/apps/soundcloud.png", url: "others/assets/apps/soundcloud.html" },
-  { name: "Vscode", image: "others/assets/images/apps/vscode.jpeg", url: "others/assets/apps/Vscode.html" },
+  { name: "Vscode", image: "others/assets/images/apps/vscode.jpeg", url: "others/assets/apps/vscode.html" },
   { name: "YouTube", image: "/others/assets/images/apps/youtube.png", url: "/others/assets/apps/yt.html"}
 ];
 
