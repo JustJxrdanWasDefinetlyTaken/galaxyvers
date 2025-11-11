@@ -10,7 +10,7 @@ if (window.GVerseConsole && !window.GVerseConsole.initialized) {
 }
 
 // ===== CONSOLE INTEGRATION =====
-console.log('📦 Loading scripts.js with Cross-Domain HWID Protection...');
+console.log('📦 Loading scripts.js with Browser Fingerprint Protection...');
 console.log('🔍 Checking console status:', window.GVerseConsole ? 'Available' : 'Not loaded');
 
 // ===== SEASONAL THEME SYSTEM (BUILT-IN) =====
@@ -51,10 +51,10 @@ function shouldAutoApplySeasonalTheme() {
     init: function() {
       if (this.initialized) return;
       this.initialized = true;
-      console.log('🔍 WebsiteKeyTracker initialized (v4.0 - Cross-Domain HWID)');
+      console.log('🔍 WebsiteKeyTracker initialized (v5.0 - Fingerprint Only)');
     },
     
-    trackKeyUsage: async function(key, website, fingerprint, hwid) {
+    trackKeyUsage: async function(key, website, fingerprint) {
       try {
         if (typeof firebase === 'undefined' || !firebase.database) {
           console.error('❌ Firebase not available for tracking');
@@ -67,7 +67,6 @@ function shouldAutoApplySeasonalTheme() {
         await trackingRef.set({
           website: website,
           fingerprint: fingerprint,
-          hwid: hwid,
           timestamp: Date.now(),
           date: new Date().toISOString(),
           userAgent: navigator.userAgent,
@@ -84,9 +83,9 @@ function shouldAutoApplySeasonalTheme() {
   window.WebsiteKeyTracker.init();
 })();
 
-// ===== FIREBASE CROSS-DOMAIN KEY SYSTEM WITH HWID PROTECTION =====
+// ===== FIREBASE CROSS-DOMAIN KEY SYSTEM WITH FINGERPRINT PROTECTION =====
 (function() {
-  console.log('🔑 Initializing Cross-Domain Firebase Key System with HWID...');
+  console.log('🔑 Initializing Cross-Domain Firebase Key System with Browser Fingerprint...');
   
   // ===== DOMAIN NORMALIZATION =====
   function normalizeHostname(hostname) {
@@ -141,27 +140,40 @@ function shouldAutoApplySeasonalTheme() {
     return hostname;
   }
 
-  // Legacy fingerprint (kept for backward compatibility)
+  // Enhanced browser fingerprint generation
   function generateBrowserFingerprint() {
     try {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       if (!ctx) return 'fp_' + Math.random().toString(36).substr(2, 9);
       
+      canvas.width = 200;
+      canvas.height = 50;
       ctx.textBaseline = 'top';
       ctx.font = '14px Arial';
-      ctx.fillText('Browser Fingerprint', 2, 2);
+      ctx.fillStyle = '#f60';
+      ctx.fillRect(125, 1, 62, 20);
+      ctx.fillStyle = '#069';
+      ctx.fillText('GalaxyVerse Fingerprint 🔐', 2, 15);
       const canvasData = canvas.toDataURL();
       
       const fingerprint = {
         userAgent: navigator.userAgent,
         language: navigator.language,
+        languages: navigator.languages ? navigator.languages.join(',') : '',
         platform: navigator.platform,
         screenResolution: `${screen.width}x${screen.height}`,
         colorDepth: screen.colorDepth,
+        pixelDepth: screen.pixelDepth,
+        availableResolution: `${screen.availWidth}x${screen.availHeight}`,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        canvasHash: canvasData.substring(0, 50),
-        hardwareConcurrency: navigator.hardwareConcurrency || 0
+        timezoneOffset: new Date().getTimezoneOffset(),
+        canvasHash: canvasData.substring(0, 100),
+        hardwareConcurrency: navigator.hardwareConcurrency || 0,
+        deviceMemory: navigator.deviceMemory || 0,
+        maxTouchPoints: navigator.maxTouchPoints || 0,
+        doNotTrack: navigator.doNotTrack,
+        cookieEnabled: navigator.cookieEnabled
       };
       
       const fingerprintString = JSON.stringify(fingerprint);
@@ -178,17 +190,42 @@ function shouldAutoApplySeasonalTheme() {
     }
   }
 
+  function getDeviceInfo() {
+    const ua = navigator.userAgent;
+    let browser = 'Unknown';
+    let os = 'Unknown';
+    
+    if (ua.includes('Firefox')) browser = 'Firefox';
+    else if (ua.includes('Chrome')) browser = 'Chrome';
+    else if (ua.includes('Safari')) browser = 'Safari';
+    else if (ua.includes('Edge')) browser = 'Edge';
+    
+    if (ua.includes('Windows')) os = 'Windows';
+    else if (ua.includes('Mac')) os = 'macOS';
+    else if (ua.includes('Linux')) os = 'Linux';
+    else if (ua.includes('Android')) os = 'Android';
+    else if (ua.includes('iOS')) os = 'iOS';
+    
+    return {
+      browser: browser,
+      os: os,
+      screen: `${screen.width}x${screen.height}`,
+      cores: navigator.hardwareConcurrency || 'unknown',
+      memory: navigator.deviceMemory ? `${navigator.deviceMemory}GB` : 'unknown'
+    };
+  }
+
   function waitForFirebase(callback, maxAttempts = 50) {
     let attempts = 0;
     const checkFirebase = setInterval(() => {
       attempts++;
-      if (typeof firebase !== 'undefined' && firebase.apps && window.EnhancedFingerprint) {
+      if (typeof firebase !== 'undefined' && firebase.apps) {
         clearInterval(checkFirebase);
-        console.log('✅ Firebase and Enhanced Fingerprint detected');
+        console.log('✅ Firebase detected');
         callback();
       } else if (attempts >= maxAttempts) {
         clearInterval(checkFirebase);
-        console.error('❌ Firebase or Enhanced Fingerprint failed to load');
+        console.error('❌ Firebase failed to load');
         callback();
       }
     }, 100);
@@ -197,11 +234,6 @@ function shouldAutoApplySeasonalTheme() {
   waitForFirebase(async function() {
     if (typeof firebase === 'undefined') {
       console.warn('⚠️ Firebase not available, running in offline mode');
-      return;
-    }
-
-    if (!window.EnhancedFingerprint) {
-      console.error('❌ Enhanced Fingerprint system not loaded!');
       return;
     }
 
@@ -276,18 +308,16 @@ function shouldAutoApplySeasonalTheme() {
       console.log('🌐 Network:', normalizedSite);
       console.log('🌐 Current domain:', actualSite);
       
-      // Generate HWID and fingerprint
-      console.log('🔐 Generating device HWID...');
-      const hwid = await window.EnhancedFingerprint.generateHWID();
+      // Generate fingerprint
+      console.log('🔐 Generating browser fingerprint...');
       const browserFingerprint = generateBrowserFingerprint();
-      const deviceInfo = window.EnhancedFingerprint.getDeviceInfo();
+      const deviceInfo = getDeviceInfo();
       
-      console.log('🔒 HWID:', hwid.substring(0, 20) + '...');
       console.log('🔒 Fingerprint:', browserFingerprint);
       console.log('💻 Device:', deviceInfo.browser, 'on', deviceInfo.os);
       
-      // ===== STEP 1: CHECK FIREBASE FOR EXISTING KEY BY HWID =====
-      console.log('🔍 Step 1: Searching Firebase for existing key with this HWID...');
+      // ===== STEP 1: CHECK FIREBASE FOR EXISTING KEY BY FINGERPRINT =====
+      console.log('🔍 Step 1: Searching Firebase for existing key with this fingerprint...');
       
       try {
         const usedKeysRef = database.ref('usedKeys');
@@ -297,18 +327,18 @@ function shouldAutoApplySeasonalTheme() {
           const allKeys = snapshot.val();
           let foundKey = null;
           
-          // Search all keys for matching HWID
+          // Search all keys for matching fingerprint
           for (const [key, keyData] of Object.entries(allKeys)) {
-            if (keyData.hwid === hwid) {
+            if (keyData.fingerprint === browserFingerprint) {
               foundKey = key;
-              console.log('✅ Found existing key in Firebase for this HWID:', key);
+              console.log('✅ Found existing key in Firebase for this fingerprint:', key);
               break;
             }
           }
           
           if (foundKey) {
-            // HWID match found in Firebase - auto-login
-            console.log('🎉 HWID matches Firebase record - Auto-login across ALL domains!');
+            // Fingerprint match found in Firebase - auto-login
+            console.log('🎉 Fingerprint matches Firebase record - Auto-login across ALL domains!');
             
             // Update last accessed info
             const keyRef = database.ref('usedKeys/' + foundKey);
@@ -323,7 +353,6 @@ function shouldAutoApplySeasonalTheme() {
                 lastAccessedSite: actualSite,
                 lastVerified: new Date().toISOString(),
                 timesAccessed: (keyData.timesAccessed || 0) + 1,
-                fingerprint: browserFingerprint,
                 deviceInfo: deviceInfo
               });
             } else {
@@ -332,7 +361,6 @@ function shouldAutoApplySeasonalTheme() {
                 lastAccessed: new Date().toISOString(),
                 lastAccessedSite: actualSite,
                 lastVerified: new Date().toISOString(),
-                fingerprint: browserFingerprint,
                 deviceInfo: deviceInfo
               });
             }
@@ -340,7 +368,6 @@ function shouldAutoApplySeasonalTheme() {
             // Update fingerprint database
             await database.ref('fingerprints/' + browserFingerprint).set({
               key: foundKey,
-              hwid: hwid,
               lastSeen: new Date().toISOString(),
               lastSeenSite: actualSite,
               deviceInfo: deviceInfo
@@ -351,7 +378,7 @@ function shouldAutoApplySeasonalTheme() {
             localStorage.setItem('galaxyverse_access', 'granted');
             
             if (typeof window.WebsiteKeyTracker !== 'undefined') {
-              window.WebsiteKeyTracker.trackKeyUsage(foundKey, actualSite, browserFingerprint, hwid);
+              window.WebsiteKeyTracker.trackKeyUsage(foundKey, actualSite, browserFingerprint);
             }
             
             console.log('✅ Cross-domain access granted automatically');
@@ -360,7 +387,7 @@ function shouldAutoApplySeasonalTheme() {
           }
         }
         
-        console.log('ℹ️ No existing key found in Firebase for this HWID');
+        console.log('ℹ️ No existing key found in Firebase for this fingerprint');
       } catch (error) {
         console.error('❌ Error searching Firebase:', error);
       }
@@ -378,15 +405,14 @@ function shouldAutoApplySeasonalTheme() {
           if (snapshot.exists()) {
             const keyData = snapshot.val();
             
-            // CRITICAL: Check HWID match
-            if (keyData.hwid && keyData.hwid !== hwid) {
-              console.error('🚫 HWID MISMATCH! localStorage key belongs to different device.');
+            // CRITICAL: Check fingerprint match
+            if (keyData.fingerprint && keyData.fingerprint !== browserFingerprint) {
+              console.error('🚫 FINGERPRINT MISMATCH! localStorage key belongs to different browser.');
               
-              await database.ref('securityLogs/hwidMismatches/' + Date.now()).set({
+              await database.ref('securityLogs/fingerprintMismatches/' + Date.now()).set({
                 key: storedKey,
-                storedHWID: keyData.hwid,
-                attemptedHWID: hwid,
-                fingerprint: browserFingerprint,
+                storedFingerprint: keyData.fingerprint,
+                attemptedFingerprint: browserFingerprint,
                 website: actualSite,
                 timestamp: Date.now(),
                 date: new Date().toISOString(),
@@ -396,13 +422,13 @@ function shouldAutoApplySeasonalTheme() {
               localStorage.removeItem('galaxyverse_user_key');
               localStorage.removeItem('galaxyverse_access');
               
-              alert('⚠️ Security Alert: This key is registered to another device. Access denied.');
+              alert('⚠️ Security Alert: This key is registered to another browser. Access denied.');
               showKeyEntryScreen();
               return;
             }
             
-            // HWID matches - grant access
-            console.log('✅ localStorage key verified with HWID match');
+            // Fingerprint matches - grant access
+            console.log('✅ localStorage key verified with fingerprint match');
             
             const websites = keyData.websites || [];
             if (!websites.includes(actualSite)) {
@@ -411,21 +437,19 @@ function shouldAutoApplySeasonalTheme() {
                 lastAccessed: new Date().toISOString(),
                 lastAccessedSite: actualSite,
                 lastVerified: new Date().toISOString(),
-                timesAccessed: (keyData.timesAccessed || 0) + 1,
-                fingerprint: browserFingerprint
+                timesAccessed: (keyData.timesAccessed || 0) + 1
               });
             } else {
               await keyRef.update({
                 timesAccessed: (keyData.timesAccessed || 0) + 1,
                 lastAccessed: new Date().toISOString(),
                 lastAccessedSite: actualSite,
-                lastVerified: new Date().toISOString(),
-                fingerprint: browserFingerprint
+                lastVerified: new Date().toISOString()
               });
             }
             
             if (typeof window.WebsiteKeyTracker !== 'undefined') {
-              window.WebsiteKeyTracker.trackKeyUsage(storedKey, actualSite, browserFingerprint, hwid);
+              window.WebsiteKeyTracker.trackKeyUsage(storedKey, actualSite, browserFingerprint);
             }
             
             localStorage.setItem('galaxyverse_access', 'granted');
@@ -447,7 +471,7 @@ function shouldAutoApplySeasonalTheme() {
     }
 
     function showKeyEntryScreen() {
-      console.log('🔐 Showing key entry screen with cross-domain HWID protection');
+      console.log('🔐 Showing key entry screen with fingerprint protection');
       
       const keyOverlay = document.createElement('div');
       keyOverlay.id = 'galaxyverse-key-overlay';
@@ -465,7 +489,8 @@ function shouldAutoApplySeasonalTheme() {
         font-family: 'Roboto', sans-serif;
       `;
 
-      const deviceInfo = window.EnhancedFingerprint.getDeviceInfo();
+      const deviceInfo = getDeviceInfo();
+      const browserFingerprint = generateBrowserFingerprint();
 
       keyOverlay.innerHTML = `
         <div style="
@@ -515,10 +540,11 @@ function shouldAutoApplySeasonalTheme() {
             font-size: 13px;
             color: #9ca3af;
           ">
-            <div style="margin-bottom: 8px; color: #4f90ff; font-weight: bold;">🔒 Cross-Domain HWID Protection</div>
+            <div style="margin-bottom: 8px; color: #4f90ff; font-weight: bold;">🔒 Browser Fingerprint Protection</div>
             <div style="font-size: 12px;">
               Device: ${deviceInfo.browser} on ${deviceInfo.os}<br>
-              Screen: ${deviceInfo.screen} | Cores: ${deviceInfo.cores}
+              Screen: ${deviceInfo.screen} | Cores: ${deviceInfo.cores}<br>
+              Fingerprint: ${browserFingerprint.substring(0, 16)}...
             </div>
           </div>
           
@@ -528,7 +554,7 @@ function shouldAutoApplySeasonalTheme() {
             margin-bottom: 20px;
           ">
           <a href="https://docs.google.com/document/d/1RfHWPQ-8Kq2NDV6vxfOgquBqIKwp4OoL7K1NXkYLUEg/edit?usp=sharing" target="_blank" style="color: #4f90ff;">GalaxyVerse Policy</a><br>
-          V1.3.0 - Cross-Domain HWID System</p>
+          V2.0.0 - Browser Fingerprint System</p>
           
           <input type="text" id="keyInput" placeholder="Enter your key" style="
             width: 100%;
@@ -604,8 +630,8 @@ function shouldAutoApplySeasonalTheme() {
             color: #6b7280;
             font-size: 12px;
           ">
-            🔐 Each key is permanently linked to your device HWID<br>
-            🌟 Cannot be transferred or used on other devices<br>
+            🔐 Each key is permanently linked to your browser fingerprint<br>
+            🌟 Cannot be transferred or used in other browsers<br>
             ✨ Works across ALL GalaxyVerse websites automatically<br>
             💫 Use on any domain - auto-recognized everywhere<br><br>
             Contact admins for lifetime key ($5)
@@ -708,22 +734,20 @@ function shouldAutoApplySeasonalTheme() {
         }
 
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Generating HWID...';
+        submitBtn.textContent = 'Generating Fingerprint...';
         submitBtn.style.cursor = 'wait';
         
-        console.log('🔑 Verifying key with cross-domain HWID:', enteredKey);
+        console.log('🔑 Verifying key with browser fingerprint:', enteredKey);
 
         try {
           const normalizedSite = normalizeHostname(window.location.hostname || 'localhost');
           const actualSite = getActualWebsite(window.location.hostname || 'localhost');
           
-          submitBtn.textContent = 'Analyzing Device...';
-          const hwid = await window.EnhancedFingerprint.generateHWID();
+          submitBtn.textContent = 'Analyzing Browser...';
           const browserFingerprint = generateBrowserFingerprint();
-          const deviceInfo = window.EnhancedFingerprint.getDeviceInfo();
+          const deviceInfo = getDeviceInfo();
           
-          console.log('🔒 Generated HWID:', hwid.substring(0, 20) + '...');
-          console.log('🔒 Fingerprint:', browserFingerprint);
+          console.log('🔒 Generated Fingerprint:', browserFingerprint);
           
           submitBtn.textContent = 'Checking Firebase...';
           await database.ref('.info/connected').once('value');
@@ -737,22 +761,21 @@ function shouldAutoApplySeasonalTheme() {
           if (snapshot.exists()) {
             // KEY ALREADY REGISTERED
             const keyData = snapshot.val();
-            const keyOwnerHWID = keyData.hwid;
+            const keyOwnerFingerprint = keyData.fingerprint;
             
             console.log('📝 Key found in database');
-            console.log('🔍 Comparing HWIDs...');
-            console.log('   Database HWID:', keyOwnerHWID?.substring(0, 20) + '...');
-            console.log('   Current HWID:', hwid.substring(0, 20) + '...');
+            console.log('🔍 Comparing Fingerprints...');
+            console.log('   Database Fingerprint:', keyOwnerFingerprint);
+            console.log('   Current Fingerprint:', browserFingerprint);
             
-            // CRITICAL: Check HWID match
-            if (hwid !== keyOwnerHWID) {
-              console.error('🚫 HWID MISMATCH! Key belongs to different device.');
+            // CRITICAL: Check fingerprint match
+            if (browserFingerprint !== keyOwnerFingerprint) {
+              console.error('🚫 FINGERPRINT MISMATCH! Key belongs to different browser.');
               
               // Log security event
               await database.ref('securityLogs/unauthorizedKeyAttempts/' + Date.now()).set({
                 attemptedKey: enteredKey,
-                keyOwnerHWID: keyOwnerHWID,
-                attemptedByHWID: hwid,
+                keyOwnerFingerprint: keyOwnerFingerprint,
                 attemptedByFingerprint: browserFingerprint,
                 website: actualSite,
                 normalizedSite: normalizedSite,
@@ -760,10 +783,10 @@ function shouldAutoApplySeasonalTheme() {
                 date: new Date().toISOString(),
                 userAgent: navigator.userAgent,
                 deviceInfo: deviceInfo,
-                reason: 'HWID_MISMATCH'
+                reason: 'FINGERPRINT_MISMATCH'
               });
               
-              keyError.textContent = '🚫 SECURITY ALERT: This key is permanently locked to another device. Each key can only be used on ONE device. If this is your key, contact support.';
+              keyError.textContent = '🚫 SECURITY ALERT: This key is permanently locked to another browser. Each key can only be used in ONE browser. If this is your key, contact support.';
               keyError.style.color = '#ff4444';
               keyError.style.display = 'block';
               keyInput.style.borderColor = '#ff4444';
@@ -774,8 +797,8 @@ function shouldAutoApplySeasonalTheme() {
               return;
             }
             
-            // ===== HWID MATCHES - GRANT ACCESS =====
-            console.log('✅ HWID matches! This is the correct device.');
+            // ===== FINGERPRINT MATCHES - GRANT ACCESS =====
+            console.log('✅ Fingerprint matches! This is the correct browser.');
             submitBtn.textContent = 'Granting access...';
             
             const websites = keyData.websites || [];
@@ -789,8 +812,7 @@ function shouldAutoApplySeasonalTheme() {
                 lastAccessedSite: actualSite,
                 lastVerified: new Date().toISOString(),
                 network: normalizedSite,
-                deviceInfo: deviceInfo,
-                fingerprint: browserFingerprint
+                deviceInfo: deviceInfo
               });
             } else {
               console.log('📝 Updating existing domain access');
@@ -800,15 +822,13 @@ function shouldAutoApplySeasonalTheme() {
                 lastAccessedSite: actualSite,
                 lastVerified: new Date().toISOString(),
                 network: normalizedSite,
-                deviceInfo: deviceInfo,
-                fingerprint: browserFingerprint
+                deviceInfo: deviceInfo
               });
             }
             
             // Update fingerprint database
             await database.ref('fingerprints/' + browserFingerprint).set({
               key: enteredKey,
-              hwid: hwid,
               lastSeen: new Date().toISOString(),
               lastSeenSite: actualSite,
               deviceInfo: deviceInfo
@@ -819,7 +839,7 @@ function shouldAutoApplySeasonalTheme() {
             localStorage.setItem('galaxyverse_user_key', enteredKey);
             
             if (typeof window.WebsiteKeyTracker !== 'undefined') {
-              window.WebsiteKeyTracker.trackKeyUsage(enteredKey, actualSite, browserFingerprint, hwid);
+              window.WebsiteKeyTracker.trackKeyUsage(enteredKey, actualSite, browserFingerprint);
             }
             
             keyError.style.color = '#4ade80';
@@ -845,13 +865,12 @@ function shouldAutoApplySeasonalTheme() {
             }, 1500);
             return;
           } else {
-            // ===== NEW KEY - REGISTER WITH HWID =====
-            console.log('🆕 New key! Registering with HWID...');
-            submitBtn.textContent = 'Registering device...';
+            // ===== NEW KEY - REGISTER WITH FINGERPRINT =====
+            console.log('🆕 New key! Registering with fingerprint...');
+            submitBtn.textContent = 'Registering browser...';
             
             await keyRef.set({
               used: true,
-              hwid: hwid,
               fingerprint: browserFingerprint,
               firstUsedOn: actualSite,
               firstUsedDate: new Date().toISOString(),
@@ -874,7 +893,6 @@ function shouldAutoApplySeasonalTheme() {
 
             await database.ref('fingerprints/' + browserFingerprint).set({
               key: enteredKey,
-              hwid: hwid,
               createdAt: new Date().toISOString(),
               lastSeen: new Date().toISOString(),
               lastSeenSite: actualSite,
@@ -885,17 +903,17 @@ function shouldAutoApplySeasonalTheme() {
             localStorage.setItem('galaxyverse_user_key', enteredKey);
 
             if (typeof window.WebsiteKeyTracker !== 'undefined') {
-              window.WebsiteKeyTracker.trackKeyUsage(enteredKey, actualSite, browserFingerprint, hwid);
+              window.WebsiteKeyTracker.trackKeyUsage(enteredKey, actualSite, browserFingerprint);
             }
 
             keyError.style.color = '#4ade80';
-            keyError.textContent = '✅ Success! Key registered to this device permanently. Works on ALL GalaxyVerse domains!';
+            keyError.textContent = '✅ Success! Key registered to this browser permanently. Works on ALL GalaxyVerse domains!';
             keyError.style.display = 'block';
             keyInput.style.borderColor = '#4ade80';
             submitBtn.style.background = 'linear-gradient(135deg, #4ade80, #22c55e)';
             submitBtn.textContent = 'Success!';
 
-            console.log('✅ New key registered with HWID - works across all domains!');
+            console.log('✅ New key registered with fingerprint - works across all domains!');
 
             setTimeout(() => {
               keyOverlay.style.opacity = '0';
@@ -946,6 +964,9 @@ function shouldAutoApplySeasonalTheme() {
     initializeKeySystem();
   });
 })();
+
+// ===== REST OF THE CODE REMAINS THE SAME =====
+// (About:blank cloaking, tab cloaking, themes, etc.)
 
 // ===== ABOUT:BLANK CLOAKING =====
 (function() {
@@ -1557,14 +1578,13 @@ if (document.readyState === 'loading') {
 
 function initializeApp() {
   try {
-    console.log('🚀 Initializing GalaxyVerse with Cross-Domain HWID Protection...');
+    console.log('🚀 Initializing GalaxyVerse with Browser Fingerprint Protection...');
     console.log('📊 Console Status:', {
       available: !!window.GVerseConsole,
       initialized: window.GVerseConsole?.initialized || false,
       isOpen: window.GVerseConsole?.isOpen || false,
       logCount: window.GVerseConsole?.logs?.length || 0
     });
-    console.log('🔐 Enhanced Fingerprint:', !!window.EnhancedFingerprint);
   
   loadSettings();
   showHome();
@@ -1763,7 +1783,7 @@ function initializeApp() {
     fullscreenBtn.addEventListener('click', toggleFullscreen);
   }
 
-  console.log('✅ GalaxyVerse initialized with Cross-Domain HWID Protection');
+  console.log('✅ GalaxyVerse initialized with Browser Fingerprint Protection');
   console.log('📊 Console active - Press Ctrl+Shift+K to toggle');
   console.log('🌐 Cross-domain system: Keys work automatically across ALL GalaxyVerse sites');
   
