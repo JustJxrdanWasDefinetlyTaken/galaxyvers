@@ -265,7 +265,7 @@ function shouldAutoApplySeasonalTheme() {
 
     const validKeys = [
       // DEVS KEYS
-      'd4vid_ghost',
+      'ghostisnot',
       'azthedev',
       'aztestkey123',
       'MichaelIsKronos',
