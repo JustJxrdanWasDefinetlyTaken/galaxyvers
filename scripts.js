@@ -1128,7 +1128,7 @@ function debounce(func, delay = 300) {
 
 function hideAll() {
   document.querySelectorAll('.content').forEach(c => (c.style.display = 'none'));
-  document.querySelectorAll('.navbar li a').forEach(link => link.classList.remove('active'));
+  document.querySelectorAll('.sidebar-nav a').forEach(link => link.classList.remove('active'));
   const infoButtons = document.querySelector('.homepage-info-buttons');
   if (infoButtons) infoButtons.style.display = 'none';
 }
@@ -1604,6 +1604,7 @@ function initializeApp() {
   const websitesLink = document.getElementById('websitesLink');
   const settingsLink = document.getElementById('settingsLink');
   const aboutLink = document.getElementById('aboutLink');
+  const sidebarLogoLink = document.getElementById('sidebarLogoLink');
 
   if (homeLink) homeLink.addEventListener('click', (e) => { e.preventDefault(); showHome(); });
   if (gameLink) gameLink.addEventListener('click', (e) => { e.preventDefault(); showGames(); });
@@ -1611,6 +1612,7 @@ function initializeApp() {
   if (websitesLink) websitesLink.addEventListener('click', (e) => { e.preventDefault(); showWebsites(); });
   if (settingsLink) settingsLink.addEventListener('click', (e) => { e.preventDefault(); showSettings(); });
   if (aboutLink) aboutLink.addEventListener('click', (e) => { e.preventDefault(); showAbout(); });
+  if (sidebarLogoLink) sidebarLogoLink.addEventListener('click', (e) => { e.preventDefault(); showHome(); });
 
   // Back buttons
   const backToHomeGame = document.getElementById('backToHomeGame');
@@ -1673,6 +1675,7 @@ function initializeApp() {
   console.log('✅ GalaxyVerse initialized with Simple Browser ID Protection');
   console.log('📊 Console active - Press Ctrl+Shift+K to toggle');
   console.log('🌐 Cross-domain system: Keys work automatically across ALL GalaxyVerse sites');
+  console.log('📋 Sidebar navigation ready');
   
   } catch (error) {
     console.error('❌ Critical error during initialization:', error);
