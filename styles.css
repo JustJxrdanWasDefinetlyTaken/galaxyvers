@@ -54,6 +54,63 @@ body {
   }
 }
 
+/* Navbar */
+.navbar {
+  background-color: var(--nav-color);
+  border-bottom: 1px solid var(--border-color);
+  padding: 12px 28px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  justify-content: center;
+  gap: 40px;
+}
+
+.logo {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--accent-color);
+  text-transform: initial;
+  letter-spacing: 3px;
+  user-select: none;
+  cursor: default;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+.navbar ul {
+  list-style: none;
+  display: flex;
+  gap: 18px;
+  margin: 0;
+  padding: 0;
+  justify-content: center;
+  flex-grow: 1;
+  max-width: 700px;
+}
+
+.navbar li a {
+  color: var(--text-color);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 24px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.navbar li a:hover,
+.navbar li a.active {
+  background-color: var(--btn-hover-bg);
+  color: #fff;
+  box-shadow: 0 0 8px var(--btn-hover-bg);
+}
+
 /* ===== GAME FILTERS ===== */
 .game-filters {
   display: flex;
@@ -592,7 +649,6 @@ body {
 
 /* Back buttons */
 #backToHomeApps,
-#backToHomeWebsites,
 #backToHomeGame {
   padding: 10px 20px;
   border-radius: 8px;
@@ -606,7 +662,6 @@ body {
 }
 
 #backToHomeApps:hover,
-#backToHomeWebsites:hover,
 #backToHomeGame:hover {
   background-color: var(--btn-hover-bg);
   color: #fff;
@@ -648,6 +703,18 @@ body {
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px;
+  }
+
+  .navbar ul {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+
   .homepage-info-buttons {
     flex-direction: column;
     align-items: center;
@@ -699,9 +766,5 @@ body {
   .favorite-btn svg {
     width: 20px;
     height: 20px;
-  }
-
-  .container {
-    padding: 20px 10px;
   }
 }
