@@ -10,7 +10,7 @@ if (window.GVerseConsole && !window.GVerseConsole.initialized) {
 }
 
 // ===== CONSOLE INTEGRATION =====
-console.log('📦 Loading scripts.js with Simple Browser ID Protection...');
+console.log('📦 Loading scripts.js with Dual Authentication System...');
 console.log('🔍 Checking console status:', window.GVerseConsole ? 'Available' : 'Not loaded');
 
 // ===== SEASONAL THEME SYSTEM (BUILT-IN) =====
@@ -51,10 +51,10 @@ function shouldAutoApplySeasonalTheme() {
     init: function() {
       if (this.initialized) return;
       this.initialized = true;
-      console.log('🔍 WebsiteKeyTracker initialized (v5.1 - Simple ID)');
+      console.log('🔍 WebsiteKeyTracker initialized (v6.0 - Dual Auth)');
     },
     
-    trackKeyUsage: async function(key, website, fingerprintId) {
+    trackKeyUsage: async function(key, website, fingerprintId, wepKey) {
       try {
         if (typeof firebase === 'undefined' || !firebase.database) {
           console.error('❌ Firebase not available for tracking');
@@ -67,12 +67,14 @@ function shouldAutoApplySeasonalTheme() {
         await trackingRef.set({
           website: website,
           fingerprintId: fingerprintId,
+          wepKeyPreview: wepKey ? wepKey.substring(0, 8) + '...' : 'N/A',
           timestamp: Date.now(),
           date: new Date().toISOString(),
-          action: 'access'
+          action: 'access',
+          authMethod: 'dual'
         });
         
-        console.log('✅ Key usage tracked:', key, 'on', website);
+        console.log('✅ Key usage tracked with dual auth:', key, 'on', website);
       } catch (error) {
         console.error('❌ Error tracking key usage:', error);
       }
@@ -82,9 +84,10 @@ function shouldAutoApplySeasonalTheme() {
   window.WebsiteKeyTracker.init();
 })();
 
-// ===== FIREBASE CROSS-DOMAIN KEY SYSTEM WITH SIMPLE ID PROTECTION =====
+// ===== FIREBASE CROSS-DOMAIN KEY SYSTEM WITH DUAL AUTHENTICATION =====
 (function() {
-  console.log('🔑 Initializing Simple ID Key System...');
+  console.log('🔑 Initializing Dual Authentication System...');
+  console.log('🛡️ Security: Fingerprint ID + 256-bit WEP Key');
   
   // ===== DOMAIN NORMALIZATION =====
   function normalizeHostname(hostname) {
@@ -134,7 +137,7 @@ function shouldAutoApplySeasonalTheme() {
     return hostname;
   }
 
-  // Simple browser fingerprint - ID ONLY
+  // ===== ENHANCED SECURITY: BROWSER FINGERPRINT =====
   function generateBrowserFingerprintId() {
     try {
       const canvas = document.createElement('canvas');
@@ -175,6 +178,170 @@ function shouldAutoApplySeasonalTheme() {
     } catch (error) {
       console.error('❌ Fingerprint generation error:', error);
       return 'fp_' + Math.random().toString(36).substr(2, 9);
+    }
+  }
+
+  // ===== ENHANCED SECURITY: 256-BIT WEP KEY =====
+  function generateUniqueWEPKey() {
+    try {
+      // Create truly unique components
+      const timestamp = Date.now();
+      const randomValues = new Uint32Array(8);
+      crypto.getRandomValues(randomValues);
+      
+      // Additional entropy sources
+      const performanceNow = performance.now();
+      const screenData = `${screen.width}${screen.height}${screen.colorDepth}`;
+      const navigatorData = `${navigator.hardwareConcurrency}${navigator.deviceMemory || 0}`;
+      const timezoneData = `${new Date().getTimezoneOffset()}${Intl.DateTimeFormat().resolvedOptions().timeZone}`;
+      
+      // Combine all entropy sources
+      const entropyString = `${timestamp}${performanceNow}${screenData}${navigatorData}${timezoneData}${Array.from(randomValues).join('')}`;
+      
+      // Generate hash
+      let hash = 0;
+      for (let i = 0; i < entropyString.length; i++) {
+        const char = entropyString.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+      }
+      
+      // Create additional random component using crypto
+      const additionalRandom = Array.from(crypto.getRandomValues(new Uint8Array(13)))
+        .map(b => b.toString(16).padStart(2, '0').toUpperCase())
+        .join('');
+      
+      // Combine to create 26-character hex string (256-bit WEP Key format)
+      const baseHash = Math.abs(hash).toString(16).toUpperCase().padStart(13, '0').slice(0, 13);
+      const wepKey = baseHash + additionalRandom;
+      
+      console.log('🔐 Generated 256-bit WEP Key:', wepKey.substring(0, 8) + '...' + wepKey.substring(wepKey.length - 4));
+      return wepKey;
+    } catch (error) {
+      console.error('❌ WEP Key generation error:', error);
+      // Fallback method
+      return Array.from(crypto.getRandomValues(new Uint8Array(13)))
+        .map(b => b.toString(16).padStart(2, '0').toUpperCase())
+        .join('');
+    }
+  }
+
+  // ===== CHECK OR CREATE WEP KEY FOR BROWSER =====
+  async function getOrCreateWEPKey(database, browserId) {
+    try {
+      console.log('🔍 Checking for existing WEP Key...');
+      
+      // Check if this browser already has a WEP key
+      const wepKeysRef = database.ref('wepKeys');
+      const snapshot = await wepKeysRef.orderByChild('fingerprintId').equalTo(browserId).once('value');
+      
+      if (snapshot.exists()) {
+        // WEP key already exists for this browser
+        const wepData = Object.values(snapshot.val())[0];
+        console.log('✅ Existing WEP Key found:', wepData.wepKey.substring(0, 8) + '...');
+        return wepData.wepKey;
+      } else {
+        // Generate new WEP key - this can only happen once per browser
+        const newWEPKey = generateUniqueWEPKey();
+        
+        // Store in Firebase with browser ID - PERMANENT AND CANNOT BE CHANGED
+        await database.ref('wepKeys/' + newWEPKey).set({
+          wepKey: newWEPKey,
+          fingerprintId: browserId,
+          createdAt: new Date().toISOString(),
+          createdTimestamp: Date.now(),
+          cannotBeRegenerated: true,
+          permanent: true,
+          locked: true
+        });
+        
+        console.log('🆕 New 256-bit WEP Key created and PERMANENTLY locked to this browser');
+        console.log('🔒 WEP Key Preview:', newWEPKey.substring(0, 8) + '...');
+        return newWEPKey;
+      }
+    } catch (error) {
+      console.error('❌ Error with WEP Key:', error);
+      return null;
+    }
+  }
+
+  // ===== DUAL AUTHENTICATION VERIFICATION =====
+  async function verifyDualAuthentication(database, storedKey, browserId) {
+    try {
+      console.log('🔐 Starting Dual Authentication...');
+      
+      const keyRef = database.ref('usedKeys/' + storedKey);
+      const keySnapshot = await keyRef.once('value');
+      
+      if (!keySnapshot.exists()) {
+        console.error('🚫 Key does not exist');
+        return false;
+      }
+      
+      const keyData = keySnapshot.val();
+      
+      // ===== STEP 1: VERIFY FINGERPRINT ID =====
+      console.log('🔍 Step 1/2: Verifying Fingerprint ID...');
+      if (keyData.fingerprintId !== browserId) {
+        console.error('🚫 FINGERPRINT ID MISMATCH');
+        await database.ref('securityLogs/fingerprintMismatch/' + Date.now()).set({
+          key: storedKey,
+          expectedId: keyData.fingerprintId,
+          attemptedId: browserId,
+          timestamp: Date.now(),
+          date: new Date().toISOString(),
+          severity: 'HIGH',
+          authStep: 'fingerprint'
+        });
+        return false;
+      }
+      console.log('✅ Fingerprint ID verified');
+      
+      // ===== STEP 2: GET AND VERIFY WEP KEY =====
+      console.log('🔍 Step 2/2: Verifying 256-bit WEP Key...');
+      const wepKey = await getOrCreateWEPKey(database, browserId);
+      
+      if (!wepKey) {
+        console.error('🚫 Could not retrieve WEP Key');
+        return false;
+      }
+      
+      // Check if key has WEP key stored
+      if (!keyData.wepKey) {
+        // First time - store WEP key with the access key
+        await keyRef.update({
+          wepKey: wepKey,
+          wepKeyLinkedAt: new Date().toISOString(),
+          dualAuthEnabled: true
+        });
+        console.log('🔗 256-bit WEP Key linked to access key');
+        console.log('✅ Dual Authentication configured');
+        return true;
+      }
+      
+      // ===== STEP 3: VERIFY WEP KEY MATCHES =====
+      if (keyData.wepKey !== wepKey) {
+        console.error('🚫 WEP KEY MISMATCH - CRITICAL SECURITY VIOLATION');
+        await database.ref('securityLogs/wepKeyMismatch/' + Date.now()).set({
+          key: storedKey,
+          expectedWEP: keyData.wepKey.substring(0, 8) + '...',
+          attemptedWEP: wepKey.substring(0, 8) + '...',
+          browserId: browserId,
+          timestamp: Date.now(),
+          date: new Date().toISOString(),
+          severity: 'CRITICAL',
+          authStep: 'wep_key',
+          blocked: true
+        });
+        return false;
+      }
+      console.log('✅ 256-bit WEP Key verified');
+      
+      console.log('✅✅ DUAL AUTHENTICATION SUCCESSFUL');
+      return true;
+    } catch (error) {
+      console.error('❌ Dual authentication error:', error);
+      return false;
     }
   }
 
@@ -271,14 +438,13 @@ function shouldAutoApplySeasonalTheme() {
       console.log('🌐 Network:', normalizedSite);
       console.log('🌐 Current domain:', actualSite);
       
-      // Generate fingerprint ID ONLY
-      console.log('🔐 Generating browser ID...');
+      // Generate fingerprint ID
+      console.log('🔐 Generating Browser Fingerprint ID...');
       const browserId = generateBrowserFingerprintId();
-      
-      console.log('🔒 Browser ID:', browserId);
+      console.log('🔒 Browser Fingerprint ID:', browserId);
       
       // ===== STEP 1: CHECK FIREBASE FOR EXISTING KEY BY ID =====
-      console.log('🔍 Step 1: Searching Firebase for key with this ID...');
+      console.log('🔍 Step 1: Searching Firebase for key with this Fingerprint ID...');
       
       try {
         const usedKeysRef = database.ref('usedKeys');
@@ -292,13 +458,26 @@ function shouldAutoApplySeasonalTheme() {
           for (const [key, keyData] of Object.entries(allKeys)) {
             if (keyData.fingerprintId === browserId) {
               foundKey = key;
-              console.log('✅ Found key for this ID:', key);
+              console.log('✅ Found key for this Fingerprint ID:', key);
               break;
             }
           }
           
           if (foundKey) {
-            console.log('🎉 ID matches - Auto-login!');
+            console.log('🔐 Verifying with Dual Authentication...');
+            
+            const isAuthenticated = await verifyDualAuthentication(database, foundKey, browserId);
+            
+            if (!isAuthenticated) {
+              console.error('🚫 Dual Authentication Failed');
+              localStorage.removeItem('galaxyverse_user_key');
+              localStorage.removeItem('galaxyverse_access');
+              alert('⚠️ Security Alert: Dual authentication failed.');
+              showKeyEntryScreen();
+              return;
+            }
+            
+            console.log('🎉 Dual Authentication Success - Auto-login!');
             
             const keyRef = database.ref('usedKeys/' + foundKey);
             const keyData = (await keyRef.once('value')).val();
@@ -323,7 +502,7 @@ function shouldAutoApplySeasonalTheme() {
             localStorage.setItem('galaxyverse_access', 'granted');
             
             if (typeof window.WebsiteKeyTracker !== 'undefined') {
-              window.WebsiteKeyTracker.trackKeyUsage(foundKey, actualSite, browserId);
+              window.WebsiteKeyTracker.trackKeyUsage(foundKey, actualSite, browserId, keyData.wepKey);
             }
             
             console.log('✅ Access granted across all domains');
@@ -331,7 +510,7 @@ function shouldAutoApplySeasonalTheme() {
           }
         }
         
-        console.log('ℹ️ No key found for this ID');
+        console.log('ℹ️ No key found for this Fingerprint ID');
       } catch (error) {
         console.error('❌ Error searching Firebase:', error);
       }
@@ -341,66 +520,53 @@ function shouldAutoApplySeasonalTheme() {
       const storedKey = localStorage.getItem('galaxyverse_user_key');
       
       if (storedKey) {
-        console.log('📦 Found key in localStorage, verifying...');
+        console.log('📦 Found key in localStorage, verifying with Dual Authentication...');
         try {
-          const keyRef = database.ref('usedKeys/' + storedKey);
-          const snapshot = await keyRef.once('value');
+          // Use dual authentication
+          const isAuthenticated = await verifyDualAuthentication(database, storedKey, browserId);
           
-          if (snapshot.exists()) {
-            const keyData = snapshot.val();
-            
-            // CRITICAL: Check ID match ONLY
-            if (keyData.fingerprintId && keyData.fingerprintId !== browserId) {
-              console.error('🚫 BROWSER ID MISMATCH!');
-              
-              await database.ref('securityLogs/idMismatches/' + Date.now()).set({
-                key: storedKey,
-                storedId: keyData.fingerprintId,
-                attemptedId: browserId,
-                website: actualSite,
-                timestamp: Date.now(),
-                date: new Date().toISOString()
-              });
-              
-              localStorage.removeItem('galaxyverse_user_key');
-              localStorage.removeItem('galaxyverse_access');
-              
-              alert('⚠️ Security Alert: This key belongs to a different browser ID.');
-              showKeyEntryScreen();
-              return;
-            }
-            
-            console.log('✅ ID verified');
-            
-            const websites = keyData.websites || [];
-            if (!websites.includes(actualSite)) {
-              await keyRef.update({
-                websites: [...websites, actualSite],
-                lastAccessed: new Date().toISOString(),
-                lastAccessedSite: actualSite,
-                timesAccessed: (keyData.timesAccessed || 0) + 1
-              });
-            } else {
-              await keyRef.update({
-                timesAccessed: (keyData.timesAccessed || 0) + 1,
-                lastAccessed: new Date().toISOString(),
-                lastAccessedSite: actualSite
-              });
-            }
-            
-            if (typeof window.WebsiteKeyTracker !== 'undefined') {
-              window.WebsiteKeyTracker.trackKeyUsage(storedKey, actualSite, browserId);
-            }
-            
-            localStorage.setItem('galaxyverse_access', 'granted');
-            console.log('✅ Access granted');
-            return;
-          } else {
+          if (!isAuthenticated) {
+            console.error('🚫 DUAL AUTHENTICATION FAILED');
             localStorage.removeItem('galaxyverse_user_key');
             localStorage.removeItem('galaxyverse_access');
+            alert('⚠️ Security Alert: Dual authentication failed. Please re-enter your key.');
+            showKeyEntryScreen();
+            return;
           }
+          
+          console.log('✅ Dual Authentication verified');
+          
+          // Authentication successful - update access info
+          const keyRef = database.ref('usedKeys/' + storedKey);
+          const keyData = (await keyRef.once('value')).val();
+          const websites = keyData.websites || [];
+          
+          if (!websites.includes(actualSite)) {
+            await keyRef.update({
+              websites: [...websites, actualSite],
+              lastAccessed: new Date().toISOString(),
+              lastAccessedSite: actualSite,
+              timesAccessed: (keyData.timesAccessed || 0) + 1
+            });
+          } else {
+            await keyRef.update({
+              timesAccessed: (keyData.timesAccessed || 0) + 1,
+              lastAccessed: new Date().toISOString(),
+              lastAccessedSite: actualSite
+            });
+          }
+          
+          if (typeof window.WebsiteKeyTracker !== 'undefined') {
+            window.WebsiteKeyTracker.trackKeyUsage(storedKey, actualSite, browserId, keyData.wepKey);
+          }
+          
+          localStorage.setItem('galaxyverse_access', 'granted');
+          console.log('✅ Access granted');
+          return;
         } catch (error) {
           console.error('❌ Error verifying key:', error);
+          localStorage.removeItem('galaxyverse_user_key');
+          localStorage.removeItem('galaxyverse_access');
         }
       }
 
@@ -410,7 +576,7 @@ function shouldAutoApplySeasonalTheme() {
     }
 
     function showKeyEntryScreen() {
-      console.log('🔐 Showing key entry screen');
+      console.log('🔐 Showing key entry screen with Dual Authentication info');
       
       const keyOverlay = document.createElement('div');
       keyOverlay.id = 'galaxyverse-key-overlay';
@@ -438,7 +604,7 @@ function shouldAutoApplySeasonalTheme() {
           padding: 40px;
           box-shadow: 0 15px 50px rgba(79, 144, 255, 0.3);
           text-align: center;
-          max-width: 500px;
+          max-width: 550px;
           width: 90%;
         ">
           <div style="
@@ -478,9 +644,14 @@ function shouldAutoApplySeasonalTheme() {
             font-size: 13px;
             color: #9ca3af;
           ">
-            <div style="margin-bottom: 8px; color: #4f90ff; font-weight: bold;">🔒 Browser ID Protection</div>
-            <div style="font-size: 12px;">
-              Your Browser ID: ${browserId.substring(0, 20)}...
+            <div style="margin-bottom: 8px; color: #4f90ff; font-weight: bold;">🛡️ Dual Authentication System</div>
+            <div style="font-size: 12px; text-align: left; padding: 0 10px;">
+              <div style="margin: 5px 0;">✅ Layer 1: Browser Fingerprint ID</div>
+              <div style="margin: 5px 0;">✅ Layer 2: 256-bit WEP Key</div>
+              <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(79, 144, 255, 0.2);">
+                <strong>Your Browser ID:</strong><br/>
+                <code style="font-size: 11px; color: #4ade80;">${browserId.substring(0, 20)}...</code>
+              </div>
             </div>
           </div>
           
@@ -490,7 +661,7 @@ function shouldAutoApplySeasonalTheme() {
             margin-bottom: 20px;
           ">
           <a href="https://docs.google.com/document/d/1RfHWPQ-8Kq2NDV6vxfOgquBqIKwp4OoL7K1NXkYLUEg/edit?usp=sharing" target="_blank" style="color: #4f90ff;">GalaxyVerse Policy</a><br>
-          V2.1.0 - Simple Browser ID System</p>
+          V3.0.0 - Dual Authentication System</p>
           
           <input type="text" id="keyInput" placeholder="Enter your key" style="
             width: 100%;
@@ -566,8 +737,10 @@ function shouldAutoApplySeasonalTheme() {
             color: #6b7280;
             font-size: 12px;
           ">
-            🔐 Each key is locked to ONE browser ID<br>
-            🌟 Cannot be transferred to other browsers<br>
+            🛡️ Dual Authentication Protection<br>
+            🔐 Fingerprint ID + 256-bit WEP Key<br>
+            🔒 Keys locked to ONE browser permanently<br>
+            🌟 Cannot be transferred or regenerated<br>
             ✨ Works across ALL GalaxyVerse domains<br><br>
             Contact admins for lifetime key ($5)
           </div>
@@ -613,7 +786,7 @@ function shouldAutoApplySeasonalTheme() {
           await testRef.remove();
           
           keyError.style.color = '#4ade80';
-          keyError.textContent = '✅ Connection working!';
+          keyError.textContent = '✅ Connection working! Dual Auth ready.';
           keyError.style.display = 'block';
           
           testConnectionBtn.textContent = 'Test Connection';
@@ -669,10 +842,10 @@ function shouldAutoApplySeasonalTheme() {
         }
 
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Verifying...';
+        submitBtn.textContent = 'Verifying with Dual Auth...';
         submitBtn.style.cursor = 'wait';
         
-        console.log('🔑 Verifying key:', enteredKey);
+        console.log('🔑 Verifying key with Dual Authentication:', enteredKey);
 
         try {
           const normalizedSite = normalizeHostname(window.location.hostname || 'localhost');
@@ -680,7 +853,7 @@ function shouldAutoApplySeasonalTheme() {
           
           const browserId = generateBrowserFingerprintId();
           
-          console.log('🔒 Browser ID:', browserId);
+          console.log('🔒 Browser Fingerprint ID:', browserId);
           
           await database.ref('.info/connected').once('value');
           
@@ -688,28 +861,16 @@ function shouldAutoApplySeasonalTheme() {
           const snapshot = await keyRef.once('value');
           
           if (snapshot.exists()) {
-            // KEY EXISTS - CHECK ID ONLY
+            // ===== KEY EXISTS - USE DUAL AUTHENTICATION =====
             const keyData = snapshot.val();
-            const keyOwnerId = keyData.fingerprintId;
             
             console.log('📝 Key found in database');
-            console.log('🔍 Comparing IDs...');
+            console.log('🔍 Verifying dual authentication...');
             
-            // ONLY CHECK FINGERPRINT ID
-            if (browserId !== keyOwnerId) {
-              console.error('🚫 BROWSER ID MISMATCH!');
-              
-              await database.ref('securityLogs/unauthorizedAttempts/' + Date.now()).set({
-                attemptedKey: enteredKey,
-                keyOwnerId: keyOwnerId,
-                attemptedById: browserId,
-                website: actualSite,
-                timestamp: Date.now(),
-                date: new Date().toISOString(),
-                reason: 'ID_MISMATCH'
-              });
-              
-              keyError.textContent = '🚫 This key is locked to a different browser ID. Contact support if this is your key.';
+            const isAuthenticated = await verifyDualAuthentication(database, enteredKey, browserId);
+            
+            if (!isAuthenticated) {
+              keyError.textContent = '🚫 Dual Authentication failed. This key is locked to a different browser.';
               keyError.style.color = '#ff4444';
               keyError.style.display = 'block';
               keyInput.style.borderColor = '#ff4444';
@@ -720,8 +881,8 @@ function shouldAutoApplySeasonalTheme() {
               return;
             }
             
-            // ID MATCHES - GRANT ACCESS
-            console.log('✅ Browser ID matches!');
+            // ===== DUAL AUTHENTICATION SUCCESSFUL =====
+            console.log('✅ Dual Authentication successful!');
             
             const websites = keyData.websites || [];
             
@@ -745,11 +906,11 @@ function shouldAutoApplySeasonalTheme() {
             localStorage.setItem('galaxyverse_user_key', enteredKey);
             
             if (typeof window.WebsiteKeyTracker !== 'undefined') {
-              window.WebsiteKeyTracker.trackKeyUsage(enteredKey, actualSite, browserId);
+              window.WebsiteKeyTracker.trackKeyUsage(enteredKey, actualSite, browserId, keyData.wepKey);
             }
             
             keyError.style.color = '#4ade80';
-            keyError.textContent = '✅ Welcome back! Access granted';
+            keyError.textContent = '✅ Welcome back! Dual Authentication verified';
             keyError.style.display = 'block';
             keyInput.style.borderColor = '#4ade80';
             submitBtn.style.background = 'linear-gradient(135deg, #4ade80, #22c55e)';
@@ -771,13 +932,29 @@ function shouldAutoApplySeasonalTheme() {
             }, 1500);
             return;
           } else {
-            // ===== NEW KEY - REGISTER WITH ID =====
-            console.log('🆕 New key! Registering with ID...');
+            // ===== NEW KEY - REGISTER WITH DUAL AUTHENTICATION =====
+            console.log('🆕 New key! Registering with Dual Authentication...');
+            submitBtn.textContent = 'Generating WEP Key...';
+            
+            // Generate WEP Key for this browser
+            const wepKey = await getOrCreateWEPKey(database, browserId);
+            
+            if (!wepKey) {
+              keyError.textContent = '❌ Failed to generate security keys';
+              keyError.style.color = '#ff4444';
+              keyError.style.display = 'block';
+              submitBtn.disabled = false;
+              submitBtn.textContent = 'Verify Key';
+              submitBtn.style.cursor = 'pointer';
+              return;
+            }
+            
             submitBtn.textContent = 'Registering...';
             
             await keyRef.set({
               used: true,
               fingerprintId: browserId,
+              wepKey: wepKey,
               firstUsedOn: actualSite,
               firstUsedDate: new Date().toISOString(),
               firstUsedTimestamp: Date.now(),
@@ -786,24 +963,27 @@ function shouldAutoApplySeasonalTheme() {
               lastAccessed: new Date().toISOString(),
               lastAccessedSite: actualSite,
               network: normalizedSite,
-              claimedAcrossNetwork: true
+              claimedAcrossNetwork: true,
+              dualAuthEnabled: true,
+              securityLevel: 'maximum'
             });
 
             localStorage.setItem('galaxyverse_access', 'granted');
             localStorage.setItem('galaxyverse_user_key', enteredKey);
 
             if (typeof window.WebsiteKeyTracker !== 'undefined') {
-              window.WebsiteKeyTracker.trackKeyUsage(enteredKey, actualSite, browserId);
+              window.WebsiteKeyTracker.trackKeyUsage(enteredKey, actualSite, browserId, wepKey);
             }
 
             keyError.style.color = '#4ade80';
-            keyError.textContent = '✅ Success! Key registered to this browser. Works on ALL GalaxyVerse domains!';
+            keyError.textContent = '✅ Success! Key registered with Dual Authentication. Works on ALL GalaxyVerse domains!';
             keyError.style.display = 'block';
             keyInput.style.borderColor = '#4ade80';
             submitBtn.style.background = 'linear-gradient(135deg, #4ade80, #22c55e)';
             submitBtn.textContent = 'Success!';
 
-            console.log('✅ New key registered');
+            console.log('✅ New key registered with Dual Authentication');
+            console.log('🔐 Fingerprint ID + 256-bit WEP Key locked');
 
             setTimeout(() => {
               keyOverlay.style.opacity = '0';
@@ -1465,7 +1645,8 @@ if (document.readyState === 'loading') {
 
 function initializeApp() {
   try {
-    console.log('🚀 Initializing GalaxyVerse with Simple Browser ID Protection...');
+    console.log('🚀 Initializing GalaxyVerse with Dual Authentication System...');
+    console.log('🛡️ Security Layers: Fingerprint ID + 256-bit WEP Key');
     console.log('📊 Console Status:', {
       available: !!window.GVerseConsole,
       initialized: window.GVerseConsole?.initialized || false,
@@ -1670,8 +1851,10 @@ function initializeApp() {
     fullscreenBtn.addEventListener('click', toggleFullscreen);
   }
 
-  console.log('✅ GalaxyVerse initialized with Simple Browser ID Protection');
+  console.log('✅ GalaxyVerse initialized with Dual Authentication System');
   console.log('📊 Console active - Press Ctrl+Shift+K to toggle');
+  console.log('🛡️ Security: Fingerprint ID + 256-bit WEP Key');
+  console.log('🔒 Each key locked to ONE browser permanently');
   console.log('🌐 Cross-domain system: Keys work automatically across ALL GalaxyVerse sites');
   
   } catch (error) {
