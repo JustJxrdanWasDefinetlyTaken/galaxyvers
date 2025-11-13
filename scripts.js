@@ -1,10 +1,16 @@
 // Wait for console to be ready before proceeding
 if (window.GVerseConsole && !window.GVerseConsole.initialized) {
   console.log('⏳ Waiting for console initialization...');
+  let attempts = 0;
+  const maxAttempts = 100; // 5 seconds max wait
   const waitForConsole = setInterval(() => {
+    attempts++;
     if (window.GVerseConsole.initialized) {
       clearInterval(waitForConsole);
       console.log('✅ Console ready, continuing scripts.js initialization');
+    } else if (attempts >= maxAttempts) {
+      clearInterval(waitForConsole);
+      console.warn('⚠️ Console initialization timeout, continuing anyway');
     }
   }, 50);
 }
@@ -17,24 +23,22 @@ console.log('🔍 Checking console status:', window.GVerseConsole ? 'Available' 
 function getSeasonalTheme() {
   const now = new Date();
   const year = now.getFullYear();
-  const month = now.getMonth();
+  const month = now.getMonth(); // 0-indexed: 0=Jan, 9=Oct, 10=Nov, 11=Dec
   const day = now.getDate();
   
-  if (year === 2025 && month === 9 && day >= 27 && day <= 30) {
+  // Halloween: October 25-31 (month 9)
+  if (month === 9 && day >= 25 && day <= 31) {
     console.log('🎃 Halloween season detected!');
     return 'halloween';
   }
   
-  if (year === 2025 && ((month === 10 && day >= 1) || month === 11)) {
+  // Christmas: December 1-31 (month 11)
+  if (month === 11) {
     console.log('🎄 Christmas season detected!');
     return 'christmas';
   }
   
-  if (year >= 2026) {
-    console.log('✨ Default season');
-    return 'original';
-  }
-  
+  console.log('✨ Default season');
   return 'original';
 }
 
@@ -182,7 +186,7 @@ function shouldAutoApplySeasonalTheme() {
     let attempts = 0;
     const checkFirebase = setInterval(() => {
       attempts++;
-      if (typeof firebase !== 'undefined' && firebase.apps) {
+      if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length > 0) {
         clearInterval(checkFirebase);
         console.log('✅ Firebase detected');
         callback();
@@ -226,6 +230,8 @@ function shouldAutoApplySeasonalTheme() {
       .then(() => console.log('✅ Firebase database connected'))
       .catch(err => console.error('❌ Firebase database connection failed:', err));
 
+    // NOTE: Keys should be validated server-side for security
+    // This client-side list is for demonstration only
     const validKeys = [
       // DEVS KEYS
       'ghostisnot',
@@ -290,7 +296,7 @@ function shouldAutoApplySeasonalTheme() {
           
           // Search all keys for matching ID
           for (const [key, keyData] of Object.entries(allKeys)) {
-            if (keyData.fingerprintId === browserId) {
+            if (keyData && keyData.fingerprintId === browserId) {
               foundKey = key;
               console.log('✅ Found key for this ID:', key);
               break;
@@ -301,437 +307,23 @@ function shouldAutoApplySeasonalTheme() {
             console.log('🎉 ID matches - Auto-login!');
             
             const keyRef = database.ref('usedKeys/' + foundKey);
-            const keyData = (await keyRef.once('value')).val();
-            const websites = keyData.websites || [];
+            const keySnapshot = await keyRef.once('value');
+            const keyData = keySnapshot.val();
             
-            if (!websites.includes(actualSite)) {
-              await keyRef.update({
-                websites: [...websites, actualSite],
-                lastAccessed: new Date().toISOString(),
-                lastAccessedSite: actualSite,
-                timesAccessed: (keyData.timesAccessed || 0) + 1
-              });
-            } else {
-              await keyRef.update({
-                timesAccessed: (keyData.timesAccessed || 0) + 1,
-                lastAccessed: new Date().toISOString(),
-                lastAccessedSite: actualSite
-              });
-            }
-            
-            localStorage.setItem('galaxyverse_user_key', foundKey);
-            localStorage.setItem('galaxyverse_access', 'granted');
-            
-            if (typeof window.WebsiteKeyTracker !== 'undefined') {
-              window.WebsiteKeyTracker.trackKeyUsage(foundKey, actualSite, browserId);
-            }
-            
-            console.log('✅ Access granted across all domains');
-            return;
-          }
-        }
-        
-        console.log('ℹ️ No key found for this ID');
-      } catch (error) {
-        console.error('❌ Error searching Firebase:', error);
-      }
-      
-      // ===== STEP 2: CHECK LOCALSTORAGE =====
-      console.log('🔍 Step 2: Checking localStorage...');
-      const storedKey = localStorage.getItem('galaxyverse_user_key');
-      
-      if (storedKey) {
-        console.log('📦 Found key in localStorage, verifying...');
-        try {
-          const keyRef = database.ref('usedKeys/' + storedKey);
-          const snapshot = await keyRef.once('value');
-          
-          if (snapshot.exists()) {
-            const keyData = snapshot.val();
-            
-            // CRITICAL: Check ID match ONLY
-            if (keyData.fingerprintId && keyData.fingerprintId !== browserId) {
-              console.error('🚫 BROWSER ID MISMATCH!');
-              
-              await database.ref('securityLogs/idMismatches/' + Date.now()).set({
-                key: storedKey,
-                storedId: keyData.fingerprintId,
-                attemptedId: browserId,
-                website: actualSite,
-                timestamp: Date.now(),
-                date: new Date().toISOString()
-              });
-              
-              localStorage.removeItem('galaxyverse_user_key');
-              localStorage.removeItem('galaxyverse_access');
-              
-              alert('⚠️ Security Alert: This key belongs to a different browser ID.');
+            if (!keyData) {
+              console.error('❌ Key data not found');
               showKeyEntryScreen();
               return;
             }
             
-            console.log('✅ ID verified');
-            
             const websites = keyData.websites || [];
+            
             if (!websites.includes(actualSite)) {
               await keyRef.update({
                 websites: [...websites, actualSite],
                 lastAccessed: new Date().toISOString(),
                 lastAccessedSite: actualSite,
                 timesAccessed: (keyData.timesAccessed || 0) + 1
-              });
-            } else {
-              await keyRef.update({
-                timesAccessed: (keyData.timesAccessed || 0) + 1,
-                lastAccessed: new Date().toISOString(),
-                lastAccessedSite: actualSite
-              });
-            }
-            
-            if (typeof window.WebsiteKeyTracker !== 'undefined') {
-              window.WebsiteKeyTracker.trackKeyUsage(storedKey, actualSite, browserId);
-            }
-            
-            localStorage.setItem('galaxyverse_access', 'granted');
-            console.log('✅ Access granted');
-            return;
-          } else {
-            localStorage.removeItem('galaxyverse_user_key');
-            localStorage.removeItem('galaxyverse_access');
-          }
-        } catch (error) {
-          console.error('❌ Error verifying key:', error);
-        }
-      }
-
-      // ===== STEP 3: SHOW KEY ENTRY =====
-      console.log('🔐 No valid key - showing entry screen');
-      showKeyEntryScreen();
-    }
-
-    function showKeyEntryScreen() {
-      console.log('🔐 Showing key entry screen');
-      
-      const keyOverlay = document.createElement('div');
-      keyOverlay.id = 'galaxyverse-key-overlay';
-      keyOverlay.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 999999;
-        font-family: 'Roboto', sans-serif;
-      `;
-
-      const browserId = generateBrowserFingerprintId();
-
-      keyOverlay.innerHTML = `
-        <div style="
-          background: rgba(30, 36, 51, 0.95);
-          border: 2px solid #4f90ff;
-          border-radius: 20px;
-          padding: 40px;
-          box-shadow: 0 15px 50px rgba(79, 144, 255, 0.3);
-          text-align: center;
-          max-width: 500px;
-          width: 90%;
-        ">
-          <div style="
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 20px;
-            background: linear-gradient(135deg, #4f90ff, #9d4edd);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            box-shadow: 0 8px 20px rgba(79, 144, 255, 0.4);
-          ">
-            🔐
-          </div>
-          
-          <h1 style="
-            color: #e0e6f1;
-            font-size: 32px;
-            margin: 0 0 10px 0;
-            font-weight: 700;
-          ">GalaxyVerse</h1>
-          
-          <p style="
-            color: #9ca3af;
-            font-size: 16px;
-            margin: 0 0 10px 0;
-          ">Enter your access key to continue</p>
-          
-          <div style="
-            background: rgba(79, 144, 255, 0.1);
-            border: 1px solid rgba(79, 144, 255, 0.3);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
-            font-size: 13px;
-            color: #9ca3af;
-          ">
-            <div style="margin-bottom: 8px; color: #4f90ff; font-weight: bold;">🔒 Browser ID Protection</div>
-            <div style="font-size: 12px;">
-              Your Browser ID: ${browserId.substring(0, 20)}...
-            </div>
-          </div>
-          
-          <p style="
-            color: #9ca3af;
-            font-size: 14px;
-            margin-bottom: 20px;
-          ">
-          <a href="https://docs.google.com/document/d/1RfHWPQ-8Kq2NDV6vxfOgquBqIKwp4OoL7K1NXkYLUEg/edit?usp=sharing" target="_blank" style="color: #4f90ff;">GalaxyVerse Policy</a><br>
-          V2.1.0 - Simple Browser ID System</p>
-          
-          <input type="text" id="keyInput" placeholder="Enter your key" style="
-            width: 100%;
-            padding: 15px;
-            font-size: 16px;
-            border: 2px solid #38415d;
-            border-radius: 10px;
-            background: #121826;
-            color: #e0e6f1;
-            outline: none;
-            box-sizing: border-box;
-            transition: all 0.3s ease;
-            margin-bottom: 20px;
-          " />
-          
-          <button id="submitKey" style="
-            width: 100%;
-            padding: 15px;
-            font-size: 16px;
-            font-weight: bold;
-            background: linear-gradient(135deg, #4f90ff, #9d4edd);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(79, 144, 255, 0.3);
-          ">Verify Key</button>
-          
-          <button id="testConnectionBtn" style="
-            width: 100%;
-            padding: 10px;
-            font-size: 14px;
-            background: transparent;
-            color: #4f90ff;
-            border: 1px solid #4f90ff;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: all 0.3s ease;
-          ">Test Connection</button>
-          
-          <div id="keyError" style="
-            color: #ff4444;
-            margin-top: 15px;
-            font-size: 14px;
-            display: none;
-          "></div>
-          
-          <div id="connectionStatus" style="
-            margin-top: 15px;
-            font-size: 12px;
-            color: #9ca3af;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-          ">
-            <span id="statusDot" style="
-              width: 8px;
-              height: 8px;
-              border-radius: 50%;
-              background: #4ade80;
-              display: inline-block;
-            "></span>
-            <span id="statusText">Connected</span>
-          </div>
-          
-          <div style="
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #38415d;
-            color: #6b7280;
-            font-size: 12px;
-          ">
-            🔐 Each key is locked to ONE browser ID<br>
-            🌟 Cannot be transferred to other browsers<br>
-            ✨ Works across ALL GalaxyVerse domains<br><br>
-            Contact admins for lifetime key ($5)
-          </div>
-        </div>
-      `;
-
-      document.body.appendChild(keyOverlay);
-      
-      const mainContent = document.getElementById('app') || document.body;
-      if (mainContent && mainContent !== document.body) {
-        mainContent.style.filter = 'blur(10px)';
-        mainContent.style.pointerEvents = 'none';
-      }
-
-      const keyInput = document.getElementById('keyInput');
-      const submitBtn = document.getElementById('submitKey');
-      const testConnectionBtn = document.getElementById('testConnectionBtn');
-      const keyError = document.getElementById('keyError');
-      const statusDot = document.getElementById('statusDot');
-      const statusText = document.getElementById('statusText');
-
-      database.ref('.info/connected').on('value', (snapshot) => {
-        if (snapshot.val() === true) {
-          statusDot.style.background = '#4ade80';
-          statusText.textContent = 'Connected';
-        } else {
-          statusDot.style.background = '#ff4444';
-          statusText.textContent = 'Disconnected';
-        }
-      });
-
-      testConnectionBtn.addEventListener('click', async function() {
-        testConnectionBtn.disabled = true;
-        testConnectionBtn.textContent = 'Testing...';
-        keyError.style.display = 'none';
-        
-        try {
-          await database.ref('.info/connected').once('value');
-          await database.ref('usedKeys').limitToFirst(1).once('value');
-          
-          const testRef = database.ref('connectionTest/' + Date.now());
-          await testRef.set({ test: true, timestamp: Date.now() });
-          await testRef.remove();
-          
-          keyError.style.color = '#4ade80';
-          keyError.textContent = '✅ Connection working!';
-          keyError.style.display = 'block';
-          
-          testConnectionBtn.textContent = 'Test Connection';
-          testConnectionBtn.disabled = false;
-        } catch (error) {
-          console.error('❌ Connection test failed:', error);
-          keyError.style.color = '#ff4444';
-          keyError.textContent = `❌ Connection failed: ${error.message}`;
-          keyError.style.display = 'block';
-          testConnectionBtn.textContent = 'Test Connection';
-          testConnectionBtn.disabled = false;
-        }
-      });
-
-      submitBtn.addEventListener('mouseenter', function() {
-        this.style.transform = 'translateY(-2px)';
-        this.style.boxShadow = '0 6px 20px rgba(79, 144, 255, 0.5)';
-      });
-
-      submitBtn.addEventListener('mouseleave', function() {
-        this.style.transform = 'translateY(0)';
-        this.style.boxShadow = '0 4px 15px rgba(79, 144, 255, 0.3)';
-      });
-
-      keyInput.addEventListener('focus', function() {
-        this.style.borderColor = '#4f90ff';
-        this.style.boxShadow = '0 0 0 3px rgba(79, 144, 255, 0.1)';
-      });
-
-      keyInput.addEventListener('blur', function() {
-        this.style.borderColor = '#38415d';
-        this.style.boxShadow = 'none';
-      });
-
-      async function verifyKey() {
-        const enteredKey = keyInput.value.trim();
-        
-        if (!enteredKey) {
-          keyError.textContent = '❌ Please enter a key';
-          keyError.style.color = '#ff4444';
-          keyError.style.display = 'block';
-          keyInput.style.borderColor = '#ff4444';
-          return;
-        }
-
-        if (!validKeys.includes(enteredKey)) {
-          keyError.textContent = '❌ Invalid key';
-          keyError.style.color = '#ff4444';
-          keyError.style.display = 'block';
-          keyInput.style.borderColor = '#ff4444';
-          keyInput.value = '';
-          return;
-        }
-
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Verifying...';
-        submitBtn.style.cursor = 'wait';
-        
-        console.log('🔑 Verifying key:', enteredKey);
-
-        try {
-          const normalizedSite = normalizeHostname(window.location.hostname || 'localhost');
-          const actualSite = getActualWebsite(window.location.hostname || 'localhost');
-          
-          const browserId = generateBrowserFingerprintId();
-          
-          console.log('🔒 Browser ID:', browserId);
-          
-          await database.ref('.info/connected').once('value');
-          
-          const keyRef = database.ref('usedKeys/' + enteredKey);
-          const snapshot = await keyRef.once('value');
-          
-          if (snapshot.exists()) {
-            // KEY EXISTS - CHECK ID ONLY
-            const keyData = snapshot.val();
-            const keyOwnerId = keyData.fingerprintId;
-            
-            console.log('📝 Key found in database');
-            console.log('🔍 Comparing IDs...');
-            
-            // ONLY CHECK FINGERPRINT ID
-            if (browserId !== keyOwnerId) {
-              console.error('🚫 BROWSER ID MISMATCH!');
-              
-              await database.ref('securityLogs/unauthorizedAttempts/' + Date.now()).set({
-                attemptedKey: enteredKey,
-                keyOwnerId: keyOwnerId,
-                attemptedById: browserId,
-                website: actualSite,
-                timestamp: Date.now(),
-                date: new Date().toISOString(),
-                reason: 'ID_MISMATCH'
-              });
-              
-              keyError.textContent = '🚫 This key is locked to a different browser ID. Contact support if this is your key.';
-              keyError.style.color = '#ff4444';
-              keyError.style.display = 'block';
-              keyInput.style.borderColor = '#ff4444';
-              keyInput.value = '';
-              submitBtn.disabled = false;
-              submitBtn.textContent = 'Verify Key';
-              submitBtn.style.cursor = 'pointer';
-              return;
-            }
-            
-            // ID MATCHES - GRANT ACCESS
-            console.log('✅ Browser ID matches!');
-            
-            const websites = keyData.websites || [];
-            
-            if (!websites.includes(actualSite)) {
-              await keyRef.update({
-                websites: [...websites, actualSite],
-                timesAccessed: (keyData.timesAccessed || 0) + 1,
-                lastAccessed: new Date().toISOString(),
-                lastAccessedSite: actualSite,
-                network: normalizedSite
               });
             } else {
               await keyRef.update({
@@ -1126,6 +718,10 @@ function debounce(func, delay = 300) {
   };
 }
 
+// Create debounced search functions once
+const debouncedSearchGames = debounce(searchGames, 300);
+const debouncedSearchWebsites = debounce(searchWebsites, 300);
+
 function hideAll() {
   document.querySelectorAll('.content').forEach(c => (c.style.display = 'none'));
   document.querySelectorAll('.navbar li a').forEach(link => link.classList.remove('active'));
@@ -1137,16 +733,22 @@ function hideAll() {
 function displayGameOfTheDay() {
   console.log('🎮 Displaying Game of the Day');
   const gotdContainer = document.getElementById('game-of-the-day-container');
-  if (!gotdContainer) return;
+  if (!gotdContainer) {
+    console.warn('⚠️ Game of the Day container not found');
+    return;
+  }
   
   if (typeof getGameOfTheDay !== 'function') {
-    console.error('❌ getGameOfTheDay not found');
+    console.error('❌ getGameOfTheDay function not found');
     return;
   }
   
   try {
     const game = getGameOfTheDay();
-    if (!game) return;
+    if (!game) {
+      console.warn('⚠️ No game of the day available');
+      return;
+    }
     
     gotdContainer.innerHTML = `
       <div class="gotd-card">
@@ -1196,6 +798,8 @@ function showGames() {
     } else {
       renderGames(games);
     }
+  } else {
+    console.warn('⚠️ games array not loaded yet');
   }
 }
 
@@ -1208,6 +812,8 @@ function showApps() {
   
   if (typeof apps !== 'undefined' && Array.isArray(apps)) {
     renderApps(apps);
+  } else {
+    console.warn('⚠️ apps array not loaded yet');
   }
 }
 
@@ -1220,6 +826,8 @@ function showWebsites() {
   
   if (typeof websites !== 'undefined' && Array.isArray(websites)) {
     renderWebsites(websites);
+  } else {
+    console.warn('⚠️ websites array not loaded yet');
   }
 }
 
@@ -1316,7 +924,7 @@ function renderWebsites(websitesToRender) {
     listItem.style.cssText = 'padding: 15px; margin-bottom: 10px; background: var(--nav-color); border: 1px solid var(--border-color); border-radius: 8px; transition: all 0.3s ease;';
     
     listItem.innerHTML = `
-      <a href="${website.url}" target="_blank" style="color: var(--accent-color); text-decoration: none; font-size: 18px; display: flex; align-items: center; gap: 10px;">
+      <a href="${website.url}" target="_blank" rel="noopener noreferrer" style="color: var(--accent-color); text-decoration: none; font-size: 18px; display: flex; align-items: center; gap: 10px;">
         <span>🔗</span>
         <div>
           <div style="font-weight: 600;">${website.name}</div>
@@ -1343,10 +951,27 @@ function renderWebsites(websitesToRender) {
   websitesList.appendChild(list);
 }
 
+// URL validation helper
+function isValidUrl(string) {
+  try {
+    new URL(string);
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
 function loadGame(url) {
   if (!url) {
     console.error('❌ No URL provided');
     alert('Error: Game URL is missing.');
+    return;
+  }
+  
+  // Validate URL format
+  if (!isValidUrl(url) && !url.startsWith('/') && !url.startsWith('./')) {
+    console.error('❌ Invalid URL format:', url);
+    alert('Error: Invalid game URL.');
     return;
   }
   
@@ -1634,7 +1259,7 @@ function initializeApp() {
     backToHomeWebsites.addEventListener('click', () => showHome());
   }
 
-  // Search
+  // Search - use pre-created debounced functions
   const searchBtn = document.getElementById('searchBtn');
   const searchInput = document.getElementById('searchInput');
   
@@ -1646,10 +1271,10 @@ function initializeApp() {
     searchInput.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') searchGames();
     });
-    searchInput.addEventListener('input', debounce(searchGames, 300));
+    searchInput.addEventListener('input', debouncedSearchGames);
   }
 
-  // Websites search
+  // Websites search - use pre-created debounced function
   const websitesSearchBtn = document.getElementById('websitesSearchBtn');
   const websitesSearchInput = document.getElementById('websitesSearchInput');
   
@@ -1661,7 +1286,7 @@ function initializeApp() {
     websitesSearchInput.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') searchWebsites();
     });
-    websitesSearchInput.addEventListener('input', debounce(searchWebsites, 300));
+    websitesSearchInput.addEventListener('input', debouncedSearchWebsites);
   }
 
   // Fullscreen
@@ -1678,4 +1303,426 @@ function initializeApp() {
     console.error('❌ Critical error during initialization:', error);
     alert('An error occurred during initialization. Check console.');
   }
-}
+}edSite: actualSite
+              });
+            }
+            
+            localStorage.setItem('galaxyverse_user_key', foundKey);
+            localStorage.setItem('galaxyverse_access', 'granted');
+            
+            if (typeof window.WebsiteKeyTracker !== 'undefined') {
+              window.WebsiteKeyTracker.trackKeyUsage(foundKey, actualSite, browserId);
+            }
+            
+            console.log('✅ Access granted across all domains');
+            return;
+          }
+        }
+        
+        console.log('ℹ️ No key found for this ID');
+      } catch (error) {
+        console.error('❌ Error searching Firebase:', error);
+      }
+      
+      // ===== STEP 2: CHECK LOCALSTORAGE =====
+      console.log('🔍 Step 2: Checking localStorage...');
+      const storedKey = localStorage.getItem('galaxyverse_user_key');
+      
+      if (storedKey) {
+        console.log('📦 Found key in localStorage, verifying...');
+        try {
+          const keyRef = database.ref('usedKeys/' + storedKey);
+          const snapshot = await keyRef.once('value');
+          
+          if (snapshot.exists()) {
+            const keyData = snapshot.val();
+            
+            // CRITICAL: Check ID match ONLY
+            if (keyData.fingerprintId && keyData.fingerprintId !== browserId) {
+              console.error('🚫 BROWSER ID MISMATCH!');
+              
+              await database.ref('securityLogs/idMismatches/' + Date.now()).set({
+                key: storedKey,
+                storedId: keyData.fingerprintId,
+                attemptedId: browserId,
+                website: actualSite,
+                timestamp: Date.now(),
+                date: new Date().toISOString()
+              });
+              
+              localStorage.removeItem('galaxyverse_user_key');
+              localStorage.removeItem('galaxyverse_access');
+              
+              alert('⚠️ Security Alert: This key belongs to a different browser ID.');
+              showKeyEntryScreen();
+              return;
+            }
+            
+            console.log('✅ ID verified');
+            
+            const websites = keyData.websites || [];
+            if (!websites.includes(actualSite)) {
+              await keyRef.update({
+                websites: [...websites, actualSite],
+                lastAccessed: new Date().toISOString(),
+                lastAccessedSite: actualSite,
+                timesAccessed: (keyData.timesAccessed || 0) + 1
+              });
+            } else {
+              await keyRef.update({
+                timesAccessed: (keyData.timesAccessed || 0) + 1,
+                lastAccessed: new Date().toISOString(),
+                lastAccessedSite: actualSite
+              });
+            }
+            
+            if (typeof window.WebsiteKeyTracker !== 'undefined') {
+              window.WebsiteKeyTracker.trackKeyUsage(storedKey, actualSite, browserId);
+            }
+            
+            localStorage.setItem('galaxyverse_access', 'granted');
+            console.log('✅ Access granted');
+            return;
+          } else {
+            localStorage.removeItem('galaxyverse_user_key');
+            localStorage.removeItem('galaxyverse_access');
+          }
+        } catch (error) {
+          console.error('❌ Error verifying key:', error);
+        }
+      }
+
+      // ===== STEP 3: SHOW KEY ENTRY =====
+      console.log('🔐 No valid key - showing entry screen');
+      showKeyEntryScreen();
+    }
+
+    function showKeyEntryScreen() {
+      console.log('🔐 Showing key entry screen');
+      
+      const keyOverlay = document.createElement('div');
+      keyOverlay.id = 'galaxyverse-key-overlay';
+      keyOverlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 999999;
+        font-family: 'Roboto', sans-serif;
+      `;
+
+      const browserId = generateBrowserFingerprintId();
+
+      keyOverlay.innerHTML = `
+        <div style="
+          background: rgba(30, 36, 51, 0.95);
+          border: 2px solid #4f90ff;
+          border-radius: 20px;
+          padding: 40px;
+          box-shadow: 0 15px 50px rgba(79, 144, 255, 0.3);
+          text-align: center;
+          max-width: 500px;
+          width: 90%;
+        ">
+          <div style="
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #4f90ff, #9d4edd);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            box-shadow: 0 8px 20px rgba(79, 144, 255, 0.4);
+          ">
+            🔐
+          </div>
+          
+          <h1 style="
+            color: #e0e6f1;
+            font-size: 32px;
+            margin: 0 0 10px 0;
+            font-weight: 700;
+          ">GalaxyVerse</h1>
+          
+          <p style="
+            color: #9ca3af;
+            font-size: 16px;
+            margin: 0 0 10px 0;
+          ">Enter your access key to continue</p>
+          
+          <div style="
+            background: rgba(79, 144, 255, 0.1);
+            border: 1px solid rgba(79, 144, 255, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #9ca3af;
+          ">
+            <div style="margin-bottom: 8px; color: #4f90ff; font-weight: bold;">🔒 Browser ID Protection</div>
+            <div style="font-size: 12px;">
+              Your Browser ID: ${browserId.substring(0, 20)}...
+            </div>
+          </div>
+          
+          <p style="
+            color: #9ca3af;
+            font-size: 14px;
+            margin-bottom: 20px;
+          ">
+          <a href="https://docs.google.com/document/d/1RfHWPQ-8Kq2NDV6vxfOgquBqIKwp4OoL7K1NXkYLUEg/edit?usp=sharing" target="_blank" style="color: #4f90ff;">GalaxyVerse Policy</a><br>
+          V1.2.8 - Simple Browser ID System</p>
+          
+          <input type="text" id="keyInput" placeholder="Enter your key" style="
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            border: 2px solid #38415d;
+            border-radius: 10px;
+            background: #121826;
+            color: #e0e6f1;
+            outline: none;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+          " />
+          
+          <button id="submitKey" style="
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #4f90ff, #9d4edd);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(79, 144, 255, 0.3);
+          ">Verify Key</button>
+          
+          <button id="testConnectionBtn" style="
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            background: transparent;
+            color: #4f90ff;
+            border: 1px solid #4f90ff;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+          ">Test Connection</button>
+          
+          <div id="keyError" style="
+            color: #ff4444;
+            margin-top: 15px;
+            font-size: 14px;
+            display: none;
+          "></div>
+          
+          <div id="connectionStatus" style="
+            margin-top: 15px;
+            font-size: 12px;
+            color: #9ca3af;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+          ">
+            <span id="statusDot" style="
+              width: 8px;
+              height: 8px;
+              border-radius: 50%;
+              background: #4ade80;
+              display: inline-block;
+            "></span>
+            <span id="statusText">Connected</span>
+          </div>
+          
+          <div style="
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #38415d;
+            color: #6b7280;
+            font-size: 12px;
+          ">
+            🔐 Each key is locked to ONE browser ID<br>
+            🌟 Cannot be transferred to other browsers<br>
+            ✨ Works across ALL GalaxyVerse domains<br><br>
+            Contact admins for lifetime key ($5)
+          </div>
+        </div>
+      `;
+
+      document.body.appendChild(keyOverlay);
+      
+      const mainContent = document.getElementById('app') || document.body;
+      if (mainContent && mainContent !== document.body) {
+        mainContent.style.filter = 'blur(10px)';
+        mainContent.style.pointerEvents = 'none';
+      }
+
+      const keyInput = document.getElementById('keyInput');
+      const submitBtn = document.getElementById('submitKey');
+      const testConnectionBtn = document.getElementById('testConnectionBtn');
+      const keyError = document.getElementById('keyError');
+      const statusDot = document.getElementById('statusDot');
+      const statusText = document.getElementById('statusText');
+
+      database.ref('.info/connected').on('value', (snapshot) => {
+        if (snapshot.val() === true) {
+          statusDot.style.background = '#4ade80';
+          statusText.textContent = 'Connected';
+        } else {
+          statusDot.style.background = '#ff4444';
+          statusText.textContent = 'Disconnected';
+        }
+      });
+
+      testConnectionBtn.addEventListener('click', async function() {
+        testConnectionBtn.disabled = true;
+        testConnectionBtn.textContent = 'Testing...';
+        keyError.style.display = 'none';
+        
+        try {
+          await database.ref('.info/connected').once('value');
+          await database.ref('usedKeys').limitToFirst(1).once('value');
+          
+          const testRef = database.ref('connectionTest/' + Date.now());
+          await testRef.set({ test: true, timestamp: Date.now() });
+          await testRef.remove();
+          
+          keyError.style.color = '#4ade80';
+          keyError.textContent = '✅ Connection working!';
+          keyError.style.display = 'block';
+          
+          testConnectionBtn.textContent = 'Test Connection';
+          testConnectionBtn.disabled = false;
+        } catch (error) {
+          console.error('❌ Connection test failed:', error);
+          keyError.style.color = '#ff4444';
+          keyError.textContent = `❌ Connection failed: ${error.message}`;
+          keyError.style.display = 'block';
+          testConnectionBtn.textContent = 'Test Connection';
+          testConnectionBtn.disabled = false;
+        }
+      });
+
+      submitBtn.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-2px)';
+        this.style.boxShadow = '0 6px 20px rgba(79, 144, 255, 0.5)';
+      });
+
+      submitBtn.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+        this.style.boxShadow = '0 4px 15px rgba(79, 144, 255, 0.3)';
+      });
+
+      keyInput.addEventListener('focus', function() {
+        this.style.borderColor = '#4f90ff';
+        this.style.boxShadow = '0 0 0 3px rgba(79, 144, 255, 0.1)';
+      });
+
+      keyInput.addEventListener('blur', function() {
+        this.style.borderColor = '#38415d';
+        this.style.boxShadow = 'none';
+      });
+
+      async function verifyKey() {
+        const enteredKey = keyInput.value.trim();
+        
+        if (!enteredKey) {
+          keyError.textContent = '❌ Please enter a key';
+          keyError.style.color = '#ff4444';
+          keyError.style.display = 'block';
+          keyInput.style.borderColor = '#ff4444';
+          return;
+        }
+
+        if (!validKeys.includes(enteredKey)) {
+          keyError.textContent = '❌ Invalid key';
+          keyError.style.color = '#ff4444';
+          keyError.style.display = 'block';
+          keyInput.style.borderColor = '#ff4444';
+          keyInput.value = '';
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Verifying...';
+        submitBtn.style.cursor = 'wait';
+        
+        console.log('🔑 Verifying key:', enteredKey);
+
+        try {
+          const normalizedSite = normalizeHostname(window.location.hostname || 'localhost');
+          const actualSite = getActualWebsite(window.location.hostname || 'localhost');
+          
+          const browserId = generateBrowserFingerprintId();
+          
+          console.log('🔒 Browser ID:', browserId);
+          
+          await database.ref('.info/connected').once('value');
+          
+          const keyRef = database.ref('usedKeys/' + enteredKey);
+          const snapshot = await keyRef.once('value');
+          
+          if (snapshot.exists()) {
+            // KEY EXISTS - CHECK ID ONLY
+            const keyData = snapshot.val();
+            const keyOwnerId = keyData.fingerprintId;
+            
+            console.log('📝 Key found in database');
+            console.log('🔍 Comparing IDs...');
+            
+            // ONLY CHECK FINGERPRINT ID
+            if (browserId !== keyOwnerId) {
+              console.error('🚫 BROWSER ID MISMATCH!');
+              
+              await database.ref('securityLogs/unauthorizedAttempts/' + Date.now()).set({
+                attemptedKey: enteredKey,
+                keyOwnerId: keyOwnerId,
+                attemptedById: browserId,
+                website: actualSite,
+                timestamp: Date.now(),
+                date: new Date().toISOString(),
+                reason: 'ID_MISMATCH'
+              });
+              
+              keyError.textContent = '🚫 This key is locked to a different browser ID. Contact support if this is your key.';
+              keyError.style.color = '#ff4444';
+              keyError.style.display = 'block';
+              keyInput.style.borderColor = '#ff4444';
+              keyInput.value = '';
+              submitBtn.disabled = false;
+              submitBtn.textContent = 'Verify Key';
+              submitBtn.style.cursor = 'pointer';
+              return;
+            }
+            
+            // ID MATCHES - GRANT ACCESS
+            console.log('✅ Browser ID matches!');
+            
+            const websites = keyData.websites || [];
+            
+            if (!websites.includes(actualSite)) {
+              await keyRef.update({
+                websites: [...websites, actualSite],
+                timesAccessed: (keyData.timesAccessed || 0) + 1,
+                lastAccessed: new Date().toISOString(),
+                lastAccessedSite: actualSite,
+                network: normalizedSite
+              });
+            } else {
+              await keyRef.update({
+                timesAccessed: (keyData.timesAccessed || 0) + 1,
+                lastAccessed: new Date().toISOString(),
+                lastAccess
