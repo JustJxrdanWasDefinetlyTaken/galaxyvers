@@ -429,40 +429,45 @@ function shouldAutoApplySeasonalTheme() {
     const validKeys = [
       // DEVS KEYS
       'ghostisnot',
+      'davidsbackupkey',
       'azthedev',
-      'aztestkey123',
-      'MichaelIsKronos',
+      'aziscoolbro',
       'aanzoski',
+      'MichaelIsKronos',
       'jordanthedev',
-      'd3vinthefirstdev',
+      'devinisahuman',
+      // Contributor Keys
+      'darielisa67produde',
+      'geminihereisyourkey',
+      'secrethiddenforreal',
       // PAYED KEYS
-      '9L4CxSxnkR1jHXMiuWCozAE2uHVmemzU',
-      'Nm2PErFp4dhBqw2Y8cEh2uJc2nAQ7SrO',
-      'l6el7XAxpHBb5MO1oWuFUf3XDgCIcJBT',
-      'LKPR0egJizvkY23HT5QJxjq8kp0SPsGe',
-      'RoBmU7nXLjwD47YkOjh94esQHqRAgNeD',
-      'JA3R5mEiBJBVX4259kySPVZFV097m32J',
-      '9KizEpa5P4E7GaXVZ5GD0s5eHEwqWfrx',
-      'LBT5fWdAu8RAaDJZrB8yMteE7YZT370L',
+      '6spsb9xn1lbgnbvp8tfzufrwj1971jjl',
+      'nwmjfq34gqpyai8i1oh52bjb7uy4q8dc',
+      'ey04k0wnko0rf66rx858fl9luigyo1xc',
+      'a4d54ed5mi6d96ahbet7heb8hc2vcj3l',
+      'iolhzif0fvwzp0ko6rp7mkv5ddeq115x',
+      '0rwg5j41fkglve1qz5v1809tm5lgu2ly',
+      'dfr7ywfyimt7q98alx5uxjp7idu78k0x',
+      'jtkqwpcz1oy1w43hlbj52eqdd23uvhq2',
       // Free keys
-      'hy906fm5VaNf',
-      '5HScgYoA9T0m',
-      'I4EVjWOt7a8H',
-      'D57xIn8T0qix',
-      '3bD0jxY5Y7uL',
+      '676767676767',
+      '41414141',
+      'whowantsthiskey',
+      'version3published',
       // Specified Friend keys
-      'ZH3X3R651E8FW0Z',
-      'FUBOY5J79L76W75',
-      'G1FKP8QK1YPZ3SZ',
-      'ETQZYA2SA87I59U',
-      'W5QZ263S35NN0OQ',
+      'Q2nLh6cwvxv6c6W',
+      '3pXL08S8BVrLq9r',
+      '0wV5y9ZZ6G3mSzN',
+      '7ppD9Z0j2hj0Rd5',
       // Made by az bro 
-      'jordansays67az',
-      'azsays41jordan',
+      'jordanisaskid67',
+      'azisaskid41',
+      'HOluisK',
+      'calderonisbunsatsoccer',
       // Uh idek for Hector
-      'HectorISmessifr',
-      'thisisfordomain',
-      'jordanisnotaskid'
+      'Hectordontsharethis',
+      'thisnotfordomain',
+      'jordanproskid'
     ];
 
     async function initializeKeySystem() {
