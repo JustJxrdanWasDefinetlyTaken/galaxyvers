@@ -679,8 +679,9 @@ function shouldAutoApplySeasonalTheme() {
           ">
             <div style="margin-bottom: 8px; color: #4f90ff; font-weight: bold;">🛡️ Dual Authentication System</div>
             <div style="font-size: 12px; text-align: left; padding: 0 10px;">
-              <div style="margin: 5px 0;">✅ Layer 1: Browser Fingerprint ID</div>
-              <div style="margin: 5px 0;">✅ Layer 2: 256-bit WEP Key</div>
+              <div style="margin: 5px 0;">✅ Layer 1: Fingerprint ID/div>
+              <div style="margin: 5px 0;">✅ Layer 2: 256 WEP Key</div>
+              <div style="margin: 5px 0;">❌ Layer 3: Joseluis I need my shorts</div>
               <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(79, 144, 255, 0.2);">
                 <strong>Your Browser ID:</strong><br/>
                 <code style="font-size: 11px; color: #4ade80;">${browserId.substring(0, 20)}...</code>
@@ -694,7 +695,8 @@ function shouldAutoApplySeasonalTheme() {
             margin-bottom: 20px;
           ">
           <a href="https://docs.google.com/document/d/1RfHWPQ-8Kq2NDV6vxfOgquBqIKwp4OoL7K1NXkYLUEg/edit?usp=sharing" target="_blank" style="color: #4f90ff;">GalaxyVerse Policy</a><br>
-          V3.0.0 - Dual Authentication System</p>
+          V3.0.0 - Dual Authentication System</p><br>
+          Patched keys at 11:21 PM (Thanks to the people who helped fix)</p>
           
           <input type="text" id="keyInput" placeholder="Enter your key" style="
             width: 100%;
