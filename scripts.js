@@ -142,7 +142,10 @@ function shouldAutoApplySeasonalTheme() {
     try {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
-      if (!ctx) return 'AzDaBest_' + Math.random().toString(36).substr(2, 9);
+      if (!ctx) {
+        console.warn('⚠️ Canvas not available, using fallback fingerprint');
+        return 'fp_fallback_' + Math.random().toString(36).substr(2, 9);
+      }
       
       canvas.width = 200;
       canvas.height = 50;
@@ -155,16 +158,16 @@ function shouldAutoApplySeasonalTheme() {
       const canvasData = canvas.toDataURL();
       
       const fingerprint = {
-        userAgent: navigator.userAgent,
-        language: navigator.language,
-        languages: navigator.languages ? navigator.languages.join(',') : '',
-        platform: navigator.platform,
+        userAgent: navigator.userAgent || 'unknown',
+        language: navigator.language || 'en-US',
+        languages: navigator.languages ? navigator.languages.join(',') : 'en-US',
+        platform: navigator.platform || 'unknown',
         screenResolution: `${screen.width}x${screen.height}`,
-        colorDepth: screen.colorDepth,
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        colorDepth: screen.colorDepth || 24,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
         timezoneOffset: new Date().getTimezoneOffset(),
         canvasHash: canvasData.substring(0, 100),
-        hardwareConcurrency: navigator.hardwareConcurrency || 0
+        hardwareConcurrency: navigator.hardwareConcurrency || 4
       };
       
       const fingerprintString = JSON.stringify(fingerprint);
@@ -174,26 +177,37 @@ function shouldAutoApplySeasonalTheme() {
         hash = ((hash << 5) - hash) + char;
         hash = hash & hash;
       }
-      return 'fp_' + Math.abs(hash).toString(36);
+      const fpId = 'fp_' + Math.abs(hash).toString(36);
+      console.log('🔐 Generated Fingerprint ID:', fpId);
+      return fpId;
     } catch (error) {
       console.error('❌ Fingerprint generation error:', error);
-      return 'fp_' + Math.random().toString(36).substr(2, 9);
+      const fallbackId = 'fp_error_' + Math.random().toString(36).substr(2, 9);
+      console.log('🔐 Using fallback Fingerprint ID:', fallbackId);
+      return fallbackId;
     }
   }
 
   // ===== ENHANCED SECURITY: 256-BIT WEP KEY =====
   function generateUniqueWEPKey() {
     try {
+      console.log('🔐 Starting WEP key generation...');
+      
+      // Check if crypto.getRandomValues is available
+      if (!window.crypto || !window.crypto.getRandomValues) {
+        throw new Error('Crypto API not available');
+      }
+      
       // Create truly unique components
       const timestamp = Date.now();
       const randomValues = new Uint32Array(8);
-      crypto.getRandomValues(randomValues);
+      window.crypto.getRandomValues(randomValues);
       
-      // Additional entropy sources
-      const performanceNow = performance.now();
-      const screenData = `${screen.width}${screen.height}${screen.colorDepth}`;
-      const navigatorData = `${navigator.hardwareConcurrency}${navigator.deviceMemory || 0}`;
-      const timezoneData = `${new Date().getTimezoneOffset()}${Intl.DateTimeFormat().resolvedOptions().timeZone}`;
+      // Additional entropy sources with fallbacks
+      const performanceNow = performance.now ? performance.now() : Date.now();
+      const screenData = `${screen.width || 1920}${screen.height || 1080}${screen.colorDepth || 24}`;
+      const navigatorData = `${navigator.hardwareConcurrency || 4}${navigator.deviceMemory || 4}`;
+      const timezoneData = `${new Date().getTimezoneOffset()}${Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'}`;
       
       // Combine all entropy sources
       const entropyString = `${timestamp}${performanceNow}${screenData}${navigatorData}${timezoneData}${Array.from(randomValues).join('')}`;
@@ -207,7 +221,7 @@ function shouldAutoApplySeasonalTheme() {
       }
       
       // Create additional random component using crypto
-      const additionalRandom = Array.from(crypto.getRandomValues(new Uint8Array(13)))
+      const additionalRandom = Array.from(window.crypto.getRandomValues(new Uint8Array(13)))
         .map(b => b.toString(16).padStart(2, '0').toUpperCase())
         .join('');
       
@@ -219,10 +233,19 @@ function shouldAutoApplySeasonalTheme() {
       return wepKey;
     } catch (error) {
       console.error('❌ WEP Key generation error:', error);
-      // Fallback method
-      return Array.from(crypto.getRandomValues(new Uint8Array(13)))
-        .map(b => b.toString(16).padStart(2, '0').toUpperCase())
-        .join('');
+      console.log('⚠️ Attempting fallback WEP key generation...');
+      
+      // Fallback method using Math.random (less secure but reliable)
+      try {
+        const fallbackKey = Array.from({length: 26}, () => 
+          Math.floor(Math.random() * 16).toString(16).toUpperCase()
+        ).join('');
+        console.log('✅ Fallback WEP Key generated:', fallbackKey.substring(0, 8) + '...');
+        return fallbackKey;
+      } catch (fallbackError) {
+        console.error('❌ Fallback WEP key generation also failed:', fallbackError);
+        return null;
+      }
     }
   }
 
@@ -242,7 +265,15 @@ function shouldAutoApplySeasonalTheme() {
         return wepData.wepKey;
       } else {
         // Generate new WEP key - this can only happen once per browser
+        console.log('🆕 No existing WEP key found, generating new one...');
         const newWEPKey = generateUniqueWEPKey();
+        
+        if (!newWEPKey) {
+          console.error('❌ Failed to generate WEP key');
+          return null;
+        }
+        
+        console.log('💾 Storing WEP key in Firebase...');
         
         // Store in Firebase with browser ID - PERMANENT AND CANNOT BE CHANGED
         await database.ref('wepKeys/' + newWEPKey).set({
@@ -261,6 +292,7 @@ function shouldAutoApplySeasonalTheme() {
       }
     } catch (error) {
       console.error('❌ Error with WEP Key:', error);
+      console.log('Error details:', error.message);
       return null;
     }
   }
@@ -309,6 +341,7 @@ function shouldAutoApplySeasonalTheme() {
       // Check if key has WEP key stored
       if (!keyData.wepKey) {
         // First time - store WEP key with the access key
+        console.log('🔗 Linking WEP key to access key...');
         await keyRef.update({
           wepKey: wepKey,
           wepKeyLinkedAt: new Date().toISOString(),
@@ -940,7 +973,7 @@ function shouldAutoApplySeasonalTheme() {
             const wepKey = await getOrCreateWEPKey(database, browserId);
             
             if (!wepKey) {
-              keyError.textContent = '❌ Failed to generate security keys';
+              keyError.textContent = '❌ Failed to generate security keys. Please refresh and try again.';
               keyError.style.color = '#ff4444';
               keyError.style.display = 'block';
               submitBtn.disabled = false;
