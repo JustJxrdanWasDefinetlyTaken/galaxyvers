@@ -26,6 +26,7 @@ const games = [
   { name: "Blade Ball", image: "others/assets/images/games/bladeball.png", url: "others/assets/games/Blade Ball.html" },
   { name: "Block Blast", image: "others/assets/images/games/blockblast.jpeg", url: "others/assets/games/Block Blast.html" },
   { name: "Bloxorz", image: "others/assets/images/games/blockorz.jpeg", url: "others/assets/games/Bloxorz.html" },
+  { name: "Buildnow.gg", image: "others/assets/images/games/buildnowgg.png", url: "others/assets/games/buildnowgg.html" },
   { name: "Candy Crush", image: "others/assets/images/games/candycrush.png", url: "others/assets/games/Candy Crush.html" },
   { name: "Cluster Rush", image: "others/assets/images/games/clusterrush.jpeg", url: "others/assets/games/Cluster Rush.html" },
   { name: "Cookie Clicker", image: "others/assets/images/games/cookie-clicker.png", url: "others/assets/games/Cookie Clicker.html" },
