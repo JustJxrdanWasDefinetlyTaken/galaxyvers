@@ -680,7 +680,7 @@ function shouldAutoApplySeasonalTheme() {
             <div style="margin-bottom: 8px; color: #4f90ff; font-weight: bold;">🛡️ Dual Authentication System</div>
             <div style="font-size: 12px; text-align: left; padding: 0 10px;">
               <div style="margin: 5px 0;">✅ Layer 1: Fingerprint ID/div>
-              <div style="margin: 5px 0;">✅ Layer 2: 256 WEP Key</div>
+              <div style="margin: 5px 0;">✅ Layer 2: 256 WEP Key/div>
               <div style="margin: 5px 0;">❌ Layer 3: Joseluis I need my shorts</div>
               <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(79, 144, 255, 0.2);">
                 <strong>Your Browser ID:</strong><br/>
