@@ -139,7 +139,7 @@ function shouldAutoApplySeasonalTheme() {
     try {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
-      if (!ctx) return 'fp_' + Math.random().toString(36).substr(2, 9);
+      if (!ctx) return 'AzDaBest_' + Math.random().toString(36).substr(2, 9);
       
       canvas.width = 200;
       canvas.height = 50;
