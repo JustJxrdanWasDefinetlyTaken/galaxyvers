@@ -11,6 +11,9 @@
   <!-- external CSS-->
   <link rel="stylesheet" href="./styles.css" />
 
+  <!-- Sidebar CSS -->
+  <link rel="stylesheet" href="./others/assets/css/sidebar.css" />
+
   <!-- Console CSS -->
   <link rel="stylesheet" href="./others/assets/css/console.css" />
 
@@ -55,12 +58,9 @@
     }
 
     @keyframes pulse {
-
-      0%,
-      100% {
+      0%, 100% {
         transform: scale(1);
       }
-
       50% {
         transform: scale(1.05);
       }
@@ -105,248 +105,290 @@
 
 <body>
 
-  <!-- Navigation bar -->
-  <nav class="navbar">
-    <a href="#" class="logo">GalaxyVerse</a>
-    <ul>
-      <li><a class="active" href="#" id="homeLink">Home</a></li>
-      <li><a href="#" id="gameLink">Gᾰmes</a></li>
-      <li><a href="#" id="appsLink">Shortcuts</a></li>
-      <li><a href="#" id="websitesLink">Sites</a></li>
-      <li><a href="#" id="settingsLink">Settings</a></li>
-      <li><a href="#" id="aboutLink">Latest Notes</a></li>
-    </ul>
-  </nav>
-
-  <!-- Credits Modal -->
-  <div id="creditsModal" class="info-modal">
-    <div class="info-modal-content">
-      <span class="info-close" data-modal="creditsModal">&times;</span>
-      <h2>Credits</h2>
-      <div class="info-modal-body">
-        <p><strong>Created by:</strong></p>
-        <ul>
-          <li>Aye-zee (aanzoski)</li>
-          <li>Jordan (JustJxrdanWasDefinetlyTaken)</li>
-          <li>Nived (First Developer)</li>
-        </ul>
-
-        <p><strong>Credits</strong></p>
-        <ul>
-          <li><a href="https://www.galaxyverse.org/" target="_blank" rel="noopener noreferrer">GalaxyVerse</a></li>
-          <li><a href="https://github.com/JustJxrdanWasDefinetlyTaken" target="_blank"
-              rel="noopener noreferrer">Jordan's Projects</a></li>
-          <li><a href="https://github.com/3kho" target="_blank" rel="noopener noreferrer">3kho</a></li>
-          <li><a href="https://gn-math.dev/" target="_blank" rel="noopener noreferrer">gn-math for some games</a></li>
-          <li>Vyper Group</li>
-          <li>Velara</li>
-        </ul>
-
-        <p><strong>Contributors:</strong></p>
-        <ul>
-          <li>Michael</li>
-          <li>David</li>
-          <li>Dariel</li>
-          <li>Gemini</li>
-          <li>Ho-luis</li>
-          <li>fabian (ratted)</li>
-        </ul>
-
-        <p><strong>Project Info:</strong></p>
-        <ul>
-          <li>Best development team was here</li>
-        </ul>
-      </div>
+  <!-- Sidebar Navigation -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="moon-icon">🌙</div>
     </div>
+    <nav class="sidebar-nav">
+      <a href="#" class="sidebar-link active" id="homeLink" data-page="home">
+        <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        <span>Home</span>
+      </a>
+      <a href="#" class="sidebar-link" id="gameLink" data-page="games">
+        <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
+          <polyline points="17 2 12 7 7 2"></polyline>
+        </svg>
+        <span>Gᾰmes</span>
+      </a>
+      <a href="#" class="sidebar-link" id="appsLink" data-page="apps">
+        <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7"></rect>
+          <rect x="14" y="3" width="7" height="7"></rect>
+          <rect x="14" y="14" width="7" height="7"></rect>
+          <rect x="3" y="14" width="7" height="7"></rect>
+        </svg>
+        <span>Shortcuts</span>
+      </a>
+      <a href="#" class="sidebar-link" id="searchLink" data-page="search">
+        <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+        <span>Search</span>
+      </a>
+      <a href="#" class="sidebar-link" id="websitesLink" data-page="websites">
+        <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+        </svg>
+        <span>AI</span>
+      </a>
+      <a href="#" class="sidebar-link" id="settingsLink" data-page="settings">
+        <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="3" y1="9" x2="21" y2="9"></line>
+          <line x1="9" y1="21" x2="9" y2="9"></line>
+        </svg>
+        <span>Media</span>
+      </a>
+    </nav>
   </div>
 
-  <!-- Update Log Modal -->
-  <div id="updateLogModal" class="info-modal">
-    <div class="info-modal-content">
-      <span class="info-close" data-modal="updateLogModal">&times;</span>
-      <h2>Update Log V1.2.8</h2>
-      <div class="info-modal-body">
-        <ul>
-          <li>Fixed key system errors where it wont log you out</li>
-          <li>Jordan fixed a bunch of stuff</li>
-          <li>Improved error handling and validation</li>
-          <li>Fixed infinite loop issues in console initialization</li>
-          <li>Fixed seasonal theme date detection</li>
-        </ul>
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <!-- Credits Modal -->
+    <div id="creditsModal" class="info-modal">
+      <div class="info-modal-content">
+        <span class="info-close" data-modal="creditsModal">&times;</span>
+        <h2>Credits</h2>
+        <div class="info-modal-body">
+          <p><strong>Created by:</strong></p>
+          <ul>
+            <li>Aye-zee (aanzoski)</li>
+            <li>Jordan (JustJxrdanWasDefinetlyTaken)</li>
+            <li>Nived (First Developer)</li>
+          </ul>
 
-        <h4><b>Security Features</b></h4>
-        <ul>
-          <li>Hardware ID (HWID) fingerprinting</li>
-          <li>Canvas & WebGL fingerprinting</li>
-          <li>Font detection fingerprinting</li>
-          <li>Real-time device verification</li>
-        </ul>
+          <p><strong>Credits</strong></p>
+          <ul>
+            <li><a href="https://www.galaxyverse.org/" target="_blank" rel="noopener noreferrer">GalaxyVerse</a></li>
+            <li><a href="https://github.com/JustJxrdanWasDefinetlyTaken" target="_blank" rel="noopener noreferrer">Jordan's Projects</a></li>
+            <li><a href="https://github.com/3kho" target="_blank" rel="noopener noreferrer">3kho</a></li>
+            <li><a href="https://gn-math.dev/" target="_blank" rel="noopener noreferrer">gn-math for some games</a></li>
+            <li>Vyper Group</li>
+            <li>Velara</li>
+          </ul>
 
-        <h4>Coming Soon</h4>
-        <ul>
-          <li>More games</li>
-          <li>Admin dashboard</li>
-        </ul>
-      </div>
-    </div>
-  </div>
+          <p><strong>Contributors:</strong></p>
+          <ul>
+            <li>Michael</li>
+            <li>David</li>
+            <li>Dariel</li>
+            <li>Gemini</li>
+            <li>Ho-luis</li>
+            <li>fabian (ratted)</li>
+          </ul>
 
-  <div class="container">
-    <div id="content-home" class="content">
-      <h1>Welcome to GalaxyVerse</h1>
-      <h2>[11/12/25 | 11:51]</h2> <p>Note from <b>Azrael</b> 170 requests on one key is crazy work. If you want a free key I got you 😏</p>
-      <h3>Contributors get free keys + Devs</h3>
-      
-      <div class="poxyframe">
-        <iframe src="/static/" style="width:100%; height:100vh; border:none;"
-          title="GV Engine Frame">
-        </iframe>
-      </div>
-
-      <!-- Game of the Day Section -->
-      <!-- <div id="game-of-the-day-container"></div> -->
-
-      <!-- Credits and Update Log buttons -->
-      <div class="homepage-info-buttons">
-        <button id="creditsBtn" class="info-btn">Credits</button>
-        <button id="updateLogBtn" class="info-btn">Update Log</button>
-      </div>
-    </div>
-
-    <div id="content-gms" class="content" style="display:none;">
-      <h1>Games</h1>
-      <div class="search-container">
-        <input type="text" id="searchInput" placeholder="Search for games..." />
-        <button id="searchBtn">Search</button>
-      </div>
-      <div id="game-list" class="game-grid">
-        <!-- Game cards -->
-      </div>
-    </div>
-
-    <div id="content-about" class="content" style="display:none;">
-      <h2>About</h2>
-      <h1>Latest Note: [11/12/25 | 11:54]</h1>
-      <br>
-      <h3>I fixed the key system  since there was so many people that had a key that weren't supposed to</h3>
-    </div>
-
-    <div id="content-aps" class="content" style="display:none;">
-      <h1>Apps</h1>
-      <div id="app-list" class="app-grid">
-        <!-- App cards -->
-      </div>
-      <button id="backToHomeApps">Back to Home</button>
-    </div>
-
-    <div id="content-websites" class="content" style="display:none;">
-      <h1>Websites</h1>
-      <div class="search-container">
-        <input type="text" id="websitesSearchInput" placeholder="Search websites..." />
-        <button id="websitesSearchBtn">Search</button>
-      </div>
-      <div id="websites-list" class="app-grid">
-        <!-- Website crds-->
-      </div>
-      <button id="backToHomeWebsites">Back to Home</button>
-    </div>
-
-    <div id="content-settings" class="content" style="display:none;">
-      <h1>Settings</h1>
-
-      <div class="settings-page-container">
-        <div class="settings-section">
-          <h3>Tab Cloaking</h3>
-          <div class="setting-item">
-            <label for="customTitle">Custom Title:</label>
-            <input type="text" id="customTitle" placeholder="e.g., Google" />
-          </div>
-          <div class="setting-item">
-            <label for="customFavicon">Custom Favicon URL:</label>
-            <input type="text" id="customFavicon" placeholder="e.g., https://google.com/favicon.ico" />
-          </div>
-          <div class="setting-item">
-            <label for="presetSelect">Presets:</label>
-            <select id="presetSelect">
-              <option value="">-- Select Preset --</option>
-              <option value="google">Google</option>
-              <option value="classroom">Google Classroom</option>
-              <option value="bing">Bing</option>
-              <option value="nearpod">Nearpod</option>
-              <option value="powerschool">PowerSchool</option>
-              <option value="chrome">Chrome New Tab</option>
-              <option value="edge">Edge New Tab</option>
-            </select>
-          </div>
-          <div class="setting-buttons">
-            <button id="applyBtn" class="btn-primary">Apply</button>
-            <button id="resetBtn" class="btn-secondary">Reset</button>
-          </div>
-        </div>
-
-        <div class="settings-section">
-          <h3>Theme</h3>
-          <div class="setting-item">
-            <label for="themeSelect">Select Theme:</label>
-            <select id="themeSelect">
-              <option value="original">Original (Dark Blue)</option>
-              <option value="dark">Dark Theme</option>
-              <option value="light">Light Theme</option>
-              <option value="midnight">Midnight</option>
-              <option value="ocean">Ocean</option>
-              <option value="sunset">Sunset</option>
-              <option value="forest">Forest</option>
-              <option value="purple">Purple Dream</option>
-              <option value="cyberpunk">Cyberpunk</option>
-              <option value="matrix">Matrix</option>
-              <option value="neon">Neon Lights</option>
-              <option value="fire">Fire</option>
-              <option value="ice">Ice</option>
-              <option value="retro">Retro</option>
-            </select>
-          </div>
-          <div class="setting-item">
-            <label>
-              <input type="checkbox" id="snowToggle" checked /> Enable Snow Effect
-            </label>
-          </div>
-        </div>
-
-        <div class="settings-section">
-          <h3>Panic Button</h3>
-          <div class="setting-item">
-            <label for="hotkey-input">Panic Hotkey:</label>
-            <input type="text" id="hotkey-input" placeholder="Press a key" readonly />
-            <button id="change-hotkey-btn" class="btn-small">Change</button>
-          </div>
-          <div class="setting-item">
-            <label for="redirect-url-input">Redirect URL:</label>
-            <input type="text" id="redirect-url-input" placeholder="https://google.com" />
-            <button id="change-URL-btn" class="btn-small">Change</button>
-          </div>
-        </div>
-
-        <div class="settings-section">
-          <h3>About Blank</h3>
-          <div class="setting-item">
-            <label>
-              <input type="checkbox" id="aboutBlankToggle" /> Enable About:Blank Cloaking
-            </label>
-            <p style="font-size: 12px; color: var(--text-color); margin-top: 8px; opacity: 0.8;">
-              When enabled, the site will open in an about:blank window to hide from browser history.
-            </p>
-          </div>
+          <p><strong>Project Info:</strong></p>
+          <ul>
+            <li>Best development team was here</li>
+          </ul>
         </div>
       </div>
     </div>
 
-    <div id="game-display" class="content" style="display:none;">
-      <div class="game-play-area" id="game-play-area">
-        <button class="fullscreen-btn" id="fullscreenBtn">Fullscreen</button>
-        <iframe id="game-iframe" class="game-iframe" title="Game Display"></iframe>
+    <!-- Update Log Modal -->
+    <div id="updateLogModal" class="info-modal">
+      <div class="info-modal-content">
+        <span class="info-close" data-modal="updateLogModal">&times;</span>
+        <h2>Update Log V1.2.8</h2>
+        <div class="info-modal-body">
+          <ul>
+            <li>Fixed key system errors where it wont log you out</li>
+            <li>Jordan fixed a bunch of stuff</li>
+            <li>Improved error handling and validation</li>
+            <li>Fixed infinite loop issues in console initialization</li>
+            <li>Fixed seasonal theme date detection</li>
+          </ul>
+
+          <h4><b>Security Features</b></h4>
+          <ul>
+            <li>Hardware ID (HWID) fingerprinting</li>
+            <li>Canvas & WebGL fingerprinting</li>
+            <li>Font detection fingerprinting</li>
+            <li>Real-time device verification</li>
+          </ul>
+
+          <h4>Coming Soon</h4>
+          <ul>
+            <li>More games</li>
+            <li>Admin dashboard</li>
+          </ul>
+        </div>
       </div>
-      <br />
-      <button id="backToHomeGame">Back to Home</button>
+    </div>
+
+    <div class="container">
+      <div id="content-home" class="content">
+        <h1>Welcome to GalaxyVerse</h1>
+        <h2>[11/12/25 | 11:51]</h2> 
+        <p>Note from <b>Azrael</b> 170 requests on one key is crazy work. If you want a free key I got you 😏</p>
+        <h3>Contributors get free keys + Devs</h3>
+        
+        <div class="poxyframe">
+          <iframe src="/static/" style="width:100%; height:100vh; border:none;" title="GV Engine Frame">
+          </iframe>
+        </div>
+
+        <!-- Game of the Day Section -->
+        <!-- <div id="game-of-the-day-container"></div> -->
+
+        <!-- Credits and Update Log buttons -->
+        <div class="homepage-info-buttons">
+          <button id="creditsBtn" class="info-btn">Credits</button>
+          <button id="updateLogBtn" class="info-btn">Update Log</button>
+        </div>
+      </div>
+
+      <div id="content-gms" class="content" style="display:none;">
+        <h1>Games</h1>
+        <div class="search-container">
+          <input type="text" id="searchInput" placeholder="Search for games..." />
+          <button id="searchBtn">Search</button>
+        </div>
+        <div id="game-list" class="game-grid">
+          <!-- Game cards -->
+        </div>
+      </div>
+
+      <div id="content-about" class="content" style="display:none;">
+        <h2>About</h2>
+        <h1>Latest Note: [11/12/25 | 11:54]</h1>
+        <br>
+        <h3>I fixed the key system since there was so many people that had a key that weren't supposed to</h3>
+      </div>
+
+      <div id="content-aps" class="content" style="display:none;">
+        <h1>Apps</h1>
+        <div id="app-list" class="app-grid">
+          <!-- App cards -->
+        </div>
+        <button id="backToHomeApps">Back to Home</button>
+      </div>
+
+      <div id="content-websites" class="content" style="display:none;">
+        <h1>Websites</h1>
+        <div class="search-container">
+          <input type="text" id="websitesSearchInput" placeholder="Search websites..." />
+          <button id="websitesSearchBtn">Search</button>
+        </div>
+        <div id="websites-list" class="app-grid">
+          <!-- Website cards-->
+        </div>
+        <button id="backToHomeWebsites">Back to Home</button>
+      </div>
+
+      <div id="content-settings" class="content" style="display:none;">
+        <h1>Settings</h1>
+
+        <div class="settings-page-container">
+          <div class="settings-section">
+            <h3>Tab Cloaking</h3>
+            <div class="setting-item">
+              <label for="customTitle">Custom Title:</label>
+              <input type="text" id="customTitle" placeholder="e.g., Google" />
+            </div>
+            <div class="setting-item">
+              <label for="customFavicon">Custom Favicon URL:</label>
+              <input type="text" id="customFavicon" placeholder="e.g., https://google.com/favicon.ico" />
+            </div>
+            <div class="setting-item">
+              <label for="presetSelect">Presets:</label>
+              <select id="presetSelect">
+                <option value="">-- Select Preset --</option>
+                <option value="google">Google</option>
+                <option value="classroom">Google Classroom</option>
+                <option value="bing">Bing</option>
+                <option value="nearpod">Nearpod</option>
+                <option value="powerschool">PowerSchool</option>
+                <option value="chrome">Chrome New Tab</option>
+                <option value="edge">Edge New Tab</option>
+              </select>
+            </div>
+            <div class="setting-buttons">
+              <button id="applyBtn" class="btn-primary">Apply</button>
+              <button id="resetBtn" class="btn-secondary">Reset</button>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <h3>Theme</h3>
+            <div class="setting-item">
+              <label for="themeSelect">Select Theme:</label>
+              <select id="themeSelect">
+                <option value="original">Original (Dark Blue)</option>
+                <option value="dark">Dark Theme</option>
+                <option value="light">Light Theme</option>
+                <option value="midnight">Midnight</option>
+                <option value="ocean">Ocean</option>
+                <option value="sunset">Sunset</option>
+                <option value="forest">Forest</option>
+                <option value="purple">Purple Dream</option>
+                <option value="cyberpunk">Cyberpunk</option>
+                <option value="matrix">Matrix</option>
+                <option value="neon">Neon Lights</option>
+                <option value="fire">Fire</option>
+                <option value="ice">Ice</option>
+                <option value="retro">Retro</option>
+              </select>
+            </div>
+            <div class="setting-item">
+              <label>
+                <input type="checkbox" id="snowToggle" checked /> Enable Snow Effect
+              </label>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <h3>Panic Button</h3>
+            <div class="setting-item">
+              <label for="hotkey-input">Panic Hotkey:</label>
+              <input type="text" id="hotkey-input" placeholder="Press a key" readonly />
+              <button id="change-hotkey-btn" class="btn-small">Change</button>
+            </div>
+            <div class="setting-item">
+              <label for="redirect-url-input">Redirect URL:</label>
+              <input type="text" id="redirect-url-input" placeholder="https://google.com" />
+              <button id="change-URL-btn" class="btn-small">Change</button>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <h3>About Blank</h3>
+            <div class="setting-item">
+              <label>
+                <input type="checkbox" id="aboutBlankToggle" /> Enable About:Blank Cloaking
+              </label>
+              <p style="font-size: 12px; color: var(--text-color); margin-top: 8px; opacity: 0.8;">
+                When enabled, the site will open in an about:blank window to hide from browser history.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="game-display" class="content" style="display:none;">
+        <div class="game-play-area" id="game-play-area">
+          <button class="fullscreen-btn" id="fullscreenBtn">Fullscreen</button>
+          <iframe id="game-iframe" class="game-iframe" title="Game Display"></iframe>
+        </div>
+        <br />
+        <button id="backToHomeGame">Back to Home</button>
+      </div>
     </div>
   </div>
 
@@ -370,7 +412,10 @@
   <!-- 4. Stats tracking -->
   <script src="others/assets/scripts/stats.js"></script>
 
-  <!-- 5. Main scripts (with HWID protection integrated) -->
+  <!-- 5. Sidebar navigation -->
+  <script src="others/assets/js/sidebar.js"></script>
+
+  <!-- 6. Main scripts (with HWID protection integrated) -->
   <script src="scripts.js"></script>
 
   <!-- Iframe control functions -->
