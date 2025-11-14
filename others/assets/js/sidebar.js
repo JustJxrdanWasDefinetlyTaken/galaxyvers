@@ -1,22 +1,26 @@
-// Sidebar Navigation Handler
+// Sidebar Navigation Handler with Hover Expansion
 (function() {
   'use strict';
 
   // Wait for DOM to be fully loaded
-  document.addEventListener('DOMContentLoaded', function() {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSidebarNavigation);
+  } else {
     initSidebarNavigation();
-  });
+  }
 
   function initSidebarNavigation() {
+    console.log('🎨 Initializing hover-expandable sidebar...');
+    
     // Get all sidebar links
     const sidebarLinks = document.querySelectorAll('.sidebar-link');
+    const sidebar = document.querySelector('.sidebar');
     
     // Content sections mapping
     const contentMap = {
       'home': 'content-home',
       'games': 'content-gms',
       'apps': 'content-aps',
-      'search': 'content-gms', // Uses same as games for now
       'websites': 'content-websites',
       'settings': 'content-settings'
     };
@@ -28,6 +32,8 @@
         
         // Get the page identifier
         const page = this.getAttribute('data-page');
+        
+        console.log('📄 Switching to page:', page);
         
         // Remove active class from all links
         sidebarLinks.forEach(l => l.classList.remove('active'));
@@ -44,20 +50,35 @@
           const contentElement = document.getElementById(contentId);
           if (contentElement) {
             contentElement.style.display = 'block';
+            console.log('✅ Content displayed:', contentId);
           }
         }
 
-        // Store active page in sessionStorage
+        // Store active page
         try {
           sessionStorage.setItem('activePage', page);
         } catch (e) {
           console.warn('sessionStorage not available:', e);
         }
+
+        // Scroll to top
+        scrollToTop();
       });
     });
 
     // Restore active page on load
     restoreActivePage();
+
+    // Enhanced hover effects
+    if (sidebar) {
+      sidebar.addEventListener('mouseenter', function() {
+        console.log('🖱️ Sidebar expanded');
+      });
+
+      sidebar.addEventListener('mouseleave', function() {
+        console.log('🖱️ Sidebar collapsed');
+      });
+    }
   }
 
   function hideAllContent() {
@@ -73,7 +94,16 @@
       if (activePage) {
         const activeLink = document.querySelector(`.sidebar-link[data-page="${activePage}"]`);
         if (activeLink) {
-          activeLink.click();
+          // Simulate click to restore state
+          setTimeout(() => {
+            activeLink.click();
+          }, 100);
+        }
+      } else {
+        // Default to home if no active page
+        const homeLink = document.querySelector('.sidebar-link[data-page="home"]');
+        if (homeLink && !homeLink.classList.contains('active')) {
+          homeLink.click();
         }
       }
     } catch (e) {
@@ -82,90 +112,115 @@
   }
 
   // Handle back buttons
-  const backButtons = [
-    { id: 'backToHomeApps', target: 'home' },
-    { id: 'backToHomeWebsites', target: 'home' },
-    { id: 'backToHomeGame', target: 'home' }
-  ];
+  function setupBackButtons() {
+    const backButtons = [
+      { id: 'backToHomeApps', target: 'home' },
+      { id: 'backToHomeWebsites', target: 'home' },
+      { id: 'backToHomeGame', target: 'home' }
+    ];
 
-  backButtons.forEach(btn => {
-    const button = document.getElementById(btn.id);
-    if (button) {
-      button.addEventListener('click', function() {
-        const homeLink = document.querySelector('.sidebar-link[data-page="home"]');
-        if (homeLink) {
-          homeLink.click();
-        }
-      });
-    }
-  });
-
-  // Modal handlers
-  const creditsBtn = document.getElementById('creditsBtn');
-  const updateLogBtn = document.getElementById('updateLogBtn');
-  const creditsModal = document.getElementById('creditsModal');
-  const updateLogModal = document.getElementById('updateLogModal');
-
-  if (creditsBtn && creditsModal) {
-    creditsBtn.addEventListener('click', function() {
-      creditsModal.style.display = 'block';
-    });
-  }
-
-  if (updateLogBtn && updateLogModal) {
-    updateLogBtn.addEventListener('click', function() {
-      updateLogModal.style.display = 'block';
-    });
-  }
-
-  // Close modal functionality
-  const closeButtons = document.querySelectorAll('.info-close');
-  closeButtons.forEach(btn => {
-    btn.addEventListener('click', function() {
-      const modalId = this.getAttribute('data-modal');
-      const modal = document.getElementById(modalId);
-      if (modal) {
-        modal.style.display = 'none';
+    backButtons.forEach(btn => {
+      const button = document.getElementById(btn.id);
+      if (button) {
+        button.addEventListener('click', function() {
+          const homeLink = document.querySelector('.sidebar-link[data-page="home"]');
+          if (homeLink) {
+            homeLink.click();
+          }
+        });
       }
     });
-  });
+  }
 
-  // Close modal when clicking outside
-  window.addEventListener('click', function(e) {
-    if (e.target.classList.contains('info-modal')) {
-      e.target.style.display = 'none';
+  // Modal handlers
+  function setupModals() {
+    const creditsBtn = document.getElementById('creditsBtn');
+    const updateLogBtn = document.getElementById('updateLogBtn');
+    const creditsModal = document.getElementById('creditsModal');
+    const updateLogModal = document.getElementById('updateLogModal');
+
+    if (creditsBtn && creditsModal) {
+      creditsBtn.addEventListener('click', function() {
+        creditsModal.style.display = 'block';
+      });
     }
-  });
 
-  // Keyboard navigation (optional enhancement)
-  document.addEventListener('keydown', function(e) {
-    // Press 'H' for home
-    if (e.key === 'h' && !e.ctrlKey && !e.metaKey) {
+    if (updateLogBtn && updateLogModal) {
+      updateLogBtn.addEventListener('click', function() {
+        updateLogModal.style.display = 'block';
+      });
+    }
+
+    // Close modal functionality
+    const closeButtons = document.querySelectorAll('.info-close');
+    closeButtons.forEach(btn => {
+      btn.addEventListener('click', function() {
+        const modalId = this.getAttribute('data-modal');
+        const modal = document.getElementById(modalId);
+        if (modal) {
+          modal.style.display = 'none';
+        }
+      });
+    });
+
+    // Close modal when clicking outside
+    window.addEventListener('click', function(e) {
+      if (e.target.classList.contains('info-modal')) {
+        e.target.style.display = 'none';
+      }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        const modals = document.querySelectorAll('.info-modal');
+        modals.forEach(modal => {
+          if (modal.style.display === 'block') {
+            modal.style.display = 'none';
+          }
+        });
+      }
+    });
+  }
+
+  // Keyboard navigation
+  function setupKeyboardNav() {
+    document.addEventListener('keydown', function(e) {
+      // Only work if not typing in input
       const activeElement = document.activeElement;
-      if (activeElement.tagName !== 'INPUT' && activeElement.tagName !== 'TEXTAREA') {
+      if (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA') {
+        return;
+      }
+
+      // Press '1' for home
+      if (e.key === '1') {
         const homeLink = document.querySelector('.sidebar-link[data-page="home"]');
         if (homeLink) homeLink.click();
       }
-    }
-    // Press 'G' for games
-    if (e.key === 'g' && !e.ctrlKey && !e.metaKey) {
-      const activeElement = document.activeElement;
-      if (activeElement.tagName !== 'INPUT' && activeElement.tagName !== 'TEXTAREA') {
+      // Press '2' for games
+      if (e.key === '2') {
         const gamesLink = document.querySelector('.sidebar-link[data-page="games"]');
         if (gamesLink) gamesLink.click();
       }
-    }
-  });
-
-  // Add hover effect enhancement
-  const sidebarLinks = document.querySelectorAll('.sidebar-link');
-  sidebarLinks.forEach(link => {
-    link.addEventListener('mouseenter', function() {
-      this.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+      // Press '3' for apps
+      if (e.key === '3') {
+        const appsLink = document.querySelector('.sidebar-link[data-page="apps"]');
+        if (appsLink) appsLink.click();
+      }
+      // Press '4' for websites
+      if (e.key === '4') {
+        const websitesLink = document.querySelector('.sidebar-link[data-page="websites"]');
+        if (websitesLink) websitesLink.click();
+      }
+      // Press '5' for settings
+      if (e.key === '5') {
+        const settingsLink = document.querySelector('.sidebar-link[data-page="settings"]');
+        if (settingsLink) settingsLink.click();
+      }
     });
-  });
+  }
 
-  // Smooth scroll to top when switching pages
+  // Smooth scroll to top
   function scrollToTop() {
     window.scrollTo({
       top: 0,
@@ -173,9 +228,60 @@
     });
   }
 
-  // Add to each link click
+  // Logo click handler
+  function setupLogoClick() {
+    const logoIcon = document.querySelector('.logo-icon');
+    if (logoIcon) {
+      logoIcon.addEventListener('click', function() {
+        const homeLink = document.querySelector('.sidebar-link[data-page="home"]');
+        if (homeLink) {
+          homeLink.click();
+        }
+      });
+    }
+  }
+
+  // Initialize all features
+  setTimeout(() => {
+    setupBackButtons();
+    setupModals();
+    setupKeyboardNav();
+    setupLogoClick();
+    console.log('✅ Sidebar fully initialized');
+  }, 100);
+
+  // Add visual feedback for active state changes
+  document.addEventListener('click', function(e) {
+    if (e.target.closest('.sidebar-link')) {
+      const link = e.target.closest('.sidebar-link');
+      link.style.transform = 'scale(0.95)';
+      setTimeout(() => {
+        link.style.transform = '';
+      }, 150);
+    }
+  });
+
+  // Enhanced accessibility: Announce page changes
+  function announcePageChange(pageName) {
+    const announcement = document.createElement('div');
+    announcement.setAttribute('role', 'status');
+    announcement.setAttribute('aria-live', 'polite');
+    announcement.className = 'sr-only';
+    announcement.textContent = `Navigated to ${pageName} page`;
+    document.body.appendChild(announcement);
+    
+    setTimeout(() => {
+      announcement.remove();
+    }, 1000);
+  }
+
+  // Update link clicks to include announcements
   document.querySelectorAll('.sidebar-link').forEach(link => {
-    link.addEventListener('click', scrollToTop);
+    link.addEventListener('click', function() {
+      const page = this.getAttribute('data-page');
+      const pageName = this.querySelector('span')?.textContent || page;
+      announcePageChange(pageName);
+    });
   });
 
 })();
