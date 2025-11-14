@@ -21,7 +21,6 @@
       'home': 'content-home',
       'games': 'content-gms',
       'apps': 'content-aps',
-      'websites': 'content-websites',
       'settings': 'content-settings'
     };
 
@@ -69,7 +68,7 @@
     // Restore active page on load
     restoreActivePage();
 
-    // Enhanced hover effects
+    // Enhanced hover effects with console logging
     if (sidebar) {
       sidebar.addEventListener('mouseenter', function() {
         console.log('🖱️ Sidebar expanded');
@@ -115,7 +114,6 @@
   function setupBackButtons() {
     const backButtons = [
       { id: 'backToHomeApps', target: 'home' },
-      { id: 'backToHomeWebsites', target: 'home' },
       { id: 'backToHomeGame', target: 'home' }
     ];
 
@@ -207,13 +205,8 @@
         const appsLink = document.querySelector('.sidebar-link[data-page="apps"]');
         if (appsLink) appsLink.click();
       }
-      // Press '4' for websites
+      // Press '4' for settings
       if (e.key === '4') {
-        const websitesLink = document.querySelector('.sidebar-link[data-page="websites"]');
-        if (websitesLink) websitesLink.click();
-      }
-      // Press '5' for settings
-      if (e.key === '5') {
         const settingsLink = document.querySelector('.sidebar-link[data-page="settings"]');
         if (settingsLink) settingsLink.click();
       }
@@ -228,11 +221,11 @@
     });
   }
 
-  // Logo click handler
-  function setupLogoClick() {
-    const logoIcon = document.querySelector('.logo-icon');
-    if (logoIcon) {
-      logoIcon.addEventListener('click', function() {
+  // Moon icon click handler - goes to home
+  function setupMoonClick() {
+    const moonIcon = document.querySelector('.moon-icon');
+    if (moonIcon) {
+      moonIcon.addEventListener('click', function() {
         const homeLink = document.querySelector('.sidebar-link[data-page="home"]');
         if (homeLink) {
           homeLink.click();
@@ -246,7 +239,7 @@
     setupBackButtons();
     setupModals();
     setupKeyboardNav();
-    setupLogoClick();
+    setupMoonClick();
     console.log('✅ Sidebar fully initialized');
   }, 100);
 
@@ -283,5 +276,22 @@
       announcePageChange(pageName);
     });
   });
+
+  // Add smooth transitions for sidebar expand/collapse
+  const sidebar = document.querySelector('.sidebar');
+  if (sidebar) {
+    let expandTimeout;
+    
+    sidebar.addEventListener('mouseenter', function() {
+      clearTimeout(expandTimeout);
+      this.style.transition = 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+    });
+    
+    sidebar.addEventListener('mouseleave', function() {
+      expandTimeout = setTimeout(() => {
+        this.style.transition = 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+      }, 50);
+    });
+  }
 
 })();
