@@ -9,7 +9,7 @@
   top: 0;
   width: 70px;
   height: 100vh;
-  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  background: linear-gradient(180deg, var(--sidebar-top) 0%, var(--sidebar-mid) 50%, var(--sidebar-bottom) 100%);
   padding: 20px 0;
   display: flex;
   flex-direction: column;
@@ -43,7 +43,7 @@
   background: rgba(255, 255, 255, 0.3);
 }
 
-/* Sidebar Header with Moon */
+/* Sidebar Header with Logo */
 .sidebar-header {
   padding: 10px 0;
   text-align: center;
@@ -53,20 +53,20 @@
   align-items: center;
 }
 
-.moon-icon {
+.sidebar-logoforanzoml {
   font-size: 36px;
-  filter: drop-shadow(0 0 15px rgba(255, 223, 0, 0.6));
+  filter: drop-shadow(0 0 15px var(--sidebar-icon-glow));
   animation: float 3s ease-in-out infinite;
   cursor: pointer;
   transition: transform 0.3s ease, font-size 0.3s ease;
   min-width: 36px;
 }
 
-.sidebar:hover .moon-icon {
+.sidebar:hover .sidebar-logoforanzoml {
   font-size: 42px;
 }
 
-.moon-icon:hover {
+.sidebar-logoforanzoml:hover {
   transform: scale(1.15) rotate(15deg);
 }
 
@@ -95,7 +95,7 @@
   align-items: center;
   gap: 15px;
   padding: 14px;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--sidebar-text);
   text-decoration: none;
   border-radius: 12px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -133,7 +133,7 @@
   top: 0;
   width: 0;
   height: 100%;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
+  background: linear-gradient(90deg, var(--sidebar-hover-gradient) 0%, transparent 100%);
   transition: width 0.3s ease;
   z-index: 0;
 }
@@ -144,16 +144,16 @@
 
 /* Hover State */
 .sidebar-link:hover {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.08);
+  color: var(--sidebar-text-hover);
+  background: var(--sidebar-hover);
   transform: translateX(3px);
 }
 
 /* Active State - Gradient Background */
 .sidebar-link.active {
-  background: linear-gradient(135deg, rgba(138, 43, 226, 0.25) 0%, rgba(75, 0, 130, 0.25) 100%);
-  color: #ffffff;
-  box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
+  background: var(--sidebar-active-bg);
+  color: var(--sidebar-text-hover);
+  box-shadow: 0 4px 15px var(--sidebar-active-shadow);
   font-weight: 600;
 }
 
@@ -166,9 +166,9 @@
   transform: translateY(-50%);
   width: 4px;
   height: 60%;
-  background: linear-gradient(180deg, #ba55d3 0%, #9370db 100%);
+  background: var(--sidebar-accent-border);
   border-radius: 0 4px 4px 0;
-  box-shadow: 0 0 10px rgba(138, 43, 226, 0.6);
+  box-shadow: 0 0 10px var(--sidebar-accent-glow);
 }
 
 /* Sidebar Icons - Centered when collapsed */
@@ -190,7 +190,7 @@
 
 /* Icon Active Effect */
 .sidebar-link.active .sidebar-icon {
-  filter: drop-shadow(0 0 8px rgba(138, 43, 226, 0.6));
+  filter: drop-shadow(0 0 8px var(--sidebar-icon-active-glow));
   stroke-width: 2.8;
 }
 
@@ -275,11 +275,11 @@
     width: calc(100% - 220px);
   }
 
-  .moon-icon {
+  .sidebar-logoforanzoml {
     font-size: 32px;
   }
 
-  .sidebar:hover .moon-icon {
+  .sidebar:hover .sidebar-logoforanzoml {
     font-size: 38px;
   }
 }
@@ -294,11 +294,11 @@
     width: 200px;
   }
 
-  .moon-icon {
+  .sidebar-logoforanzoml {
     font-size: 28px;
   }
 
-  .sidebar:hover .moon-icon {
+  .sidebar:hover .sidebar-logoforanzoml {
     font-size: 34px;
   }
 
@@ -343,11 +343,11 @@
     width: 180px;
   }
 
-  .moon-icon {
+  .sidebar-logoforanzoml {
     font-size: 24px;
   }
 
-  .sidebar:hover .moon-icon {
+  .sidebar:hover .sidebar-logoforanzoml {
     font-size: 30px;
   }
 
@@ -415,11 +415,11 @@
     min-width: 16px;
   }
 
-  .moon-icon {
+  .sidebar-logoforanzoml {
     font-size: 20px;
   }
 
-  .sidebar:hover .moon-icon {
+  .sidebar:hover .sidebar-logoforanzoml {
     font-size: 26px;
   }
 
@@ -441,7 +441,7 @@
 
 /* Focus States for Keyboard Navigation */
 .sidebar-link:focus {
-  outline: 2px solid rgba(138, 43, 226, 0.6);
+  outline: 2px solid var(--sidebar-accent-glow);
   outline-offset: 2px;
 }
 
@@ -454,7 +454,7 @@
   .sidebar,
   .sidebar-link,
   .sidebar-icon,
-  .moon-icon,
+  .sidebar-logoforanzoml,
   .content,
   .sidebar-link span,
   .main-content {
