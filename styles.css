@@ -459,11 +459,11 @@ body {
   transform: rotate(90deg);
 }
 
-/* Homepage info buttons */
+/* Homepage info buttons - Adjusted positioning */
 .homepage-info-buttons {
   position: fixed;
   bottom: 30px;
-  left: 0;
+  left: 100px; /* Moved from 0 to 100px to clear the sidebar */
   right: 0;
   display: flex;
   justify-content: space-between;
@@ -720,6 +720,7 @@ body {
     align-items: center;
     gap: 15px;
     bottom: 20px;
+    left: 60px; /* Adjusted for mobile sidebar width */
     padding: 0 15px;
   }
 
