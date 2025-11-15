@@ -17,7 +17,7 @@
   <!-- Console CSS -->
   <link rel="stylesheet" href="./others/assets/css/console.css" />
 
-  <!-- Google -->
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100..900&display=swap" rel="stylesheet" />
 
   <style>
@@ -58,12 +58,9 @@
     }
 
     @keyframes pulse {
-
-      0%,
-      100% {
+      0%, 100% {
         transform: scale(1);
       }
-
       50% {
         transform: scale(1.05);
       }
@@ -102,6 +99,16 @@
       background: var(--btn-hover-bg);
       transform: scale(1.05);
       box-shadow: 0 6px 20px rgba(79, 144, 255, 0.5);
+    }
+
+    /* Proxy Frame */
+    .poxyframe {
+      width: 100%;
+      height: 100vh;
+      margin: 20px 0;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     }
   </style>
 </head>
@@ -199,9 +206,12 @@
     <div id="updateLogModal" class="info-modal">
       <div class="info-modal-content">
         <span class="info-close" data-modal="updateLogModal">&times;</span>
-        <h2>Update Log V1.2.8</h2>
+        <h2>Update Log V1.2.9</h2>
         <div class="info-modal-body">
           <ul>
+            <li>✨ NEW: Dynamic sidebar theming - Sidebar now matches selected theme colors</li>
+            <li>🎨 Enhanced theme system with 13 new sidebar-specific CSS variables</li>
+            <li>🌈 All 15 themes now have coordinated sidebar colors</li>
             <li>Fixed key system errors where it wont log you out</li>
             <li>Jordan fixed a bunch of stuff</li>
             <li>Improved error handling and validation</li>
@@ -217,10 +227,19 @@
             <li>Real-time device verification</li>
           </ul>
 
+          <h4><b>Theme Features</b></h4>
+          <ul>
+            <li>Sidebar colors automatically adjust with themes</li>
+            <li>Dark themes get darker sidebars for consistency</li>
+            <li>Light theme gets slightly darker sidebar for contrast</li>
+            <li>Each theme maintains unique color identity</li>
+          </ul>
+
           <h4>Coming Soon</h4>
           <ul>
             <li>More games</li>
             <li>Admin dashboard</li>
+            <li>Custom theme creator</li>
           </ul>
         </div>
       </div>
@@ -229,7 +248,7 @@
     <div class="container">
       <div id="content-home" class="content">
         <h1>Welcome to GalaxyVerse</h1>
-        <h2>[Nov 14 6:28 PM] Do not harrass me for keys or you will be blacklisted from this site.</h2>
+        <h2>[Nov 15 2025] Dynamic sidebar theming is now live! 🎨</h2>
         <h3>Contributors get free keys + Devs</h3>
 
         <div class="poxyframe">
@@ -251,21 +270,23 @@
           <button id="searchBtn">Search</button>
         </div>
         <div id="game-list" class="game-grid">
-          <!-- Game cards -->
+          <!-- Game cards will be dynamically loaded here -->
         </div>
       </div>
 
       <div id="content-about" class="content" style="display:none;">
         <h2>About</h2>
-        <h1>Latest Note: [11/12/25 | 11:54]</h1>
+        <h1>Latest Note: [11/15/25]</h1>
         <br>
-        <h3>I fixed the key system since there was so many people that had a key that weren't supposed to</h3>
+        <h3>✨ Dynamic sidebar theming system implemented!</h3>
+        <h3>🎨 Sidebar now matches your selected theme automatically</h3>
+        <h3>🔧 Improved theme consistency across all UI elements</h3>
       </div>
 
       <div id="content-aps" class="content" style="display:none;">
         <h1>Shortcuts</h1>
         <div id="app-list" class="app-grid">
-          <!-- App cards -->
+          <!-- App cards will be dynamically loaded here -->
         </div>
         <button id="backToHomeApps">Back to Home</button>
       </div>
@@ -304,7 +325,7 @@
           </div>
 
           <div class="settings-section">
-            <h3>Theme</h3>
+            <h3>Theme 🎨</h3>
             <div class="setting-item">
               <label for="themeSelect">Select Theme:</label>
               <select id="themeSelect">
@@ -324,6 +345,9 @@
                 <option value="retro">Retro</option>
               </select>
             </div>
+            <p style="font-size: 12px; color: var(--text-color); opacity: 0.8; margin-top: 8px;">
+              ✨ Sidebar colors automatically match your selected theme!
+            </p>
             <div class="setting-item">
               <label>
                 <input type="checkbox" id="snowToggle" checked /> Enable Snow Effect
@@ -381,7 +405,7 @@
   <!-- 1. Console system -->
   <script src="others/assets/scripts/console.js"></script>
 
-  <!-- 2. Enhanced Fingerprint System (NEW - MUST BE BEFORE SCRIPTS.JS) -->
+  <!-- 2. Enhanced Fingerprint System -->
   <script src="others/assets/scripts/fingerprint-enhanced.js"></script>
 
   <!-- 3. Games data -->
