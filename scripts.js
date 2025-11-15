@@ -665,7 +665,8 @@ function shouldAutoApplySeasonalTheme() {
             font-size: 32px;
             margin: 0 0 10px 0;
             font-weight: 700;
-          ">GalaxyVerse</h1>
+          ">GalaxyVerse</h1><br>
+          <h2>NO FREE KEYS</h2>
           
           <p style="
             color: #9ca3af;
@@ -700,7 +701,7 @@ function shouldAutoApplySeasonalTheme() {
             margin-bottom: 20px;
           ">
           <a href="https://docs.google.com/document/d/1RfHWPQ-8Kq2NDV6vxfOgquBqIKwp4OoL7K1NXkYLUEg/edit?usp=sharing" target="_blank" style="color: #4f90ff;">GalaxyVerse Policy</a><br>
-          V3.0.0 - Dual Authentication System</p>
+          V3.0.1 - Fixed key system + More games</p>
           
           <input type="text" id="keyInput" placeholder="Enter your key" style="
             width: 100%;
