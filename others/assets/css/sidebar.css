@@ -202,6 +202,12 @@
   transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Push main content when sidebar expands */
+.sidebar:hover ~ .main-content {
+  margin-left: 240px;
+  width: calc(100% - 240px);
+}
+
 /* Container Adjustment */
 .container {
   padding: 20px;
@@ -263,6 +269,12 @@
     width: calc(100% - 65px);
   }
 
+  /* Push effect for tablet landscape */
+  .sidebar:hover ~ .main-content {
+    margin-left: 220px;
+    width: calc(100% - 220px);
+  }
+
   .moon-icon {
     font-size: 32px;
   }
@@ -308,6 +320,12 @@
   .main-content {
     margin-left: 60px;
     width: calc(100% - 60px);
+  }
+
+  /* Push effect for tablet portrait */
+  .sidebar:hover ~ .main-content {
+    margin-left: 200px;
+    width: calc(100% - 200px);
   }
 
   .container {
@@ -361,6 +379,12 @@
     width: calc(100% - 55px);
   }
 
+  /* Push effect for mobile */
+  .sidebar:hover ~ .main-content {
+    margin-left: 180px;
+    width: calc(100% - 180px);
+  }
+
   .container {
     padding: 10px;
   }
@@ -403,6 +427,12 @@
     margin-left: 50px;
     width: calc(100% - 50px);
   }
+
+  /* Push effect for extra small mobile */
+  .sidebar:hover ~ .main-content {
+    margin-left: 160px;
+    width: calc(100% - 160px);
+  }
 }
 
 /* ========================================
@@ -426,7 +456,8 @@
   .sidebar-icon,
   .moon-icon,
   .content,
-  .sidebar-link span {
+  .sidebar-link span,
+  .main-content {
     animation: none;
     transition: none;
   }
