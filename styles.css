@@ -9,6 +9,21 @@
   --hover-bg: #2a2f48;
   --btn-bg: #3b466f;
   --btn-hover-bg: #4f90ff;
+  
+  /* Sidebar variables */
+  --sidebar-top: #0d1018;
+  --sidebar-mid: #0f1420;
+  --sidebar-bottom: #091229;
+  --sidebar-text: rgba(224, 230, 241, 0.75);
+  --sidebar-text-hover: #ffffff;
+  --sidebar-hover: rgba(79, 144, 255, 0.15);
+  --sidebar-hover-gradient: rgba(79, 144, 255, 0.15);
+  --sidebar-active-bg: linear-gradient(135deg, rgba(79, 144, 255, 0.25) 0%, rgba(63, 81, 181, 0.25) 100%);
+  --sidebar-active-shadow: rgba(79, 144, 255, 0.3);
+  --sidebar-accent-border: linear-gradient(180deg, #4f90ff 0%, #3f51b5 100%);
+  --sidebar-accent-glow: rgba(79, 144, 255, 0.6);
+  --sidebar-icon-glow: rgba(79, 144, 255, 0.6);
+  --sidebar-icon-active-glow: rgba(79, 144, 255, 0.6);
 }
 
 body {
@@ -463,7 +478,7 @@ body {
 .homepage-info-buttons {
   position: fixed;
   bottom: 30px;
-  left: 50px; /* Moved from 0 to 100px to clear the sidebar */
+  left: 100px;
   right: 0;
   display: flex;
   justify-content: space-between;
@@ -720,7 +735,7 @@ body {
     align-items: center;
     gap: 15px;
     bottom: 20px;
-    left: 60px; /* Adjusted for mobile sidebar width */
+    left: 60px;
     padding: 0 15px;
   }
 
